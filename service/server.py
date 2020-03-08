@@ -1,19 +1,98 @@
 #!/usr/bin/env python
+"""
+Bare HTTP server for processing stuff.
+"""
 
-from flask import Flask
+import base64
+
+from flask import Flask, Response, request, jsonify
 app = Flask(__name__)
 
-
-@app.route('/')
-def hello_world():
-    import time
-    time.sleep(20)
-    return 'Hello, World!'
+import build
+import json_funcs
 
 
-@app.route('/hw')
-def hello_world2():
-    return 'Hello, World!'
+@app.route('/build/<format>', methods=['POST'])
+def url_build(format):
+    if 'source' not in request.files:
+        return "Unprocessable entity: Require 'source' to build", 422
+
+    if format not in ('binary', 'json'):
+        return "Unprocessable entity: Format may only be 'binary' or 'json'", 422
+
+    source = request.files['source'].stream.read()
+
+    builder = build.Builder(data=source)
+    try:
+        builder.load()
+        builder.prepare_builder()
+        builder.prepare_pyro()
+        #pyro.add_command('gos')
+        #pyro.add_debug('cli')
+        #pyro.add_debug('traceswiargs')
+        builder.prepare_docker()
+        rc = builder.run()
+
+        result = builder.result
+
+        # At this point we're able to return the data back as JSON
+        if format == 'binary':
+            print("Returning binary data")
+            # We can only return the binary if there wasn't an error
+            success = True
+            content = ''
+            if result.rc != 0:
+                content = 'Failed to build, return code {}\n'.format(result.rc)
+                success = False
+            elif len(result.clipboard) == 0:
+                content = 'Failed to build, no content returned\n'
+                success = False
+            if not success:
+                content += '---- Output ----\n'
+                content += ''.join(result.output)
+                content += '\n'
+                if result.throwback:
+                    content += "---- Throwback ----\n"
+                    for tb in result.throwback:
+                        content += "Reason:    {}\n".format(tb.reason_name)
+                        content += "File:      {}\n".format(tb.filename.ro_filename)
+                        if tb.reason != 0:
+                            content += "Severity:  {}\n".format(tb.severity)
+                            content += "Line:      {}\n".format(tb.lineno)
+                            content += "Message:   {}\n".format(tb.message)
+                        content += '\n'
+                return content, 400, 'text/plain'
+
+            # Success, so let's return the correct content
+            data = result.clipboard[0].data
+            filetype = result.clipboard[0].filetype
+            return Response(data, 200, mimetype='application/riscos; name="build,{:03x}"'.format(filetype & 0xfff))
+
+        elif format == 'json':
+            print("Returning JSON data")
+            data = None
+            filetype = None
+            if len(result.clipboard) != 0:
+                data = result.clipboard[0].data
+                filetype = result.clipboard[0].filetype
+            content = {
+                    'messages': result.messages,
+                    'throwback': result.throwback,
+                    'output': result.output,
+                    'data': base64.b64encode(data) if data else None,
+                    'filetype': filetype,
+                    'rc': result.rc,
+                }
+            encoded = json_funcs.json_iterable(content)
+            return Response(encoded, 200, mimetype='application/riscos; name="build,{:03x}"'.format(filetype & 0xfff))
+
+    except Exception as exc:
+        try:
+            if builder:
+                builder.close()
+        except Exception as exc2:
+            print("Another exception in close: {}".format(exc2))
+        return "Badness: {}".format(exc), 500
 
 
 if __name__ == "__main__":

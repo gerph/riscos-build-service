@@ -77,3 +77,8 @@ class Builder(object):
 
         self.result.rc = rc
         self.result.message("Return code: {}".format(rc))
+
+    def close(self):
+        if self.pyro:
+            self.pyro.stop_server()
+        # FIXME: Stop any docker that might be running by killing it?

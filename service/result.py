@@ -30,6 +30,16 @@ class ThrowbackData(object):
                                            self.filename.ro_filename,
                                            self.message or '<no message>')
 
+    def __jsonencode__(self):
+        return {
+                'reason': self.reason,
+                'reason_name': self.reason_name,
+                'severity': self.severity,
+                'filename': self.filename.ro_filename,
+                'message': self.message,
+                'lineno': self.lineno,
+            }
+
 
 class BuildResult(object):
 
