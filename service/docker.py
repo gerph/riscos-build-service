@@ -95,14 +95,16 @@ class DockerStreamed(Docker):
 
     def __init__(self, *args, **kwargs):
         self.stream_queue = kwargs.pop('stream_queue', queue.Queue())
+        self.data_function = kwargs.pop('data_function', self.got_output)
+        self.complete_function = kwargs.pop('complete_function', self.got_complete)
         super(DockerStreamed, self).__init__(*args, **kwargs)
         self.stream = None
 
     def run(self):
         args = self.get_command()
         self.stream = streamedinput.ThreadedStreamedInput(args, shell=False, keep_stderr=True,
-                                                          data_function=self.got_output,
-                                                          complete_function=self.got_complete)
+                                                          data_function=self.data_function,
+                                                          complete_function=self.complete_function)
         self.stream.start()
         while self.stream.is_running():
             # Wait between checks for it completing
@@ -110,7 +112,6 @@ class DockerStreamed(Docker):
         return self.stream.returncode
 
     def got_output(self, data):
-        print("Got: %r" % (data,))
         self.stream_queue.put(data)
 
     def got_complete(self):

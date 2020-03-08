@@ -13,6 +13,7 @@ import urlparse
 
 import roname
 import pyro
+from rofiletypes import *
 
 
 class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -27,8 +28,8 @@ class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         length = int(content_length[0]) if content_length else 0
         body = self.rfile.read(length)
 
-        print("Received %s" % (path,))
-        print("Content type %s" % (content_type,))
+        self.server.log_message("Received %s" % (path,))
+        self.server.log_message("Content type %s" % (content_type,))
 
         if content_type:
             content_type, content_type_params = cgi.parse_header(content_type)
@@ -42,10 +43,20 @@ class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 filetype = filename.filetype
         elif content_type == 'application/json':
             body = json.loads(body)
-            import pprint
-            pprint.pprint(body)
+            filename = None
+            filetype = FILETYPE_THROWBACK
+            #import pprint
+            #pprint.pprint(body)
 
-        self.send_response(200)
+        try:
+            self.server.data_received(path, body, filename, filetype)
+            self.send_response(200)
+
+        except Exception as exc:
+            self.send_response(500, 'Internal error: {}'.format(exc))
+
+    def log_message(self, *args, **kwargs):
+        return self.server.log_message(*args, **kwargs)
 
 
 class PyroServer(pyro.Pyro):
@@ -138,15 +149,40 @@ class PyroServer(pyro.Pyro):
 
 class PyroNativeServer(PyroServer):
 
-    def __init__(self, hostname=None, port=0, scheme='http', path='/{service}', url=None):
+    def __init__(self, hostname=None, port=0, scheme='http', path='/{service}', url=None,
+                 throwback_function=None,
+                 clipboard_function=None):
         super(PyroNativeServer, self).__init__(hostname=hostname, port=port, scheme=scheme, path=path, url=url)
         self.server = None
         self.server_thread = None
         self.server_running = False
+        self.throwback_function = throwback_function
+        self.clipboard_function = clipboard_function
+
+    def data_received(self, path, data, filename, filetype):
+        if path == '/throwback':
+            if filetype == FILETYPE_THROWBACK:
+                if self.throwback_function:
+                    self.throwback_function(data)
+                return
+        elif path == '/clipboard':
+            if self.clipboard_function:
+                self.clipboard_function(data, filetype)
+
+        else:
+            raise ValueError('No handler for path {}'.format(path))
+
+    def log_message(self, format, *args):
+        """
+        Log message from the HTTP server.
+        """
+        pass
 
     def start_server(self):
         if not self.server:
             self.server = BaseHTTPServer.HTTPServer(('', self.post_port), PyroHTTPRequestHandler)
+            self.server.data_received = self.data_received
+            self.server.log_message = self.log_message
             if not self.post_port:
                 # They requested an ephemeral port, so find out what that port is.
                 self.post_port = self.server.server_address[1]

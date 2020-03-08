@@ -13,7 +13,10 @@ import roname
 from rofiletypes import *
 
 
+# Files with these extensions will be flipped to put the files into subdirectories
 translate_extension = ['.c', '.s', '.h', '.c++', '.p']
+
+# Those files that *must* be in a subdirectory to work properly
 require_subdirectory = {
         FILETYPE_C: 'c',
         FILETYPE_H: 'h',
@@ -21,6 +24,14 @@ require_subdirectory = {
         FILETYPE_PASCAL: 'p',
     }
 
+# Files in these directories have a known type
+directory_filetype = {
+        'c': FILETYPE_C,
+        'h': FILETYPE_H,
+        's': FILETYPE_OBJASM,
+        'cmhg': FILETYPE_CMHG,
+        'p': FILETYPE_PASCAL,
+    }
 
 # Our temporary directory (so that it's easy to clean up.
 tempdir = os.path.join(os.getcwd(), 'tmp')
@@ -113,16 +124,16 @@ class RISCOSSource(object):
         if unix_filename:
             # The filename will give us some hints if the prefix checks don't tell us what it is
             dirname = os.path.basename(os.path.dirname(unix_filename))
-            if dirname == 'c':
-                return FILETYPE_C
-            if dirname == 'h':
-                return FILETYPE_H
-            if dirname == 's':
-                return FILETYPE_OBJASM
-            if dirname == 'cmhg':
-                return FILETYPE_CMHG
-            if dirname == 'p':
-                return FILETYPE_PASCAL
+            filetype = directory_filetype.get(dirname)
+            if filetype:
+                return filetype
+
+            # Let's see if the extension helps?
+            (base, ext) = os.path.splitext(unix_filename)
+            if base and ext in translate_extension:
+                filetype = directory_filetype.get(ext[1:])
+                if filetype:
+                    return filetype
 
         if any(['void *' in data,
                 'int main' in data,
@@ -146,7 +157,8 @@ class RISCOSSource(object):
             return FILETYPE_CMHG
 
         if any(['\nbegin' in data and '\nend.' in data,
-                'program ' in data and ' writeln(' in data]):
+                'program ' in data and ' writeln(' in data,
+                data.startswith('program ')]):
             return FILETYPE_PASCAL
 
         # FIXME: Recognise perl?

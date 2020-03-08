@@ -28,6 +28,8 @@ class Pyro(object):
         self.config_files.append(config_file)
 
     def set_config(self, var, value):
+        if isinstance(value, bool):
+            value = 'yes' if value else 'no'
         self.configs[var] = str(value)
 
     def add_module(self, module):

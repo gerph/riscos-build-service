@@ -12,7 +12,7 @@ def register_builder(cls):
     return cls
 
 
-class BuilderBase(object):
+class ROBuilderBase(object):
     tool_name = None
     tool_command = None
 
@@ -42,7 +42,7 @@ class BuilderBase(object):
         return self.source.primary_file.ro_dirname
 
 
-class BuilderSingleFile(BuilderBase):
+class ROBuilderSingleFile(ROBuilderBase):
     tool_filetype = None
 
     def recognise(self):
@@ -54,7 +54,7 @@ class BuilderSingleFile(BuilderBase):
 
 
 @register_builder
-class BuilderJFPatch(BuilderSingleFile):
+class ROBuilderJFPatch(ROBuilderSingleFile):
     tool_name = 'JFPatch'
     tool_command = '/jfpatch'
     tool_filetype = FILETYPE_JFPATCH
@@ -78,7 +78,7 @@ class BuilderJFPatch(BuilderSingleFile):
 
 
 @register_builder
-class BuilderBASIC(BuilderSingleFile):
+class ROBuilderBASIC(ROBuilderSingleFile):
     tool_name = 'BASIC'
     tool_command = 'BASIC'
     tool_filetype = FILETYPE_BASIC
@@ -93,7 +93,7 @@ class BuilderBASIC(BuilderSingleFile):
 
 
 @register_builder
-class BuilderC(BuilderSingleFile):
+class ROBuilderC(ROBuilderSingleFile):
     tool_name = 'Norcroft C'
     tool_command = 'CC'
     tool_filetype = FILETYPE_C
@@ -115,7 +115,7 @@ class BuilderC(BuilderSingleFile):
 
 
 @register_builder
-class BuilderPascal(BuilderSingleFile):
+class ROBuilderPascal(ROBuilderSingleFile):
     tool_name = 'P2C + Norcroft C'
     tool_command = 'P2CC'
     tool_filetype = FILETYPE_PASCAL
@@ -137,7 +137,7 @@ class BuilderPascal(BuilderSingleFile):
 
 
 @register_builder
-class BuilderMakefile(BuilderBase):
+class ROBuilderMakefile(ROBuilderBase):
     tool_name = 'AMU'
     tool_command = 'AMU'
 
@@ -155,20 +155,20 @@ class BuilderMakefile(BuilderBase):
         return bool(self.source.makefile)
 
 
-class BuilderError(Exception):
+class ROBuilderError(Exception):
     pass
 
 
-def Builder(source, options=None):
+def ROBuilder(source, options=None):
     """
-    Select a Builder class based on the supplied source.
+    Select a ROBuilder class based on the supplied source.
     """
 
-    #print("Finding Builder for %r" % (source,))
+    #print("Finding ROBuilder for %r" % (source,))
     for cls in builder_classes:
-        #print("Checking builder %r" % (cls,))
+        #print("Checking ROBuilder %r" % (cls,))
         obj = cls(source, options)
         if obj.recognise():
             return obj
 
-    raise BuilderError("Unrecognised source content: {!r}".format(source))
+    raise ROBuilderError("Unrecognised source content: {!r}".format(source))
