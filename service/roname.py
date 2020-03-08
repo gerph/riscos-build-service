@@ -107,7 +107,8 @@ class RISCOSName(object):
         name = self._unix_filename
         match = native_filetype_re.search(name)
         if match:
-            name = name[:-4]
+            filetype = int(name[-3:], 16)
+            return filetype
 
         return FILETYPE_DEFAULT
 

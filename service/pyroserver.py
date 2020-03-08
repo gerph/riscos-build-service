@@ -28,8 +28,8 @@ class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         length = int(content_length[0]) if content_length else 0
         body = self.rfile.read(length)
 
-        self.server.log_message("Received %s" % (path,))
-        self.server.log_message("Content type %s" % (content_type,))
+        self.log_message("Received %s" % (path,))
+        self.log_message("Content type %s" % (content_type,))
 
         if content_type:
             content_type, content_type_params = cgi.parse_header(content_type)

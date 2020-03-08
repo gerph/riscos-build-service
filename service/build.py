@@ -69,23 +69,11 @@ class Builder(object):
 
     def run(self):
         rc = self.docker.run()
+        try:
+            self.pyro.stop_server()
+        except Exception as exc:
+            print("Failed to stop server? - {}".format(exc))
+            # And fall through
+
         self.result.rc = rc
         self.result.message("Return code: {}".format(rc))
-
-
-#sourcefile = '../example/djf-source,13c'
-#sourcefile = '../example/pt-backup.zip'
-#sourcefile = '../example/demo.c'
-sourcefile = '../example/phelloworld'
-sourcefile = '../example/bad-pascal.p'
-
-
-builder = Builder(sourcefile)
-builder.load()
-builder.prepare_builder()
-builder.prepare_pyro()
-#pyro.add_command('gos')
-#pyro.add_debug('cli')
-#pyro.add_debug('traceswiargs')
-builder.prepare_docker()
-builder.run()
