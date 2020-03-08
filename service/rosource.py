@@ -115,6 +115,9 @@ class RISCOSSource(object):
         if data.startswith(b'\x0d\x00') and data.endswith(b'\x0d\xff'):
             return FILETYPE_BASIC
 
+        if data.startswith(('REM>', 'REM >', '0REM', '10REM')):
+            return FILETYPE_BASTXT
+
         if data.startswith(b'\xc5\xc6\xcb\xc3'):
             return FILETYPE_AOF
 

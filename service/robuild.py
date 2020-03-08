@@ -93,6 +93,13 @@ class ROBuilderBASIC(ROBuilderSingleFile):
 
 
 @register_builder
+class ROBuilderBASTXT(ROBuilderBASIC):
+    tool_name = 'BASIC Text'
+    tool_command = 'BASIC'
+    tool_filetype = FILETYPE_BASTXT
+
+
+@register_builder
 class ROBuilderC(ROBuilderSingleFile):
     tool_name = 'Norcroft C'
     tool_command = 'CC'

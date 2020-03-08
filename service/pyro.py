@@ -17,6 +17,7 @@ class Pyro(object):
         self.commands = []
         self.enter_module = None
         self.internal_modules = True
+        self.timeout = None
 
     def __repr__(self):
         params = []
@@ -42,7 +43,10 @@ class Pyro(object):
         self.debugs.add(flag)
 
     def command(self):
-        args = ['pyro']
+        args = []
+        if self.timeout:
+            args.extend(['timeout', str(self.timeout)])
+        args.append('pyro')
 
         # Configuration
         for config_file in self.config_files:

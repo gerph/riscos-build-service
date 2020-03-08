@@ -12,6 +12,10 @@ import build
 import json_funcs
 
 
+# How long we'll allow things to run
+MAX_RUNTIME = 60
+
+
 @app.route('/build/<format>', methods=['POST'])
 def url_build(format):
     if 'source' not in request.files:
@@ -27,9 +31,10 @@ def url_build(format):
         builder.load()
         builder.prepare_builder()
         builder.prepare_pyro()
-        #pyro.add_command('gos')
-        #pyro.add_debug('cli')
-        #pyro.add_debug('traceswiargs')
+        builder.pyro.timeout = MAX_RUNTIME
+        #builder.pyro.add_command('gos')
+        #builder.pyro.add_debug('cli')
+        #builder.pyro.add_debug('traceswiargs')
         builder.prepare_docker()
         rc = builder.run()
 
@@ -42,10 +47,13 @@ def url_build(format):
             success = True
             content = ''
             if result.rc != 0:
-                content = 'Failed to build, return code {}\n'.format(result.rc)
+                if result.rc == 124:
+                    content = 'Execution timeout reached - terminated'
+                else:
+                    content = 'Failed to build, return code {}\n'.format(result.rc)
                 success = False
             elif len(result.clipboard) == 0:
-                content = 'Failed to build, no content returned\n'
+                content = 'No content returned\n'
                 success = False
             if not success:
                 content += '---- Output ----\n'
@@ -61,7 +69,7 @@ def url_build(format):
                             content += "Line:      {}\n".format(tb.lineno)
                             content += "Message:   {}\n".format(tb.message)
                         content += '\n'
-                return content, 400, 'text/plain'
+                return Response(content, 400, mimetype='text/plain')
 
             # Success, so let's return the correct content
             data = result.clipboard[0].data
@@ -83,8 +91,11 @@ def url_build(format):
                     'filetype': filetype,
                     'rc': result.rc,
                 }
-            encoded = json_funcs.json_iterable(content)
-            return Response(encoded, 200, mimetype='application/riscos; name="build,{:03x}"'.format(filetype & 0xfff))
+            if not data or len(data) < 1024*10:
+                encoded = json_funcs.json_iterable(content, pretty=True)
+            else:
+                encoded = json_funcs.json_iterable(content)
+            return Response(encoded, 200, mimetype='application/json')
 
     except Exception as exc:
         try:
@@ -92,6 +103,7 @@ def url_build(format):
                 builder.close()
         except Exception as exc2:
             print("Another exception in close: {}".format(exc2))
+        #raise
         return "Badness: {}".format(exc), 500
 
 
