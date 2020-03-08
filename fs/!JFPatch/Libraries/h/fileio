@@ -1,0 +1,90 @@
+/*******************************************************************
+ File:     fileio.h
+ Purpose:  File access (almost stdio.h, but not grouped together)
+ Author:   Justin Fletcher
+ Date:     09 Apr 1997
+ ******************************************************************/
+
+#ifndef  __FILEIO_H
+#define __FILEIO_H
+
+typedef struct FILE {
+  int handle;
+} FILE;
+
+#define EOF -1
+
+/*********************************************** <c> Gerph *********
+ Function:     fopen
+ Description:  Open a file
+ Parameters:   name-> filename
+               mode-> mode string (r, w, a with + added for appending)
+ Returns:      pointer to file block, NULL if error
+ ******************************************************************/
+extern FILE *fopen(char *file,char *mode);
+
+/*********************************************** <c> Gerph *********
+ Function:     fclose
+ Description:  Close a file
+ Parameters:   file-> file block
+ Returns:      0
+ ******************************************************************/
+extern int fclose(FILE *file);
+
+/*********************************************** <c> Gerph *********
+ Function:     feof
+ Description:  Check for end of file
+ Parameters:   file-> file block
+ Returns:      0 if not at eof
+ ******************************************************************/
+extern int feof (FILE *file);
+
+/*********************************************** <c> Gerph *********
+ Function:     fgetc
+ Description:  Get a character from a file
+ Parameters:   file-> file block
+ Returns:      character, or EOF if invalid
+ ******************************************************************/
+extern int fgetc (FILE *file);
+
+/*********************************************** <c> Gerph *********
+ Function:     putc
+ Description:  Write a character to the screen
+ Parameters:   ch = character
+ Returns:      none
+ ******************************************************************/
+extern void putc(char ch);
+
+/*********************************************** <c> Gerph *********
+ Function:     puts
+ Description:  Write a string to the screen
+ Parameters:   s = string
+ Returns:      none
+ ******************************************************************/
+extern void puts(char *s);
+
+/*********************************************** <c> Gerph *********
+ Function:     putnl
+ Description:  Write a newline to the screen
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+extern void putnl(void);
+
+/*********************************************** <c> Gerph *********
+ Function:     getc
+ Description:  Get a character from keyboard
+ Parameters:   none
+ Returns:      character
+ ******************************************************************/
+extern char getc(void);
+
+/*********************************************** <c> Gerph *********
+ Function:     gets
+ Description:  Gets a string from the keyboard
+ Parameters:   string-> block to store in
+ Returns:      pointer to string
+ ******************************************************************/
+extern char *gets(char *);
+
+#endif

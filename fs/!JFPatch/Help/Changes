@@ -1,0 +1,328 @@
+Changes in 2.55ﬂ (partial releases were 2.54ﬂ)
+----------------
+è Multiple entries in 'Events' blocks now work - previously they did
+  everything except claim the vector.
+è MemCpy routine added to AOF code.
+è EgCode added in case people want it.
+è Service call handler code isn't quite as intelligent as first thought.
+  Produces things like :
+   SUB     R0,R1,#&00100000
+   SUB     R0,R0,#&00023000
+   SUB     R0,R0,#&0400
+   SUB     R0,R0,#&40
+   SUB     R0,R0,#&10
+   SUB     R0,R0,#4
+   TEQ     R0,#2
+  For &123456, which some might argue was slightly sub-optimal.
+  Now slightly more optimal (move, and increased tap bits)
+   SUB     R0,R1,#&00120000
+   SUB     R0,R0,#&3400
+   TEQ     R0,#&56
+  which is kinda better.
+  Also, instead of re-starting the subtractions afresh each time, the value
+  will only be recalculated if it would generate more than two subtractions.
+  This may not be amazingly optimal, but without a full search it will
+  suffice. Test includes miscellaneous ridiculous service numbers to test the
+  optimisation code.
+  To facilitate these changes the services list is now sorted and each
+  routine requiring a service must supply two pieces of code, one for when
+  the user specifies a service handler (now decrecated), and one for the
+  auto-generated form. Autogeneration is much more preferable.
+è Ursula style module service blocks added. As the current dispatch handler
+  /is/ the reject handler in JFPatch modules, it is not possible to seperate
+  them. However it is intended that this situation be changed in the near
+  future.
+è Added choice of relocation routine in AOF modules with
+    AOFRELOC   <routine>
+è Added JB's cunning LDR/ADR :
+    LDR    <x>,|label|
+    ADR    <x>,|label|
+  Note: These do NOT use LTORG as you may have used in other assemblers.
+è Multiple post filter reason codes can now be filtered off and combined with
+  unknown reason code processors (which no longer worked in 2.53 :-(
+
+
+Changes in 2.53ﬂ  (partial releases were 2.52ﬂ2)
+----------------
+è Filenames localised differently; most places that include filenames (eg In,
+  Out, #Include, #Load) now use a generic 'localfile' routine meaning that
+  any filename with no path information in it (ie no .'s or :'s) will be
+  assumed to be in the source file directory; those with path information are
+  assumed to be absolute, /except/ those starting with @ which are localised
+  to the source file directory. It makes more sense when you use it than
+  written down !
+è Added MessageFile fix (Johnathan Brady) - what did I write last time ? Was
+  it complete cack or am I just imagining the code I saw ? :-)
+è Added Resources block (Johnathan Brady) :
+    Resources
+      <local file>  <resource file>
+    End Resources
+  Note: 2nd parameter is the filename of the resource file, if you give this
+  a different leaf name to the local file then it'll use that leaf name.
+  Note 2: If you use a directory it'll include that directory as the resource
+  file name and all of it's children.
+  Local files follow the same regime as the In and Out directives described
+  above.
+  #Here Resources will include the resources at a particular location, or at
+  the end of the code if not specified.
+  JB's routines slightly optimised at basic sides.
+è Expanded list of people beta-testing to :
+    Chris Johns <cmj@eh.org>
+    Phil Norman <P.C.F.Norman@exeter.ac.uk>
+    Jonathan Brady <cs0u71d9@liverpool.ac.uk>
+    (Is matt interested?)
+  Will other people wishing to test /please/ contact me to be added to this
+  list. Similarly, suggestions for people who wouldn't mind would be good.
+  Testing means that you're happy to put up with more bugs than usual in
+  JFPatch and suggest both ideas and possible fixes. Not all will be
+  implemented but that's true of anything.
+è Workspace checks now include `len_<wsname> (Johnathan Brady), but I don't
+  see much of a use for this except in the context of ADRW when creating an
+  FD stack. These routines will soon be moved elsewhere to cope with CAS/RAS.
+è FNshowreg improved to use ConvertInteger instead of adding a - and calling
+  ConvertCardinal; this saves all of three instructions per REM "%r#" call
+  (!).
+è Output buffering doubled to 16k (text) and 4k (debug).
+è 'Flags Token' now added to definition of commands.
+è In Post-Filter code, the 'Code' entry may now be of two forms :
+     Code    <label>
+  The standard form, with usage as before, and also
+     Code    <reason>    <label>
+  The extended form with all the checking of the conditions done for you.
+  Mask/Accept need not be specified, but if it is /must/ preceed the Code
+  entries. Multiple entries of the form /are/ allowed and will be cumulative.
+  Use of the standard form and the extended form are allowed, but you will
+  need to use 'Mask <value>' or 'Accept <reason>' if you wish to use these
+  as otherwise you will never actually see the reasons. Similarly, the
+  standard form will never see those codes catered for by the extended codes.
+è Tiny optimisation means that Modules with the same name as their SWI prefix
+  will only include one instance of the name.
+è ImageFS handling blocks added :
+   ImageFS
+    Type     <filetype>
+    Open     <label>
+    Close    <label>
+    Args     <label>
+    Get      <label>
+    Put      <label>
+    Func     <label>
+    File     <label>
+    Flags    <flags>
+   End ImageFS
+  Only 'Type' is required, but without the rest it won't do much
+  'Flags' may be given many times, and may be preceeded by - to negate.
+    Flag                  bit to set (see manuals)
+    TellWhenFlushing             27
+  This has not been tested hardly; use at your own risk :-)
+è Normal filing system block added :
+   FS
+    Name     <fs name>
+    Startup  <fs startup text> | -
+    Number   <fs number>
+    Files    <number of open files> | Infinite
+    Open     <label>
+    Close    <label>
+    Args     <label>
+    Get      <label>
+    Put      <label>
+    Func     <label>
+    File     <label>
+    GBPB     <label>
+    Flags    <flags>
+   End FS
+  'Name', 'Number' and 'Files' are required. Startup text of - will use Func
+  17 to display FS name.
+  'Flags' may be given many times, and may be preceeded by - to negate.
+    Flag                  bit to set (see manuals)
+    SpecialFields                31
+    InteractiveStreams           30
+    NullFilenames                29
+    AlwaysOpenFiles              28
+    TellWhenFlushing             27
+    SupportsFile9                26
+    SupportsFunc20               25
+    SupportsFunc18               24
+    SupportsImageFS              23
+    UseURDLib                    22
+    NoDirectories / NoDirs       21
+    NeverLoad / UseOpenGetClose  20
+    NeverSave / UseOpenPutClose  19
+    UseFunc9                     18
+    ReadOnly                     16
+    SupportsFile34               ext 0
+    SupportsCat                  ext 1
+    SupportsEx                   ext 2
+  This has not been tested hardly; use at your own risk :-)
+  FS names has been optimised to use the module name /if/ this is the same;
+  similarly the startup text.
+è Fixed bug in module help worker-outer to append more tabs if required. The
+  code's been there since /really/ early versions but has only ever fired on
+  single character module names because it was severely broken.
+
+
+Changes in 2.52ﬂ
+----------------
+è Changed the function of the ERR macro. This used to embed an
+  'OS_GenerateError' block into some code. Now it embeds an error block;
+  syntax is :
+    ERR <number>,<string>
+è Added REMF and REMFP variants of the REM macro; these /will/ preserve the
+  flags and the link register...
+
+
+Changes in 2.51ﬂ
+----------------
+è Output buffering added. This isn't at all impressive, but seemed like an
+  interesting and useful optimisation to have. Maybe it won't thrash the
+  drive on Chris' machine, or maybe it will - I'll have to see.
+è Output buffering on debug data added. As above this appears to make very
+  little difference to the performance, but as I'm timing things using the
+  seconds numbers on !Alarm I reserve the right to be wrong. For those of
+  interest, the buffers are 8k for the main BasTxt file and 2k for the debug
+  data. Since BasTxt files tend to be rather large I may up this some time
+  soon.
+è Bug fixes in 2.50ﬂ's dictionary encoding code, and optimised encoding's now
+  mean that entries including the token 0 will not fail to be compressed to
+  their minimal form.
+è Release to Chris Johns and Phil Norman. I don't actually know who else uses
+  it... I wish people would contact me - if only to report bugs !
+
+
+Changes in 2.50ﬂ
+----------------
+è printf improved to include %d for cmj
+è memcpy added (suboptimal but works!) (currently only on cmj's machine)
+è Pre/PostFilter code handlers in AOF mode didn't work previously - now fixed
+è WimpSWIs didn't work since about 2.46ﬂ where I tried optimising the code;
+  both WimpSWIs and Filter code should be vaguely optimal
+è SWIs block now allows for 'Pre' and 'Post' handler code - this should allow
+  you to do things before we check the SWI number and after we return from the
+  SWI call
+è Extra info string has been added (for Module block) to allow you to describe
+  a module more fully (eg, ARM3 variant, etc) on the help line.
+è Syntax strings will now have the OS dictionary for RO3.1 substituted into
+  them
+è Looks like strings can have embedded variable expressions in them (I've no
+  idea when I added this); things like Help blocks can have {<expr>} to
+  indicate that the <expr> can be embedded - eg, This was compiled {TIME$}
+  Just goes to show what you can learn when you read your own programs!
+
+
+Changes in 2.49ﬂ
+----------------
+è Added Phil Norman's divide routine to the 'Libraries' directory (at last!),
+  as well as another Divide routine I got from 'jonboy' on IRC.
+è Partial messages file support added ('jonboy')
+è InsBranch library added; similar to Patch, but useful when you don't care
+  what you've patched, or need to patch a branch table, etc... ('jonboy')
+è Strings library updated to use 'nice-upper' code extracted from RiscOS :-)
+è SWI out of range now uses MessageTrans rather than 'knowing' the error
+  ('jonboy')
+è Added 'printf' library for making debugging in C easier (yay!)
+è Fixed and optimised a few string routines.
+
+
+Changes in 2.48ﬂ
+----------------
+è 'Type AOFModule' is now depreciated; you should use 'Type AOF Module'
+  instead; new syntax is 'Type AOF [<subtype> [<subtype>]...]' where
+  <subtype> may be Module or Debug.
+  The current implementation of Debug, whilst looking correct seems to
+  crash ddt; I recommend that you avoid the debug option for the time being.
+è Released to Chris Johns, Phil Norman and 'jonboy' (who I've forgotten the
+  name of!)
+
+
+Changes in 2.47ﬂ
+----------------
+è REM storage space moved onto stack rather than inside code. This should
+  allow you to /really/ say READONLY in AOF with REM's in them.
+è WARNING: Do NOT use WimpSWI Post trap code prior to this version; pretrap
+  code will be called instead !!!!
+è In AOF, any exported label followed by the word ENTRY will be made the
+  execution entry point for this file.
+
+
+Changes in 2.46ﬂ
+----------------
+è Minor bugs in AOF handling fixed
+è Fixed bug with $$ - this now translates to $ correctly if macros are not in
+  use
+
+
+Changes in 2.45ﬂ
+----------------
+è Arrgghh... fixed nasty bug in the WimpSWIve claim routines ;-(
+  This should stop the table being included twice and r0 being corrupted
+  randomly in the init code !
+è Don't even think about using |'s around WimpSWIve stuff - it doesn't work,
+  I've got to work out how to get the right addresses in there - atm it's
+  using offsets for normal variables, and addresses for |'s - I need a
+  consistant interface internally - I don't want conversions on the fly if I
+  can help it ;-(
+è CAS and RAS macros added. Don't expect anything special from them though.
+è I think CodePrefix actually works now... Need to check this really though.
+è TaskWindow error handling improved.
+è Includes now work correctly (inline, rather than at end)
+
+
+Changes in 2.44ﬂ
+----------------
+è Multiple areas now supported correctly.
+è AOFModule now allows |label| style labels for the most part - if there's one
+  I've missed please tell me :-)
+è Relocation of symbols where they are both exported and local now works if the
+  first instance was a reference and not a definition.
+è Filters /may/ not work on AOFModules. This is untested.
+è WimpSWIs /do/ work with AOFModules.
+è EQUD |routine| will store the /absolute/ address, not the relative one -
+  ideas as to how to fiddle this are greatfully appreciated :-)
+è strdup added to j.memory.
+è astrcmp added - this is an assembler style string compare - it returns EQ,
+è LT, GT, etc rather than -1,0,+1 as in C. There is no C header for this.
+è Events, Services, Vectors, init, final & service have not been tested for use
+  with AOF functions.
+è Some re-organisation of the internals of the filters code means that it is no
+  longer restricted to the 64k previously available - this takes one extra
+  word and I'm not happy with it - I'd rather the use of that style of function
+  was restricted to AOFModule only, then standard Module types could have the
+  luxury of an extra instruction with the knowledge that they cannot exceed 64k
+  of code (!)
+
+Notes:
+è Remember: strcpy copies from r1 to r0 NOT r0 to r1.
+è Filters using Accept are unstable - be careful to check /explicitly/ for the
+  reason you want. Unfortunately ToolBox passes ridiculously big reasons down
+  to the application - it's difficult to mask reason 17 million if you've
+  only got a 32 bit word to use :-(
+è Am considering making the jfplib functions into a seperate area each - the
+  overheads will be minimal and non-existant when linked, but /only/ the
+  required routines will be linked and link can ditch those we don't want.
+
+
+Changes in 2.43ﬂ
+----------------
+è Added > macro command to embed function name before routine
+è #CodePrefix <bool> will modify this variable.
+è <bool> is now allowed to be =<file> which evaluates to TRUE if the file
+  exists but is empty, and the boolean value of the contents of that file
+  otherwise. The latter form is prefered.
+è Matthew Godbolts main routine included in the jfplib library,
+  SkipWhitespace and SkipNonWhitespace added to string.j, puts (writes a
+  string), putnl (new line), updated headers.
+
+
+Changes in 2.41ﬂ
+----------------
+è Fixed bug in Event handler code (DON'T use workspace in events prior to this
+  version :-( )
+è Added LO and HS to the list of conditionals accepted.
+
+
+Changes in 2.40ﬂ over 2.33
+--------------------------
+è Macros are slightly more stable - still not brilliant though.
+è AOF compilation now possible - again, not brilliant, but it works !
+è REM's now optimised; should cut quite a size off debugging code.
+è Minor modifications to allow tabs - not complete but getting there.
+è Error handling slightly improved - now allows errors returned using ABEX.

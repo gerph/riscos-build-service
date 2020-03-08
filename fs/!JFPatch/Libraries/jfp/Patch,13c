@@ -1,0 +1,112 @@
+LIBRARY Patch
+
+>patch
+; *******************************************************************
+; Subroutine:   patch
+; Description:  patches a memory location so that it redirects via
+;               your routine first
+; Parameters:   r0-> location to patch
+;               r1-> new routine
+;               r2-> return block (4 words)
+; Returns:      none
+; Note:         Will NOT work if the first instruction relies on pc
+;               being a particular value. The main examples are
+;               OS_WriteS and [LDR|STR] rx,[pc,#x].
+; *******************************************************************
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+; first copy the first instruction
+   STR     r0,[r2,#8]                    ; store the old address for later
+   LDR     r3,[r0]                       ; read contents of address
+   STR     r3,[r2,#12]                   ; store for restoring later
+   AND     r4,r3,#&0F000000              ; find out the type of instruction
+   CMP     r4,#&0A000000                 ; is it a Bxx ?
+   CMPNE   r4,#&0B000000                 ; or a BLxx ?
+   BNE     $notspecial                   ; if not, skip this bit
+; we need to modify the instruction so that it is relative to the patch
+   BIC     r4,r3,#&FF000000              ; clear the the instruction bit
+   MOV     r4,r4,LSL #2                  ; make into word offset
+   TST     r4,#&02000000                 ; was it -ve ?
+   ORRNE   r4,r4,#&FC000000              ; sign extend if it was
+   ADD     r4,r4,r0                      ; add to the address we are patching
+; this address is already pipelined
+   REM     "Original address was %&4"
+   SUBS    r4,r4,r2                      ; the address we are coming from
+   BICMI   r4,r4,#&FC000000              ; clear top byte if -ve
+   MOV     r4,r4,LSR #2                  ; divide by 4 and move to reg 3
+   AND     r5,r3,#&FF000000              ; get the instruction type
+   ADD     r3,r4,r5                      ; add it on
+$notspecial
+   STR     r3,[r2]                       ; store at return block
+   SUB     r1,r1,#8                      ; take off 8 for pipelining
+   SUBS    r1,r1,r0                      ; find the difference
+   BICMI   r1,r1,#&FC000000              ; clear top byte if -ve
+   MOV     r1,r1,LSR #2                  ; divide by 4
+   ADD     r1,r1,#&EA000000              ; add BAL instruction
+   STR     r1,[r0]                       ; store in place of old instruction
+; now the 'return' branch
+   ADD     r1,r0,#4                      ; we will return to the next inst
+   ADD     r0,r2,#4                      ; the return instruction pointer
+   SUB     r1,r1,#8                      ; take off for pipelining
+   SUBS    r1,r1,r0                      ; the difference
+   BICMI   r1,r1,#&FC000000              ; clear top byte
+   MOV     r1,r1,LSR #2                  ; divide by 4
+   ADD     r1,r1,#&EA000000              ; add B instruction
+   STR     r1,[r2,#4]                    ; the 'real' code caller
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>unpatch
+; *******************************************************************
+; Subroutine:   unpatch
+; Description:  unpatch a routine, removing it's hook
+; Parameters:   r0-> our return block (4 words)
+; Returns:      none
+; *******************************************************************
+   STMFD   (sp)!,{r0-r2,link}            ; Stack registers
+   LDR     r2,[r0,#0]                    ; read our instruction
+   CMP     r2,#0                         ; is it already unpatched ?
+   BEQ     $exit                         ; if so, jump out
+   LDR     r2,[r0,#12]                   ; read original instruction
+   LDR     r1,[r0,#8]                    ; read original address
+   STR     r2,[r1]                       ; replace the instruction
+   MOV     r0,#0                         ; mark as unpatched
+   STR     r0,[r0]                       ; and store in block
+$exit
+   LDMFD   (sp)!,{r0-r2,pc}              ; Return from call
+
+>patch_simple
+; *******************************************************************
+; Subroutine:   patch_simple
+; Description:  patches a memory location so that it redirects via
+;               your routine first - this version won't cope with
+;               branches and you should only use it if you KNOW that
+;               the patched code should never contain a B or BL as it's
+;               first instruction.
+; Parameters:   r0-> location to patch
+;               r1-> new routine
+;               r2-> return block (4 words)
+; Returns:      none
+; Note:         Will NOT work if the first instruction is a branch or
+;               other PC reliant instruction.
+; *******************************************************************
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+; first copy the first instruction
+   STR     r0,[r2,#8]                    ; store the old address for later
+   LDR     r3,[r0]                       ; read contents of address
+   STR     r3,[r2,#12]                   ; store for restoring later
+   STR     r3,[r2]                       ; store at return block
+   SUB     r1,r1,#8                      ; take off 8 for pipelining
+   SUBS    r1,r1,r0                      ; find the difference
+   BICMI   r1,r1,#&FC000000              ; clear top byte if -ve
+   MOV     r1,r1,LSR #2                  ; divide by 4
+   ADD     r1,r1,#&EA000000              ; add B instruction
+   STR     r1,[r0]                       ; store in place of old instruction
+; now the 'return' branch
+   ADD     r1,r0,#4                      ; we will return to the next inst
+   ADD     r0,r2,#4                      ; the return instruction pointer
+   SUB     r1,r1,#8                      ; take off for pipelining
+   SUBS    r1,r1,r0                      ; the difference
+   BICMI   r1,r1,#&FC000000              ; clear top byte
+   MOV     r1,r1,LSR #2                  ; divide by 4
+   ADD     r1,r1,#&EA000000              ; add B instruction
+   STR     r1,[r2,#4]                    ; the 'real' code caller
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call

@@ -1,0 +1,5 @@
+program myprogram;
+
+begin
+    writeln('Hello, World!');
+end.

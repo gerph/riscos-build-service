@@ -1,0 +1,5 @@
+| RunPatch file to call the Patch program 
+| Patch will then make the code required
+| and then if -Run set will compile the module
+WimpSlot -Min 256k -Max 256k
+Run <JFPatch$Dir>.Code.Patch -hourglass %*0

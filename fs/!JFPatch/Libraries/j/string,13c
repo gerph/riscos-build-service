@@ -1,0 +1,216 @@
+In   -
+Out  string
+Type AOF
+Ver  1.01t
+
+#Area "JFP:String:strlen" Code ReadOnly
+#Rem =Rem
+#CodePrefix =Prefix
+; *******************************************************************
+; Subroutine:   strlen
+; Description:  Finds a strings length
+; Parameters:   r0-> string
+; Returns:      r0 = length (excluding terminator)
+; *******************************************************************
+>|strlen|
+   STMFD   (sp)!,{r2,link}
+   REM     "Finding length of %$0"
+   MOV     r14,#0
+$loop
+   LDRB    r2,[r0,r14]
+   CMP     r2,#0
+   ADDNE   r14,r14,#1
+   BNE     $loop
+   MOV     r0,r14
+   LDMFD   (sp)!,{r2,pc}^
+
+#Area "JFP:String:strcpy" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strcpy
+; Description:  Copy a string
+; Parameters:   r0-> block to copy to
+;               r1-> string to copy
+; Returns:      r0-> new copy of string (with null)
+; *******************************************************************
+>|strcpy|
+   STMFD   (sp)!,{r0,r1,link}
+   REM     "Copying %$1"
+$loop
+   LDRB    r14,[r1],#1
+   STRB    r14,[r0],#1
+   TEQ     r14,#0
+   BNE     $loop
+   LDMFD   (sp)!,{r0,r1,pc}^
+
+#Area "JFP:String:strcat" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strcat
+; Description:  Copy a string on to the end of another
+; Parameters:   r0-> block to copy to
+;               r1-> string to copy
+; Returns:      r0-> new copy of string (with null)
+; *******************************************************************
+>|strcat|
+   STMFD   (sp)!,{r0,r1,link}
+   REM     "Cating %$1 on to %$0"
+$loop1
+   LDRB    r14,[r0],#1
+   TEQ     r14,#0
+   LDRNEB  r14,[r0],#1
+   TEQNE   r14,#0
+   BNE     $loop1
+   SUB     r0,r0,#1
+$loop
+   LDRB    r14,[r1],#1
+   STRB    r14,[r0],#1
+   TEQ     r14,#0
+   BNE     $loop
+   LDMFD   (sp)!,{r0,r1,pc}^
+
+#Area "JFP:String:Conv" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strtoul
+; Description:  string to unsigned long int conversion
+; Parameters:   r0-> string
+;               r1-> where to store the end of the string
+;               r2 = base for conversion
+; Returns:      r0 = value, or 3<<30 if error
+; *******************************************************************
+>|strtoul|
+   STMFD   (sp)!,{link}                  ; Stack registers
+   MOV     r3,r1                         ; r3-> result location
+   MOV     r1,r0                         ; r1-> string
+   XSWI    "XOS_ReadUnsigned",r2         ; convert it
+   MOVVS   r2,#3<<30                     ; if error, mark as such
+   STR     r1,[r3]                       ; store the end location
+   MOV     r0,r2                         ; r0 = value
+   LDMFD   (sp)!,{pc}^                   ; Return from call
+
+#Area "JFP:String:AssemblerStyle" Code ReadOnly
+; *******************************************************************
+; Subroutine:   astrcmp
+; Description:  Assembler compares two strings
+; Parameters:   r0-> string
+;               r1-> string
+; Returns:      EQ if same, GT if higher, LT if less
+; *******************************************************************
+>|astrcmp|
+   STMFD   (sp)!,{r0-r4,link}            ; Stack registers
+$loop
+   LDRB    r2,[r0],#1                    ; get byte from c1
+   LDRB    r3,[r1],#1                    ; get byte from c2
+   CMP     r2,#32                        ; c1 ctrl ?
+   MOVLT   r2,#0                         ; y=set to 0
+   CMP     r3,#32                        ; c2 ctrl ?
+   MOVLT   r3,#0                         ; y=set to 0
+   CMP     r2,r3                         ; compare
+   BNE     $notfound                     ; if not same, then return flags
+   CMP     r2,#0                         ; end of line ?
+   BNE     $loop                         ; if not, then next character
+$notfound
+   LDMFD   (sp)!,{r0-r4,pc}              ; Return from call
+
+#Area "JFP:String:strcmp" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strcmp
+; Description:  Compares two strings
+; Parameters:   r0-> string
+;               r1-> string
+; Returns:      r0 = if same, 1 if r0 > r1, -1 if less
+; *******************************************************************
+>|strcmp|
+   STMFD   (sp)!,{r1-r3,link}            ; Stack registers
+$loop
+   LDRB    r2,[r0],#1                    ; get byte from c1
+   LDRB    r3,[r1],#1                    ; get byte from c2
+   CMP     r2,#32                        ; c1 ctrl ?
+   MOVLT   r2,#0                         ; y=set to 0
+   CMP     r3,#32                        ; c2 ctrl ?
+   MOVLT   r3,#0                         ; y=set to 0
+   CMP     r2,r3                         ; compare
+   BNE     $notfound                     ; if not same, then return flags
+   CMP     r2,#0                         ; end of line ?
+   BNE     $loop                         ; if not, then next character
+$notfound
+   SUB     r0,r2,r3                      ; difference in ascii value
+   LDMFD   (sp)!,{r1-r3,pc}^             ; Return from call
+
+#Area "JFP:String:strncmp" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strncmp
+; Description:  Compares two strings
+; Parameters:   r0-> string
+;               r1-> string
+;               r2 = length to compare (max)
+; Returns:      r0 = 0 if same, 1 if lower, -1 if higher
+; *******************************************************************
+>|strncmp|
+   STMFD   (sp)!,{r1-r4,link}            ; Stack registers
+$loop
+   LDRB    r4,[r0],#1                    ; get byte from c1
+   LDRB    r3,[r1],#1                    ; get byte from c2
+   CMP     r4,#32                        ; c1 ctrl ?
+   MOVLT   r4,#0                         ; y=set to 0
+   CMP     r3,#32                        ; c2 ctrl ?
+   MOVLT   r3,#0                         ; y=set to 0
+   CMP     r4,r3                         ; compare
+   BNE     $notfound                     ; if not same, then return flags
+   SUBS    r2,r2,#1                      ; decrement length (are we done?)
+   CMPNE   r4,#0                         ; or is it the end of line ?
+   BNE     $loop                         ; if not, then next character
+$notfound
+   MOVLT   r0,#1                         ; if <, return 1
+   MVNGT   r0,#NOT -1                    ; if >, return -1
+   MOVEQ   r0,#0                         ; if =, return 0
+   LDMFD   (sp)!,{r1-r4,pc}              ; Return from call
+
+#Area "JFP:String:Strdup" Code ReadOnly
+; *******************************************************************
+; Subroutine:   strdup
+; Description:  Duplicate a string
+; Parameters:   r0-> string
+; Returns:      r0-> new string, or 0 if failed
+; *******************************************************************
+>|strdup|
+   STMFD   (sp)!,{r1,link}               ; Stack registers
+   REM     "Strdup of %$0"
+   MOV     r1,r0                         ; hang onto pointer
+   BL      |strlen|                      ; find length of string
+   ADD     r0,r0,#1                      ; including terminator
+   BL      |malloc|                      ; claim space for it
+   CMP     r0,#0                         ; did claim fail ?
+   BLNE    |strcpy|                      ; copy string
+   LDMFD   (sp)!,{r1,pc}^                ; Return from call
+
+#Area "JFP:String:writeunsigned" Code ReadOnly
+; *******************************************************************
+; Subroutine:   writeunsigned
+; Description:  write an unsigned number into a string
+; Parameters:   r0-> destination
+;               r1 = number
+; Returns:      pointer to end of string
+; *******************************************************************
+>|writeunsigned|
+   STMFD   (sp)!,{r1-r2,link}            ; Stack registers
+   SWAP    r0,r1                         ; swap them
+   XSWI    "XOS_ConvertCardinal4",,,11   ; do it
+   MOVVC   r0,r1                         ; r0-> end of string
+   MOVVS   r0,#0                         ; if failed, r0 = 0
+   LDMFD   (sp)!,{r1-r2,pc}              ; Return from call
+
+#Area "JFP:String:writehex" Code ReadOnly
+; *******************************************************************
+; Subroutine:   writehex
+; Description:  write an hex number into a string
+; Parameters:   r0-> destination
+;               r1 = number
+; Returns:      pointer to end of string
+; *******************************************************************
+>|writehex|
+   STMFD   (sp)!,{r1-r2,link}            ; Stack registers
+   SWAP    r0,r1                         ; swap them
+   XSWI    "XOS_ConvertHex8",,,9         ; do it
+   MOVVC   r0,r1                         ; r0-> end of string
+   MOVVS   r0,#0                         ; if failed, r0 = 0
+   LDMFD   (sp)!,{r1-r2,pc}              ; Return from call
+

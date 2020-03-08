@@ -1,0 +1,215 @@
+                               The Strings Library
+                               ===================
+
+Introduction
+------------
+This is a quite simple library which I tend to use when I'm feeling lazy and
+can't be bothered to write another set of routines to do identical things.
+The names are *not* those of the C calls of the same type, so you should be
+careful about what you are writing :-)
+
+The routines are :
+  left         : equates to LEFT$(
+  right        : equates to RIGHT$(
+  mid          : equates to MID$(
+  cmpstring    : case sensitive ctrl terminated string comparison
+  cmpstringi   : case insensitive ctrl terminated string comparison
+  cmpwildcard  : wildcarded ctrl terminated string comparison
+  cmpwildcardi : wildcarded insensitive ctrl terminated string comparison
+  move         : string copying (no overlaps)
+  strcpy       : ctrl terminated string copying (no overlaps)
+  instr        : equates to INSTR(
+  len          : equates to LEN( (specified terminator)
+  strlen       : equates to LEN( (ctrl terminated)
+  val          : equates to VAL( (simple decimal evaluation)
+  lower        : change string to lower case
+  upper        : change string to upper case
+  getlinefromfile : equates to GET$#
+  get          : similar, but with forward or reverse directions
+  put          : equates to BPUT# for strings
+  putline      : equates to BPUT# for strings using ctrl-terminators
+
+Note: The routines strcpy and strlen were previously known as movectrl and
+lenctrl respectively.
+
+I'll just pop off and describe them all, shall I ?
+
+
+left
+----
+=> r0-> input string
+   r1-> output buffer
+   r2 = terminator
+   r3 = number of characters
+
+Performs r1=LEFT$(r0,r3)
+
+
+right
+-----
+=> r0-> input string
+   r1-> output buffer
+   r2 = terminator
+   r3 = number of characters
+
+Performs r1=RIGHT$(r0,r3)
+
+
+mid
+---
+=> r0-> input string
+   r1-> output buffer
+   r2 = terminator
+   r3 = number of characters
+   r4 = start position (from 0)
+
+Performs r1=RIGHT$(r0,r4+1,r3)
+
+
+cmpstring
+---------
+=> r0-> string 1
+   r1-> string 2
+<= GT if r1>r0
+   LT if r1<r0
+   EQ if r1=r0
+
+Compares two strings. This is case sensitive.
+
+
+cmpstringi
+----------
+=> r0-> string 1
+   r1-> string 2
+<= GT if r1>r0
+   LT if r1<r0
+   EQ if r1=r0
+
+Compares two strings. This is case insensitive.
+
+
+cmpwildcard
+-----------
+=> r0-> wildcard string
+   r1-> string
+<= NE if no match
+   EQ if matches
+
+Compares a string to a wildcard pattern. This is case sensitive.
+
+
+cmpwildcardi
+------------
+=> r0-> wildcard string
+   r1-> string
+<= NE if no match
+   EQ if matches
+
+Compares a string to a wildcard pattern. This is case insensitive.
+
+
+move
+----
+=> r0-> input string
+   r1-> output buffer
+   r2 = terminator
+
+Copies the string from r0 to r1, terminating at r2.
+
+
+strcpy (aka movectrl)
+------
+=> r0-> input string
+   r1-> output buffer
+
+Copies the string from r0 to r1, terminating at control characters.
+
+
+instr
+-----
+=> r0-> input string
+   r1-> string to search for
+   r2 = terminator
+   r3 = start position (0 onwards)
+
+Performs r3=INSTR(r0,r1,r2).
+
+
+len
+---
+=> r0-> input string
+   r1-> terminator
+
+Returns the length of the string.
+
+
+strlen (aka lenctrl)
+------
+=> r0-> input string
+
+Returns the length of the ctrl-terminated string
+
+
+val
+---
+=> r0-> input string
+   r1 = terminator
+
+Finds the decimal value of the string. Very simple routine and should be
+discouraged.
+
+
+lower
+-----
+=> r0-> string to change
+   r1 = terminator
+
+Changes a string to be lower case.
+
+
+upper
+-----
+=> r0-> string to change
+   r1 = terminator
+
+Changes a string to be upper case.
+
+
+getlinefromfile
+---------------
+=> r0-> buffer for string
+   r1 = file handle
+   r2 = buffer length
+<= r2 = first free byte in buffer
+   CS if eof read
+
+Reads in a ctrl terminated string from a file.
+
+
+get
+---
+=> r0-> buffer for string
+   r1 = file handle
+   r2 = buffer length
+   r3 = terminator
+   r4 = direction (0=forwards, 1=reverse)
+<= r2 = first free byte in buffer
+
+Reads in a string from a file, either forwards or backwards.
+
+
+put
+---
+=> r0-> string to write
+   r1 = file handle
+   r2 = terminator
+
+Performs BPUT#r1,r0 to write the string to the file.
+
+
+putline
+-------
+=> r0-> string to write
+   r1 = file handle
+
+Writes a ctrl terminated string as linefeed terminated string.

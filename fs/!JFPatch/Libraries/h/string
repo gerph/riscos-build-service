@@ -1,0 +1,109 @@
+/*******************************************************************
+ File:     string.h
+ Purpose:  String handling
+ Author:   Justin Fletcher
+ Date:     09 Apr 1997
+ Updated:  23 Jul 1998 (strcat)
+ ******************************************************************/
+
+#ifndef __STRING_H
+#define __STRING_H
+
+/*********************************************** <c> Gerph *********
+ Function:     strcpy
+ Description:  Copy a string
+ Parameters:   from-> string to copy
+               to-> block to copy to
+ Returns:      pointer to to
+ ******************************************************************/
+extern char *strcpy(char *to,char *from);
+
+/*********************************************** <c> Gerph *********
+ Function:     strcat
+ Description:  Copy a string to the end of another
+ Parameters:   from-> string to copy
+               to-> block to copy to end of
+ Returns:      pointer to to
+ ******************************************************************/
+extern char *strcat(char *to,char *from);
+
+/*********************************************** <c> Gerph *********
+ Function:     strlen
+ Description:  Find the length of a string
+ Parameters:   str-> string
+ Returns:      length of string
+ ******************************************************************/
+extern int strlen(char *str);
+
+/*********************************************** <c> Gerph *********
+ Function:     SkipWhitespace
+ Description:  Skips whitespace in the given string
+ Parameters:   str-> string
+ Returns:      pointer to first non-whitespace character
+ ******************************************************************/
+extern char *SkipWhitespace(char *str);
+
+/*********************************************** <c> Gerph *********
+ Function:     SkipNonWhitespace
+ Description:  Skips non-whitespace in the given string
+ Parameters:   str-> string
+ Returns:      pointer to first non-whitespace character, or 0
+ ******************************************************************/
+extern char *SkipNonWhitespace(char *str);
+
+/*********************************************** <c> Gerph *********
+ Function:     strtoul
+ Description:  Convert string to an unsigned long
+ Parameters:   str-> string to read
+               end-> where to store the end location
+               base = base
+ Returns:      value, or 3<<30 if error
+ ******************************************************************/
+extern int strtoul(char *str,char **end,int base);
+
+/*********************************************** <c> Gerph *********
+ Function:     strdup
+ Description:  Copy a string into a new block of memory
+ Parameters:   str-> string to copy (ctrl terminated)
+ Returns:      pointer to new string
+ ******************************************************************/
+extern char *strdup(char *str);
+
+/*********************************************** <c> Gerph *********
+ Function:     strcmp
+ Description:  Compare two strings
+ Parameters:   one-> first string
+               two-> second string
+ Returns:      0 if equal, -1 if <, 1 if >
+ ******************************************************************/
+extern int strcmp(char *one, char *two);
+
+/*********************************************** <c> Gerph *********
+ Function:     strncmp
+ Description:  Compare two strings (with length)
+ Parameters:   one-> first string
+               two-> second string
+               num = maximum length
+ Returns:      0 if equal, -1 if <, 1 if >
+ ******************************************************************/
+extern char *strncmp(char *one, char *two, int num);
+
+/*********************************************** <c> Gerph *********
+ Function:     writeunsigned
+ Description:  Writes an unsigned number into a buffer (10 long at least!)
+ Parameters:   dest-> destination for copy
+               num = number
+ Returns:      pointer to end of string
+ ******************************************************************/
+extern char *writeunsigned(char *dest,int num);
+
+/*********************************************** <c> Gerph *********
+ Function:     writehex
+ Description:  Writes a hex number into a buffer (8 long at least!)
+ Parameters:   dest-> destination for copy
+               num = number
+ Returns:      pointer to end of string
+ ******************************************************************/
+extern char *writehex(char *dest,int num);
+
+#endif

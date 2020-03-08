@@ -1,0 +1,117 @@
+In   -
+Out  fileio
+Type AOF
+Ver  1.01g
+
+Define Workspace
+ Name    file
+ Default r2
+  handle  !   the file handle
+End Workspace
+
+Pre
+ eof=-1
+End Pre
+
+#Area "JFP:FileIO" Code ReadOnly
+#Rem =Rem
+#CodePrefix =Prefix
+; *******************************************************************
+; Subroutine:   fopen
+; Description:  Open a file
+; Parameters:   r0-> filename
+;               r1-> mode string (r or w)
+; Returns:      pointer to file block, or 0 if error
+; *******************************************************************
+>|fopen|
+   STMFD   (sp)!,{r1-r3,link}            ; Stack registers
+   MOV     r3,r1                         ; r3->mode
+   MOV     r1,r0                         ; r1->filename
+   LDRB    r2,[r3],#1                    ; read the file mode
+   CMP     r2,#ASC("w")                  ; is it write ?
+   MOVEQ   r0,#&80                       ; if so create it
+   MOVNE   r0,#&40                       ; if not, it's read (or append)
+   LDR     r14,[r3],#1                   ; read the next char
+   CMP     r14,#ASC("+")                 ; is it + ?
+   CMPEQ   r0,#&40                       ; and are we reading ?
+   MOVEQ   r0,#&C0                       ; if so, make it r/w
+   REM     "Opening %$1 with access %r0"
+   XSWI    "XOS_Find"                    ; open it
+   MOVVS   r0,#0                         ; if error, assume failed
+   TEQ     r0,#0                         ; did it open ?
+   LDMEQFD (sp)!,{r1-r3,pc}^             ; if not, return with 0
+   MOV     r1,r0                         ; r1 = handle
+   CMP     r2,#ASC("a")                  ; was it 'append' ?
+   BNE     $notappend                    ; if not, skip the 'move to end'
+   XSWI    "XOS_Args",2                  ; read extent
+   XSWI    "XOS_Args",1                  ; write it pointer
+$notappend
+#MapWS file,r0
+   XBL     |malloc|,`len_file            ; claim some space for the block
+   CMP     r0,#0                         ; was it valid ?
+   BEQ     $nospace
+   STRW    r1,handle                     ; store it in the block
+   LDMFD   (sp)!,{r1-r3,pc}^             ; return with block in r0
+$nospace
+   XSWI    "XOS_Find",0                  ; close it
+   MOV     r0,#0                         ; 0 for handle
+   LDMFD   (sp)!,{r1-r3,pc}^             ; return with block in r0
+
+
+; *******************************************************************
+; Subroutine:   feof
+; Description:  Check for end of file
+; Parameters:   file-> file block
+; Returns:      0 if not at eof
+; *******************************************************************
+>|feof|
+   CMP     r0,#0                         ; is it null ?
+   MVNEQ   r0,#NOT eof                   ; if so, return eof
+   MOVEQ   pc,link                       ; and return
+   STMFD   (sp)!,{r1,r2,link}            ; Stack registers
+#MapWS file,r0
+   LDRW    r1,handle                     ; read the handle
+   XSWI    "XOS_Args",5                  ; check state
+   MOVVS   r2,#1                         ; if error, return 1
+   MOV     r0,r2                         ; r0 = result
+   REM     "feof returning %r0"
+   LDMFD   (sp)!,{r1,r2,pc}^             ; Return from call
+
+; *******************************************************************
+; Subroutine:   fclose
+; Description:  close an open file
+; Parameters:   r0-> block
+; Returns:      r0 = 0
+; *******************************************************************
+#MapWS file
+>|fclose|
+   CMP     r0,#0                         ; is it null ?
+   MOVEQ   pc,link                       ; return if so
+   STMFD   (sp)!,{r1-r2,link}            ; Stack registers
+   REM     "fclose called"
+   MOV     r2,r0                         ; r1-> block
+   LDRW    r1,handle                     ; read the handle
+   XSWI    "OS_Find",0                   ; close the file
+   XBL     |free|,r2                     ; free it
+   MOV     r0,#0                         ; return 0
+   LDMFD   (sp)!,{r1-r2,pc}^             ; Return from call
+
+#Area "JFP:FileIO:ReadStuff" Code ReadOnly
+; *******************************************************************
+; Subroutine:   fgetc
+; Description:  Get a character
+; Parameters:   r0-> block
+; Returns:      r0 = character, or eof if error
+; *******************************************************************
+>|fgetc|
+   CMP     r0,#0                         ; is it null ?
+   MVNEQ   r0,#NOT eof                   ; if so, return eof
+   MOVEQ   pc,link                       ; and return
+   STMFD   (sp)!,{r1,link}               ; Stack registers
+#MapWS file,r0
+   LDRW    r1,handle                     ; read the handle
+   XSWI    "OS_BGet"                     ; close the file
+   MVNCS   r0,#NOT eof                   ; return eof if nothing read
+   REM     "Got %a0"
+   LDMFD   (sp)!,{r1,pc}^                ; Return from call
+

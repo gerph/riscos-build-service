@@ -1,0 +1,112 @@
+In   -
+Out  fileio
+Type AOF
+Ver  1.01i
+
+Pre
+ eof=-1
+End Pre
+
+#Area "JFP:stdio:putc" Code ReadOnly
+#Rem =Rem
+#CodePrefix =Prefix
+; *******************************************************************
+; Subroutine:   putc
+; Description:  Write character to the screen
+; Parameters:   r0 = character
+; Returns:      none
+; *******************************************************************
+>|putc|
+   STMFD   (sp)!,{link}                  ; Stack registers
+   CMP     r0,#10                        ; was it newline ?
+   SWIEQ   "OS_NewLine"                  ; if so, dump a newline up there
+   SWINE   "OS_WriteC"                   ; write it
+   LDMFD   (sp)!,{pc}^                   ; Return from call
+
+#Area "JFP:stdio:puts" Code ReadOnly
+; *******************************************************************
+; Subroutine:   puts
+; Description:  Write a string to the screen
+; Parameters:   r0-> string
+; Returns:      none
+; *******************************************************************
+>|puts|
+   STMFD   (sp)!,{link}                  ; Stack registers
+   SWI     "OS_Write0"                   ; write string
+   LDMFD   (sp)!,{pc}^                   ; Return from call
+
+#Area "JFP:stdio:putnl" Code ReadOnly
+; *******************************************************************
+; Subroutine:   putnl
+; Description:  Write a string to the screen
+; Parameters:   r0-> string
+; Returns:      none
+; *******************************************************************
+>|putnl|
+   STMFD   (sp)!,{link}                  ; Stack registers
+   SWI     "OS_NewLine"                  ; a new line
+   LDMFD   (sp)!,{pc}^                   ; Return from call
+
+#Area "JFP:stdio:getc" Code ReadOnly
+; *******************************************************************
+; Subroutine:   getc
+; Description:  Get a character from the keyboard
+; Parameters:   none
+; Returns:      r0 = character
+; *******************************************************************
+>|getc|
+   STMFD   (sp)!,{link}                  ; Stack registers
+   SWI     "OS_ReadC"                    ; read it
+   LDMFD   (sp)!,{pc}^                   ; Return from call
+
+#Area "JFP:stdio:gets" Code ReadOnly
+; *******************************************************************
+; Subroutine:   gets
+; Description:  Read a string from the keyboard
+; Parameters:   str-> string buffer
+; Returns:      pointer to string
+; *******************************************************************
+>|gets|
+   STMFD   (sp)!,{r0-r2,link}            ; Stack registers
+   MOV     r2,r0                         ; r2-> string block
+   MOV     r1,#0                         ; length of string
+$loop
+   SWI     "OS_ReadC"                    ; read a string
+   MOVCS   r0,#27                        ; if error, return 27
+   CMP     r0,#27                        ; is it escape ?
+   CMPNE   r0,#10                        ; or newline ?
+   CMPNE   r0,#13                        ; or return ?
+   STRB    r0,[r2,r1]                    ; store the char
+   ADD     r1,r1,#1                      ; increment length
+   BEQ     $eos                          ; end of string
+   CMP     r0,#ASC("U")-64               ; is it ctrl-U (delete all)
+   SUBEQ   r1,r1,#1                      ; remove the delete if so
+   BLEQ    $deleteall                    ; delete the line
+
+   CMP     r0,#8                         ; is it backspace ?
+   MOVEQ   r0,#127                       ; if so, use delete
+   CMP     r0,#127                       ; is it delete ?
+   SUBEQ   r1,r1,#2                      ; go back two (remove del and last)
+
+   CMP     r0,#32                        ; is it a ctrl character
+   SUBLT   r1,r1,#1                      ; if so, don't keep it
+   BLT     $loop                         ; got for the next one
+
+   SWI     "OS_WriteC"                   ; write it out
+   B       $loop                         ; and go around again
+$eos
+   CMP     r0,#10                        ; is it newline ?
+   CMPNE   r0,#13                        ; or return ?
+   SUBEQ   r1,r1,#1                      ; if so, go back one
+   MOV     r0,#0                         ; zero terminator
+   STRB    r0,[r2,r1]                    ; store it
+   SWI     "OS_NewLine"                  ; next line
+   LDMFD   (sp)!,{r0-r2,pc}^             ; Return from call
+; delete all the string
+$deleteall
+   CMP     r1,#0                         ; is that it ?
+$deleteloop
+   BEQ     $loop                         ; if so, jump out
+   SWI     &100+127                      ; delete a character
+   SUBS    r1,r1,#1                      ; go back one
+   B       $deleteloop                   ; and check the next

@@ -1,0 +1,36 @@
+LIBRARY InsBranch
+
+; *******************************************************************
+; Subroutine:   InsertBranch
+; Description:  Given locations calculate branch instruction between them
+; Parameters:   R0 is location to branch from, R1 is location to branch to
+; Returns:      Registers preserved, branch instruction placed at R0
+; *******************************************************************
+>InsertBranch
+   STMFD   r13!,{r1-r2,r14}
+   SUB     r1,r1,#8                      ; Subtract 8 to compensate for PC
+   SUB     r1,r1,r0                      ; Get offset to address
+   MOV     r2,#0
+   ADD     r1,r2,r1,LSR #2               ; Divide offset to get in words
+   BIC     r1,r1,#&FF000000              ; Clear instruction
+   ORR     r1,r1,#&EA000000              ; Add branch instruction
+   STR     r1,[r0]                       ; Store instruction
+   LDMFD   r13!,{r1-r2,pc}^
+; *******************************************************************
+; Subroutine:   InsertLoadPC
+; Description:  Given location calculate instruction to load PC with contents
+; Parameters:   R0 is address for instruction, R1 is pointer
+; Returns:      Registers preserved, load instruction placed at R0
+; *******************************************************************
+>InsertLoadPC
+   STMFD   r13!,{r1-r2,r14}
+   MVN     r2,#0
+   SUB     r1,r1,#8                      ; Subtract 8 to compensate for PC
+   SUBS    r1,r0,r1                      ; Get offset from instruction
+   EORMI   r1,r1,r2                      ; If negative reverse bits and add 1
+   ADDMI   r1,r1,#1                      ; to compensate
+   LMOV    r2,`LDRPC                     ; Get instruction
+   ORRMI   r2,r2,#&00900000              ; Set up bit if necessary
+   ORR     r2,r2,r1                      ; Add offset to instruction
+   STR     r2,[r0]                       ; Store instruction
+   LDMFD   r13!,{r1-r2,pc}^

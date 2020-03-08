@@ -1,0 +1,47 @@
+JFPatch (updated 10 Apr 1999 for 2.55ﬂ)
+=======
+
+Important :
+è fix CAS to support workspace working-outing and branch overs.
+è Add Phils little functions in some way...
+è Add more message file support
+è Input file buffering - might speed up things on cmj's machine.
+è Decent front end ?
+è Warnings in pre-processor would be good; warnings in Basic would be
+  excellent.
+è Update documentation; use /one/ file only !
+è Tidy up the cack in the init/final code. At the moment errors are handled
+  very badly.
+
+Lesser :
+è Need some form of STMFD for an APCS header, a stack splitter would be nice
+  too
+è Implement LDR r#,[sp,{regs},r#] for stack read, and STR for store
+è FILE - to load file
+è problems with number of spaces/tabs after statements - see forrey's mail
+è Patching an in memory module (In  *<modname>) where the module does not exist
+  causes a strange error if throwback is enabled.
+è New-style filter manager registration.
+
+
+Sometime :
+è Proper macro code - the current stuff is pretty naff :-(
+è Write it in C ?
+è Identify bad use of LDR rx,blah : <operation on rx> - this is not so
+  efficient on a StrongArm.
+
+Done?
+=====
+è Check that the events, services, vector, etc blocks /work/ with AOF (most
+  work I think)
+è lower case R for registers (fixed, I think)
+è LADR, LMOV needs spaces and to allow lower case - fixed I think
+è 'real' includes (Done, I think - needs a good test)
+è Add divider routine (done)
+è Filter code requires additional checks for Toolbox cackness, possibly
+  Code <reason> <code> ?
+è Support for ImageFS/FS registration on initialisation and removal on
+  shutdown.
+è Support for FileCore FS's.
+è Move the 'Wimp_Poll' reasons information into a resource file rather than
+  keeping in the code.

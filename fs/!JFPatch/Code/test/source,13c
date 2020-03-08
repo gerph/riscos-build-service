@@ -1,0 +1,180 @@
+In   -
+Out  test
+Type Module
+Ver  1.03d
+
+{
+  &123458    null
+  &123459    null
+  &12345a    null
+  &12345b    null
+}
+
+Define Module
+ Name      JFS
+ Author    Justin Fletcher
+ PostFilter
+  Name     TestFilter
+  Task     -
+  Mask     0
+  Code     MouseClick    click
+  Code     unknown
+ End PostFilter
+ Services
+  Error      null
+  &902C0     null
+  &902C1     null
+  &903BF     null
+  &912D0     null
+  &123456    null
+  &123457    null
+  &1234560   null
+  &1234561   null
+  &08510000  null
+  &08511000  null
+  &08511001  null
+  &08511101  null
+ End Services
+ Init      test
+ Resources
+  run!     and.hide
+  !Help    Apps.My!Help
+ End Resources
+ SWIs
+  Prefix   test
+  Base     &8000
+   0       code   null
+ End SWIs
+ ImageFS
+  Type     &123
+  Open     open
+  Close    close
+  Args     args
+  Get      get
+  Put      put
+  Func     func
+  File     file
+  Flags    -TellWhenFlushing
+ End ImageFS
+ FS
+  Name     JFS
+  Startup  JFS
+  Number   88
+  Files    Infinite
+  Flags    ReadOnly NoDirs
+ End FS
+End Module
+
+; imagefs stuff
+>open
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "Open"
+   MOV     r0,#0                         ; unable to open
+   STR     r0,[sp,#4]                    ; store as r1
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>close
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "Close"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>func
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "Func"
+   CMP     r0,#14                        ; is it read entries ?
+   CMPNE   r0,#15                        ; is it read entries with info?
+   BEQ     $readentries
+$readentries
+   MOV     r0,#0                         ; no entries
+   STR     r0,[sp,#4*3]                  ; store as r3
+   MVN     r0,#NOT -1                    ; end of list
+   STR     r0,[sp,#4*4]                  ; store as r4
+$exit
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>args
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "args"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>get
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "Get"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>put
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "Put"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>file
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "File"
+   CMP     r0,#0                         ; is it save file ?
+   BEQ     $save
+   CMP     r0,#1                         ; is it write cat info ?
+   BEQ     $writecatinfo
+   CMP     r0,#5                         ; is it read cat info ?
+   BEQ     $readcatinfo
+   B       $exit
+
+$readcatinfo
+   MOV     r0,#0                         ; doesn't exist
+   STR     r0,[sp,#0]                    ; store as r0
+$save
+$writecatinfo
+$exit
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+.null
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "MyNull"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>click
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+;    SWI     &107
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+>unknown
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   REM     "%c04%c30Unknown reason code %r0"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+.test
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   ADR     r2,$`error+4
+   ADR     r0,$`error
+   REM     "%E0"
+   MOV     r0,#0
+   CMP     r0,#0
+   MOV     r3,link
+   MOV     r1,pc
+   AND     r1,r1,#&FC000003
+   REM     "Flags = %&1 %&3 %$2"
+   MOV     r3,link
+   MOV     r1,pc
+   AND     r1,r1,#&FC000003
+   REM     "Flags = %&1 %&3 %$2"
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+$`error
+   EQUD    &657
+   EQUZA   "Test message"
+
+   EQUZA   "TEST CODE (RAS)"
+   RAS     r1,r2,#4
+   EQUZA   "TEST CODE (CAS)"
+   CAS     r1,r2,#4,#16                   ; specifying length (no r0's)
+   EQUZA   "TEST CODE (CAS2)"
+   CAS     r0,r2,#4,#16                   ; specifying length (r0 as rx)
+   EQUZA   "TEST CODE (CAS3)"
+   CAS     r1,r0,#4,#16                   ; specifying length (r0 as ry)
+   EQUZA   "TEST CODE (CAS4)"
+   CAS     r1,r0,#4,#16,claim             ; length and claimer
+
+>er
+   ERR     99,"error"
+
+#Library "Memory",claim
+#Here Libraries

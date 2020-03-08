@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+"""
+Filetypes for RISC OS.
+"""
+
+FILETYPE_BASIC = 0xFFB
+FILETYPE_JFPATCH = 0x13C
+FILETYPE_DATA = 0xFFD
+FILETYPE_AOF = 0x1FFD
+FILETYPE_C = 0x1FFF
+FILETYPE_H = 0x2FFF
+FILETYPE_OBJASM = 0x3FFF
+FILETYPE_CMHG = 0x4FFF
+FILETYPE_PASCAL = 0x5FFF
+FILETYPE_AMU = 0xFE1
+
+BUILDABLE_FILETYPES = (FILETYPE_BASIC,
+                       FILETYPE_JFPATCH,
+                       FILETYPE_C,
+                       FILETYPE_OBJASM,
+                       FILETYPE_PASCAL)
+
+# For those times when we don't know
+FILETYPE_DEFAULT = FILETYPE_DATA

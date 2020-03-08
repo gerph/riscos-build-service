@@ -1,0 +1,588 @@
+LIBRARY Strings
+
+>left
+; > r0=input string
+;   r1=ouput buffer
+;   r2=terminating character
+;   r3=No. of Characters to transfer
+; < r1=LEFT$(r0,r3)
+   STMFD   (sp)!,{r4-r12,link}
+   MOV     r4,#0
+$loop
+   LDRB    r5,[r0,r4]
+   STRB    r5,[r1,r4]
+   ADD     r4,r4,#1
+   CMP     r5,r2
+   BEQ     $exit
+   CMP     r4,r3
+   BNE     $loop
+   STRB    r2,[r1,r4]
+$exit
+   LDMFD   (sp)!,{r4-r12,pc}^
+
+>right
+; > r0=input string
+;   r1=ouput buffer
+;   r2=terminating character
+;   r3=No. of Characters to transfer
+; < r1=RIGHT$(r0,r3)
+   STMFD   (sp)!,{r4-r12,link}
+   MOV     r4,#0
+$loop1
+   LDRB    r5,[r0,r4]
+   CMP     r5,r2
+   ADDNE   r4,r4,#1
+   BNE     $loop1
+   SUB     r4,r4,r3
+   MOV     r6,#0
+$loop2
+   LDRB    r5,[r0,r4]
+   STRB    r5,[r1,r6]
+   ADD     r4,r4,#1
+   ADD     r6,r6,#1
+   CMP     r5,r2
+   BNE     $loop2
+   LDMFD   (sp)!,{r4-r12,pc}^
+
+>mid
+; > r0=input string
+;   r1=ouput buffer
+;   r2=terminating character
+;   r3=number of characters to transfer
+;   r4=start position
+; < r1=MID$(r0,r4,r3)
+   STMFD   (sp)!,{r5-r12,link}
+   MOV     r7,r4
+   MOV     r8,#0
+$loop
+   LDRB    r6,[r0,r7]
+   STRB    r6,[r1,r8]
+   ADD     r7,r7,#1
+   ADD     r8,r8,#1
+   CMP     r6,r2
+   BEQ     $exit
+   CMP     r8,r3
+   BNE     $loop
+   STRB    r2,[r1,r8]
+$exit
+   LDMFD   (sp)!,{r5-r12,pc}
+
+; Compare strings (case sensitive)
+; *** liked ***
+; > r0 = compare 1
+;   r1 = compare 2
+; < GT if r1>r0, LT if r1<r0, EQ if r0=r1
+>cmpstring
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+$loop
+   LDRB    r3,[r0],#1                    ; get byte from c1
+   LDRB    r4,[r1],#1                    ; get byte from c2
+   CMP     r3,#32                        ; c1 ctrl ?
+   MOVLT   r3,#0                         ; y=set to 0
+   CMP     r4,#32                        ; c2 ctrl ?
+   MOVLT   r4,#0                         ; y=set to 0
+   CMP     r3,r4                         ; compare
+   BNE     $notfound                     ; if not same, then return flags
+   CMP     r3,#0                         ; end of line ?
+   BNE     $loop                         ; if not, then next character
+$notfound
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+; Compare strings (insensitive)
+; *** liked ***
+; > r0 = compare 1
+;   r1 = compare 2
+; < GT if r1>r0, LT if r1<r0, EQ if r0=r1
+>cmpstringi
+   STMFD   (sp)!,{r0-r1,r3-r4,link}      ; Stack registers
+$loop
+   LDRB    r3,[r0],#1                    ; get byte from c1
+   LDRB    r4,[r1],#1                    ; get byte from c2
+
+   CMP     r3,#32                        ; c1 ctrl ?
+   MOVLT   r3,#0                         ; y=set to 0
+   CMP     r4,#32                        ; c2 ctrl ?
+   MOVLT   r4,#0                         ; y=set to 0
+
+; astounding case-insensitiveness
+   CMP     r3,#ASC("a")
+   RSBGES  r14,r3,#ASC("z")
+   SUBGE   r3,r3,#&20
+   CMP     r4,#ASC("a")
+   RSBGES  r14,r4,#ASC("z")
+   SUBGE   r4,r4,#&20
+
+   CMP     r3,r4                         ; compare
+   BNE     $notfound                     ; if not same, then return flags
+   CMP     r3,#0                         ; end of line ?
+   BNE     $loop                         ; if not, then next character
+$notfound
+   LDMFD   (sp)!,{r0-r1,r3-r4,pc}        ; Return from call
+
+; compare string using wildcards
+; *** liked ***
+; > r0 = wildcard string
+;   r1 = base string
+; < EQ if same, NE if different
+>cmpwildcard
+   STMFD   (sp)!,{r0-r3,link}            ; Stack registers
+$trythis
+   LDRB    r3,[r0]                       ; get wildcard
+   CMP     r3,#32
+   MOVLT   r3,#0
+   LDRB    r2,[r1]                       ; get base
+   CMP     r2,#32
+   MOVLT   r2,#0
+
+   CMP     r2,#0                         ; is base eol ?
+   BNE     $notbaseeol                   ; if not the skip this
+   CMP     r3,#ASC("*")                  ; is wild * ?
+   ADDEQ   r0,r0,#1                      ; if so, inc wild ptrŒ
+   BEQ     $trythis                      ; Œand loop around
+   CMP     r3,#0                         ; if wild eol ?
+   B       $exit                         ; return with flags
+$notbaseeol
+   CMP     r3,#0                         ; is wild eol ?
+   BEQ     $returnFALSE                  ; if so, =FALSE
+   CMP     r2,#ASC("*")                  ; is this a * itself ?
+   BEQ     $iswildcardchar               ; if so, skip check code
+   CMP     r2,r3                         ; are base and wild same ?
+   CMPNE   r3,#ASC("#")                  ; Œor is wild # ?
+   ADDEQ   r0,r0,#1                      ; if so, inc baseŒ
+   ADDEQ   r1,r1,#1                      ; Œand wildŒ
+   BEQ     $trythis                      ; Œand try again
+$iswildcardchar
+   CMP     r3,#ASC("*")                  ; is wild * ?
+   BNE     $returnFALSE                  ; if not, then return
+   ADD     r0,r0,#1                      ; inc wild
+   BL      cmpwildcard                   ; try this
+   SUBNE   r0,r0,#1                      ; if not found, reset wildŒ
+   ADDNE   r1,r1,#1                      ; Œinc baseŒ
+   BLNE    cmpwildcard                   ; Œand try thisŒ
+$exit
+   LDMFD   (sp)!,{r0-r3,pc}              ; Return from call
+$returnFALSE
+   CMP     pc,#0
+   LDMFD   (sp)!,{r0-r3,pc}
+
+; compare string using wildcards (case insensitive)
+; *** liked ***
+; > r0 = base string
+;   r1 = wildcard string
+; < EQ if same, NE if different
+>cmpwildcardi
+   STMFD   (sp)!,{r0-r3,link}            ; Stack registers
+$trythis
+   LDRB    r3,[r0]                       ; get wildcard
+   CMP     r3,#32
+   MOVLT   r3,#0
+   LDRB    r2,[r1]                       ; get base
+   CMP     r2,#32
+   MOVLT   r2,#0
+
+; astounding case-insensitiveness
+   CMP     r2,#ASC("a")
+   RSBGES  r14,r2,#ASC("z")
+   SUBGE   r2,r2,#&20
+   CMP     r3,#ASC("a")
+   RSBGES  r14,r3,#ASC("z")
+   SUBGE   r3,r3,#&20
+
+   CMP     r2,#0                         ; is base eol ?
+   BNE     $notbaseeol                   ; if not the skip this
+   CMP     r3,#ASC("*")                  ; is wild * ?
+   ADDEQ   r0,r0,#1                      ; if so, inc wild ptrŒ
+   BEQ     $trythis                      ; Œand loop around
+   CMP     r3,#0                         ; if wild eol ?
+   B       $exit                         ; return with flags
+$notbaseeol
+   CMP     r3,#0                         ; is wild eol ?
+   BEQ     $returnFALSE                  ; if so, =FALSE
+   CMP     r2,#ASC("*")                  ; is this a * itself ?
+   BEQ     $iswildcardchar               ; if so, skip check code
+   CMP     r2,r3                         ; are base and wild same ?
+   CMPNE   r3,#ASC("#")                  ; Œor is wild # ?
+   ADDEQ   r0,r0,#1                      ; if so, inc baseŒ
+   ADDEQ   r1,r1,#1                      ; Œand wildŒ
+   BEQ     $trythis                      ; Œand try again
+$iswildcardchar
+   CMP     r3,#ASC("*")                  ; is wild * ?
+   BNE     $returnFALSE                  ; if not, then return
+   ADD     r0,r0,#1                      ; inc wild
+   BL      cmpwildcardi                  ; try this
+   SUBNE   r0,r0,#1                      ; if not found, reset wildŒ
+   ADDNE   r1,r1,#1                      ; Œinc baseŒ
+   BLNE    cmpwildcardi                  ; Œand try thisŒ
+$exit
+   LDMFD   (sp)!,{r0-r3,pc}              ; Return from call
+$returnFALSE
+   CMP     pc,#0
+   LDMFD   (sp)!,{r0-r3,pc}
+
+>move
+; > r0=input string
+;   r1=ouput buffer
+;   r2=terminating character
+; < r1=r0
+   STMFD   (sp)!,{r4-r5,link}
+   MOV     r4,#0
+$loop
+   LDRB    r5,[r0,r4]
+   STRB    r5,[r1,r4]
+   ADD     r4,r4,#1
+   CMP     r5,r2
+   BNE     $loop
+   LDMFD   (sp)!,{r4-r5,pc}^
+
+; renamed to strcpy from movectrl (30 Dec 1996)
+>strcpy
+; *** liked ***
+; > r0=input string
+;   r1=ouput buffer
+; < $r1=$r0
+   STMFD   (sp)!,{r0-r1,link}
+$loop
+   LDRB    r14,[r0],#1
+   STRB    r14,[r1],#1
+   CMP     r14,#31
+   BGT     $loop
+   LDMFD   (sp)!,{r0-r1,pc}^
+
+>strcat
+; > r0=input string
+;   r1=string to attach
+; < $r0 = $r0+$r1
+   STMFD   (sp)!,{r0-r1,r5,link}
+$endloop
+   LDRB    r5,[r0],#1                    ; read byte and inc
+   CMP     r5,#31                        ; is it the end ?
+   BGT     $endloop                      ; if not, keep going
+   SUB     r0,r0,#1                      ; go back one
+$copyloop
+   LDRB    r5,[r1],#1                    ; read byte and inc
+   STRB    r5,[r0],#1                    ; store and increment
+   CMP     r5,#31                        ; are we done ?
+   BGT     $copyloop                     ; if not, go around again
+   LDMFD   (sp)!,{r0-r1,r5,pc}^
+
+
+>instr
+; > r0=input string
+;   r1=search string
+;   r2=terminating character
+;   r3=position to start from
+; < r3=INSTR(r0,r1,r2)
+   STMFD   (sp)!,{r1-r2,r4-r12,link}
+   MOV     r8,r3
+   MOV     r4,#0
+$loop1
+   LDRB    r5,[r1,r4]
+   CMP     r5,r2
+   MOVEQ   r3,r8
+   BEQ     $exit
+   LDRB    r6,[r0,r3]
+   CMP     r5,r6
+   ADDEQ   r4,r4,#1
+   ADDEQ   r3,r3,#1
+   BEQ     $loop1
+   CMP     r6,r2
+   MVNEQ   r3,#0
+   BEQ     $finish
+   MOV     r4,#0
+   ADD     r3,r3,#1
+   MOV     r8,r3
+   B       $loop1
+$instrfinish
+   LDMFD   (sp)!,{r1-r2,r4-r12,pc}^
+
+>len
+; > r0=input string
+;   r1=terminating character
+; < r1=LEN(r0)
+   STMFD   (sp)!,{r2-r12,link}
+   MOV     r4,#0
+$loop
+   LDRB    r5,[r0,r4]
+   ADD     r4,r4,#1
+   CMP     r5,r1
+   BNE     $loop
+   LDMFD   (sp)!,{r2-r12,pc}^
+
+; this was lenctrl - I've renamed it (30 Dec 1996)
+>strlen
+; > r0=input string
+; < r1=LEN(r0)
+   STMFD   (sp)!,{link}
+   MOV     r1,#0
+$loop
+   LDRB    r14,[r0,r1]
+   ADD     r1,r1,#1
+   CMP     r14,#32
+   BGE     $loop
+   SUB     r1,r1,#1
+   LDMFD   (sp)!,{pc}^
+
+>val
+; > r0=input string
+;   r1=terminating character
+; < r1=VAL(r0)
+   STMFD   (sp)!,{r2-r12,link}
+   MOV     r4,#0
+   MOV     r8,#1
+$loop1
+   LDRB    r5,[r0,r4]
+   CMP     r5,r1
+   ADDNE   r4,r4,#1
+   BNE     $loop1
+   MOV     r1,#0
+   MOV     r6,#0
+   MOV     r7,r4
+   SUB     r4,r4,#1
+$loop2
+   LDRB    r5,[r0,r4]
+   SUB     r5,r5,#&30
+   CMP     r5,#0
+   MOVLT   r1,#0
+   BLT     $exit
+   CMP     r5,#9
+   MOVGT   r1,#0
+   BGT     $exit
+   MUL     r9,r8,r5
+   ADD     r1,r1,r9
+   MOV     r8,r8,LSL #1
+   ADD     r8,r8,r8,LSL #2
+   SUB     r4,r4,#1
+   ADD     r6,r6,#1
+   CMP     r6,r7
+   BNE     $loop2
+$exit
+   LDMFD   (sp)!,{r2-r12,pc}^
+
+>lower
+; > r0=input string
+;   r1=terminating character
+; < r0=lowercase (r0)
+   STMFD   (sp)!,{r0-r3,link}
+$loop
+   LDRB    r3,[r0]            ;r3=next character
+   CMP     r3,#ASC("A")
+   BLT     $next
+   CMP     r3,#ASC("Z")
+   BHI     $next
+   ORR     r3,r3,#&20         ;Do the business
+   STRB    r3,[r0]            ;Store character back in string
+$next
+   CMP     r3,r1              ;check for end of string
+   ADDNE   r0,r0,#1
+   BNE     $loop
+   LDMFD   (sp)!,{r0-r3,pc}^
+
+>upper
+; > r0=input string
+;   r1=terminating character
+; < r0=upper case (r0)
+   STMFD   (sp)!,{r0-r3,link}
+$loop
+   LDRB    r3,[r0]            ;r3=next character
+   CMP     r3,#ASC("a")
+   BLT     $next
+   CMP     r3,#ASC("z")
+   BHI     $next
+   AND     r3,r3,#&DF         ;Do the business
+   STRB    r3,[r0]            ;Store character back in string
+$next
+   CMP     r3,r1              ;check for end of string
+   ADDNE   r0,r0,#1
+   BNE     $loop
+   LDMFD   (sp)!,{r0-r3,pc}^
+
+>getlinefromfile
+; *** liked ***
+; > r0=buffer for string
+;   r1=handle
+;   r2=length of buffer
+; < r0=GET$#r1
+;   r2=first free byte in buffer
+;   CS if eof read
+   STMFD   (sp)!,{r0-r1,r5,link}
+   ADD     r2,r2,r0
+   SUB     r2,r2,#1
+   MOV     r5,r0
+$loop
+   SWI     "XOS_BGet"
+   BCS     $eof
+   CMP     r0,#32
+   BLT     $eof
+   STRB    r0,[r5],#1
+   CMP     r5,r2
+   B       $loop
+$eof
+   MOV     r0,#0
+   STRB    r0,[r5],#1
+   MOV     r2,r5
+   LDMFD   (sp)!,{r0-r1,r5,pc}              ; Return from call
+
+>get
+; > r0=buffer for string
+;   r1=handle
+;   r2=length of buffer
+;   r3=terminator
+;   r4=direction (0=next, 1=last)
+; < r0=GET$#r1
+;   r2=first free byte in buffer
+   STMFD   (sp)!,{r0-r1,r3-r11,link}
+   ADD     r2,r2,r0
+   MOV     r5,r0
+   CMP     r4,#1
+   BNE     $loop1
+   MOV     r4,r0
+   MOV     r6,r2
+   MOV     r0,#0
+   SWI     "XOS_Args"
+   SUB     r2,r2,#2
+   CMP     r2,#0
+   BLT     $bof
+   MOV     r0,#1
+   SWI     "XOS_Args"
+   B       $loop2
+$loop1
+   SWI     "XOS_BGet"
+   BVS     $eof
+   STRB    r0,[r5],#1
+   MOVCS   r2,r5
+   LDMCSFD (sp)!,{r0-r1,r3-r11,link}
+   BICCS   link,link,#%1111<<28
+   ORRCS   link,link,#%0010<<28
+   MOVCSS  (pc),link
+   CMP     r0,r3
+   MOVEQ   r2,r5
+   LDMEQFD (sp)!,{r0-r1,r3-r11,link}
+   BICEQ   link,link,#%1111<<28
+   MOVEQS  pc,link
+   CMP     r5,r2
+   BEQ     $overflow
+   BNE     $loop1
+
+$loop2
+   SWI     "XOS_BGet"
+   CMP     r0,r3
+   ADDEQ   r11,r2,#1
+   SUBEQ   r2,r2,#1
+   MOVEQ   r0,#1
+   SWIEQ   "XOS_Args"
+   STMEQFD (sp)!,{r3}
+   BEQ     $loop3
+   SUB     r2,r2,#1
+   CMP     r2,#0
+   MOVLT   r2,#0
+   MOV     r0,#1
+   BLT     $firstrec
+   SWI     "XOS_Args"
+   B       $loop2
+
+$firstrec
+   SWI     "XOS_Args"
+   LDMFD   (sp)!,{r0-r1,r3-r11,link}
+   BIC     link,link,#%1111<<28
+   ORRS    pc,link,#%0010<<28
+
+$loop3
+   SWI     "XOS_BGet"
+   CMP     r0,r3
+   MOVEQ   r12,#%0000<<28
+   BEQ     $store
+   STMFD   (sp)!,{r0}
+   ADD     r5,r5,#1
+   CMP     r5,r6
+   BGT     $revoverflow
+   SUB     r2,r2,#1
+   CMP     r2,#0
+   MOVLT   r2,#0
+   MOV     r0,#1
+   SWI     "XOS_Args"
+   BGE     $loop3
+   MOV     r12,#%0000<<28
+
+$store
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+   LDMFD   (sp)!,{r0}
+   STRB    r0,[r4],#1
+   CMP     r0,r3
+   BNE     $store
+   MOV     r2,r11
+   MOV     r0,#1
+   SWI     "XOS_Args"
+   MOV     r2,r4
+   LDMFD   (sp)!,{r0-r1,r3-r11,link}
+   BIC     link,link,#%1111<<28
+   ORRS    pc,link,r12
+
+$revoverflow
+   LDMFD   (sp)!,{r0}
+   STRB    r0,[r4],#1
+   CMP     r0,r3
+   BNE     $revoverflow
+   BEQ     $overflow
+
+$overflow
+   ADR     r0,$`overflowerror
+   LDMFD   (sp)!,{r0-r1,r3-r11,link}
+   BIC     link,link,#%1111<<28
+   ORRS    pc,link,#%0001<<28
+$`overflowerror
+   EQUD    &1E6
+   EQUZ    "Buffer Overflow"
+   ALIGN
+
+$bof
+   ADR     r0,$`boferror
+   MOV     r4,#0
+   LDMFD   (sp)!,{r0-r1,r3-r11,link}
+   BIC     link,link,#%1111<<28
+   ORRS    pc,link,#%0001<<28
+$`boferror
+   EQUD    &1E6
+   EQUZ    "Start Of File"
+   ALIGN
+
+$eof
+   ADR     r0,$`eoferror
+   LDMFD   (sp)!,{r0-r1,r3-r11,link}
+   BIC     link,link,#%1111<<28
+   ORRS    pc,link,#%0001<<28
+$`eoferror
+   EQUD    &1E6
+   EQUZ    "End Of File"
+   ALIGN
+
+
+>put
+; > r0=string to put
+;   r1=file handle
+;   r2=terminator
+; BPUT#r1,r0
+   STMFD   (sp)!,{r0-r12,link}
+   MOV     r4,r1
+   MOV     r1,r2
+   BL      len
+   ADD     r3,r1,#1
+   MOV     r1,r4
+   MOV     r2,r0
+   MOV     r0,#2
+   SWI     "XOS_GBPB"
+   LDMFD   (sp)!,{r0-r12,pc}^
+
+>putline
+; > r0=string to put
+;   r1=file handle
+; BPUT#r1,r0 (terminator = 10)
+   STMFD   (sp)!,{r0-r12,link}
+   MOV     r4,r1
+   MOV     r1,r2
+   BL      lenctrl
+   ADD     r3,r1,#1
+   MOV     r1,r4
+   MOV     r2,r0
+   MOV     r0,#2
+   SWI     "XOS_GBPB"
+   LDMFD   (sp)!,{r0-r12,pc}^

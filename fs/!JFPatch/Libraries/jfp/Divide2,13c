@@ -1,0 +1,41 @@
+LIBRARY Divide
+
+; *******************************************************************
+; Subroutine:   Divide
+; Description:  Divide R0 by R1
+; Parameters:   R0 is numerator, R1 is denominator
+; Returns:      R2 is result, R3 is remainder
+; *******************************************************************
+>Divide
+   STMFD   r13!,{r0,r1,r4-r14}
+   EORS    r4,r0,r1
+   MOVS    r5,r0
+   RSBMI   r0,r0,#0
+   TEQ     r1,#0
+   RSBMI   r1,r1,#0
+   BL      $Divide2
+   TEQ     r4,#0
+   RSBMI   r2,r2,#0
+   TEQ     r5,#0
+   RSBMI   r3,r3,#0
+   LDMFD   r13!,{r0,r1,r4-r13,pc}^
+$Divide2
+   TEQ     r1,#0
+   MOVEQ   pc,r14
+   MOV     r3,#0
+   MOV     r2,#0
+   MOV     r6,#&20
+$Divide3
+   SUBS    r6,r6,#1
+   MOVEQ   pc,r14
+   MOVS    r0,r0,LSL #1
+   BPL     $Divide3
+$Divide4
+   MOVS    r0,r0,LSL #1
+   ADC     r3,r3,r3
+   CMP     r3,r1
+   SUBCS   r3,r3,r1
+   ADC     r2,r2,r2
+   SUBS    r6,r6,#1
+   BNE     $Divide4
+   MOV     pc,r14

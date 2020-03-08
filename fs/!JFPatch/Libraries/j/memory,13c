@@ -1,0 +1,136 @@
+In   -
+Out  memory
+Type AOF
+Ver  1.01j
+
+; this is a simple library to deal with some things that C takes for
+; granted ;-)
+
+#Area "JFP:Memory" Code ReadOnly
+#Rem =Rem
+#CodePrefix =Prefix
+; *******************************************************************
+; Subroutine:   malloc
+; Description:  Allocate some memory
+; Parameters:   r0 = size to claim
+; Returns:      r0-> space, or 0 if failed
+; *******************************************************************
+>|malloc|
+   STMFD   (sp)!,{r1-r3,link}            ; Stack registers
+   REM     "Claim %r0"
+   MOV     r3,r0                         ; right register
+   XSWI    "XOS_Module",6                ; claim space
+   MOVVS   r0,#0                         ; if error, return 0
+   MOVVC   r0,r2                         ; return address
+   LDMFD   (sp)!,{r1-r3,pc}^             ; Return from call
+
+; *******************************************************************
+; Subroutine:   free
+; Subroutine:   free memory claimed by malloc
+; Description:  release RMA at r0
+; Parameters:   r0 = address
+; Returns:      none
+; *******************************************************************
+>|free|
+   STMFD   (sp)!,{r0-r2,link}            ; Stack registers
+   REM     "Free %&0"
+   MOV     r2,r0                         ; right register
+   XSWI    "XOS_Module",7                ; release space
+   LDMFD   (sp)!,{r0-r2,pc}^             ; Return from call
+
+#Area "JFP:Memory:Realloc" Code ReadOnly
+; *******************************************************************
+; Subroutine:   realloc
+; Description:  change the size of a block
+; Parameters:   r0 = block
+;               r1 = new size
+; Returns:      r0-> block, 0 if failed
+; *******************************************************************
+>|realloc|
+   STMFD   (sp)!,{r1-r3,link}            ; Stack registers
+   LDR     r2,[r0,#-4]                   ; read the current size
+   SUB     r2,r2,#4                      ; actual space is -4
+   SUBS    r3,r1,r2                      ; calculate the change
+   LDMEQFD (sp)!,{r1-r3,pc}^             ; if no change, return
+   MOV     r2,r0                         ; right register
+   XSWI    "XOS_Module",13               ; extend space
+   MOVVS   r0,#0                         ; if error, return 0
+   MOVVC   r0,r2                         ; return address
+   LDMFD   (sp)!,{r1-r3,pc}^             ; Return from call
+
+#Area "JFP:Memory:MemCpy" Code ReadOnly
+; *******************************************************************
+; Subroutine:   memcpy
+; Description:  memory copy routine, optimised for large memory copies
+;               on word boundaries
+; Parameters:   r0-> destination
+;               r1->source
+;               r2 = length
+; Returns:      none
+; *******************************************************************
+>|memcpy|
+   STMFD   (sp)!,{r4-r10,link}           ; Stack registers
+   TST     r0,#3                         ; is destination aligned ?
+   TSTEQ   r1,#3                         ; if so, if source aligned ?
+   BNE     $smaller                      ; if not, we must copy byte by byte
+   CMP     r2,#64                        ; is it >64 ?
+   BLT     $smaller                      ; if <, jump speed code
+$bigloop
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   SUB     r2,r2,#64                     ; decrement counter
+; first unroll
+   CMP     r2,#64                        ; is it >64 ?
+   BLT     $smaller                      ; if <, jump speed code
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   SUB     r2,r2,#64                     ; decrement counter
+; second unroll
+   CMP     r2,#64                        ; is it >64 ?
+   BLT     $smaller                      ; if <, jump speed code
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   SUB     r2,r2,#64                     ; decrement counter
+; third unroll
+   CMP     r2,#64                        ; is it >64 ?
+   BLT     $smaller                      ; if <, jump speed code
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   LDMIA   r1!,{r3,r4,r5,r6,r7,r8,r9,r10} ; load data
+   STMIA   r0!,{r3,r4,r5,r6,r7,r8,r9,r10} ; store data
+   SUB     r2,r2,#64                     ; decrement counter
+; now the final check
+   CMP     r2,#64                        ; is it >64
+   BGE     $bigloop                      ; go for more of the big copy
+
+; this bit isn't very optimal, but what the hell !
+$smaller
+   TEQ     r2,#0                         ; are we done ?
+$smallloop
+   LDMEQFD (sp)!,{r4-r10,pc}^            ; Return from call
+   LDRB    r3,[r1],#1                    ; read byte
+   STRB    r3,[r0],#1                    ; store byte
+   SUBS    r2,r2,#1                      ; decrement counter and set flags
+   LDMEQFD (sp)!,{r4-r10,pc}^            ; if nothing left, return from call
+; first unroll
+   LDRB    r3,[r1],#1                    ; read byte
+   STRB    r3,[r0],#1                    ; store byte
+   SUBS    r2,r2,#1                      ; decrement counter and set flags
+   LDMEQFD (sp)!,{r4-r10,pc}^            ; if nothing left, return from call
+; second unroll
+   LDRB    r3,[r1],#1                    ; read byte
+   STRB    r3,[r0],#1                    ; store byte
+   SUBS    r2,r2,#1                      ; decrement counter and set flags
+   LDMEQFD (sp)!,{r4-r10,pc}^            ; if nothing left, return from call
+; third unroll
+   LDRB    r3,[r1],#1                    ; read byte
+   STRB    r3,[r0],#1                    ; store byte
+   SUBS    r2,r2,#1                      ; decrement counter and set flags
+   BNE     $smallloop                    ; if >0 go for more
+   LDMFD   (sp)!,{r4-r10,pc}^            ; return from call

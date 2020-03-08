@@ -1,0 +1,81 @@
+In   -
+Out  Test
+Type Module
+Ver  1.00a
+
+Define Module
+ Name      RASandCAS
+ Author    Justin Fletcher
+End Module
+
+{ This is a reminder to myself - not everything is implemented...
+  Don't expect this to compile !
+}
+
+>rastest
+   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+; read associative structure
+   RAS     r1,r2,#`pointer               ; starting at block r1
+                                         ; find r2 at offset `pointer
+                                         ; and return the block in r1
+                                         ; or 0 if none
+
+; create associative structure (DOESN'T WORK FOR AOF!)
+   CAS     r1,r2,`pointer                ; create an associative structure
+                                         ; and link to that at r1, storing
+                                         ; the associate value from r2 in
+                                         ; blk+`pointer. Size is `len_<x>
+                                         ; where <x> is the length of
+                                         ; workspace in which `pointer lives
+                                         ; claiming memory is using
+                                         ; claim if non-aof, or |malloc| if
+                                         ; aof.
+
+   CAS     r1,r2,`pointer,#16            ; as above, but length = 16
+   CAS     r1,r2,`pointer,myclaim        ; as above, but use myclaim for
+                                         ; memory claim
+   CAS     r1,r2,`pointer,#16,myclaim    ; as above, but length = 16,
+                                         ; and use myclaim for the claimer
+   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+
+; code required for RAS
+; RAS rx,ry,num
+.ras
+   CMP     rx,#0                         ; are we at the end
+   BEQ     $done                         ; if so, we're done
+   LDR     r14,[rx,#`var]                ; read the value
+   CMP     r14,ry                        ; are they the same ?
+   LDRNE   rx,[rx]                       ; read the next pointer (at 0)
+   BNE     ras                           ; jump back to the top
+$done
+
+; code required for CAS
+rx,ry
+.cas
+   STMFD   (sp)!,{r0}                    ; Stack registers
+   MOV     r0,#`len_<x>                  ; space to claim
+   BL      claimer                       ; claim the space (to r0)
+   STR     ry,[r0,#`pointer]             ; store the associater
+   STR     rx,[r0]                       ; store the 'next' entry
+   MOV     rx,r0                         ; r1-> this block
+   LDMFD   (sp)!,{r0}                    ; Restore registers
+
+r0,rx
+   STMFD   (sp)!,{r0,rx}                 ; Stack registers
+   MOV     r0,#`len_<x>                  ; space to claim
+   BL      claimer                       ; claim the space (to r0)
+   STR     rx,[r0,#`pointer]             ; store the associater
+   LDR     rx,[sp],#4                    ; re-read r0, and inc after
+   STR     rx,[r0]                       ; store the 'next' entry
+   LDMFD   (sp)!,{rx}                    ; Restore registers
+
+rx,r0
+   STMFD   (sp)!,{r0,rx}                 ; Stack registers
+   MOV     rx,r0                         ; hang on to r0
+   MOV     r0,#`len_<x>                  ; space to claim
+   BL      claimer                       ; claim the space (to r0)
+   STR     rx,[r0,#`pointer]             ; store the associater
+   LDR     rx,[sp,#4*1]                  ; re-read rx
+   STR     rx,[r0]                       ; store the 'next' entry
+   STR     r0,[sp,#4*1]                  ; store back on the stack
+   LDMFD   (sp)!,{r0,rx}                 ; Return registers

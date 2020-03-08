@@ -1,0 +1,741 @@
+*****************************************************************************
+  > Format                A description of the description file for JFPatch
+************************************************* © Justin Fletcher, 1997 ***
+
+Introduction
+============
+JFPatch files can contain up to seven distinct components :
+ * Header     Describes what the file is going to do
+   Pre        Pre-assembly basic code which is to bo included
+   Workspace  Describes the workspace blocks to be used
+   Module     Describes the module header
+ * Code       The actual code to be assembled (may include patch offsets)
+   Post       Post-assembly, prior to exiting for testing, and running code
+   End        End inclusion, after assembly, but before the auto-included
+              routines.
+
+Those sections marked * are compulsory and must be include. These will be
+described first, followed by the other sections.
+
+*****************************************************************************
+
+Header section
+==============
+
+The header describes what the patch file is going to do. Entries are
+seperated by one or more spaces, and are case insensitive :
+
+APP        Specify application name
+           The name will be used in system vars to create the correct code
+           Files required (!Create, !Run, !Help, and WSWI-Help may be copied)
+IN      *  Input file : MUST preceed OUT
+           If -, no input file will be taken.
+           If preceeded by *, the module whose name is given will be
+           extracted from memory and processed.
+OUT     *  Output file (ignored if output is AOF and file is in j directory)
+TYPE    *  Type of file, values :
+             Module  - a module, offsets start at 0, typed Module
+             Util    - utility code, offsets start at 0, typed Utility
+             Utility - ditto
+             Absolute- absolute code, offsets start at &8000, typed Absolute
+             Code    - direct code, base is as in memory, load and exec as start
+             Memory  - Stored to memory, ie no output file
+             AOF     - AOF format file
+             AOFModule - an AOF format file, but with a Module header.
+VER        Code version number in the form 1.00a. Each time the code is
+           assembled this will be incremented, but the file you are editing
+           will not change. This is so that you can check in a general way,
+           not how many times it has been tested, but how many times it has
+           been returned to.
+MAX        Maximum amount of memory to reserve in bytes (or suffix with K)
+PC         Start PC for file if not default
+{          Start comment. See Code section for description.
+
+If filenames are not full paths then the same path as the patch file is
+assumed, unless APP is specified, in which case, all references will be from
+that system variable (<name>$Dir).
+
+*****************************************************************************
+
+Code section
+============
+
+Code lines are identified by a line outside DEFINE's which begins with .
+(full stop), # or @. Code sections may be prefixed by symbols _as the first
+character on the line_. These are :
+  %   Literal basic command, eg % PRINT "HELLO"
+      These may be used if the path of the assembly is difficult.
+  @   At offset; changes the PC to an offset in the input file.
+      The only use for this is when you are patching an input file.
+      You may use endofcode to indicate that the code should be assembled
+      after all other code. endofcode is word aligned.
+  #   Pre-assembler directive
+      Allows you to do many special things. See later for more information.
+  {   Start comment
+      These comments are not included in the output file, and serve only to
+      comment the code in large blocks (or remove sections of code) rather than       using ;. These comments are not nestable. End comments with space
+      followed by }, or } alone on a line.
+  ;   Embedded comment line. These are unlike ;'s within code lines because
+      they are stripped of all :'s which may cause errors in the assembly.
+  .   Routine or data start.
+      These are just the same as basic labels.
+  >   Code routine start.
+      These are preceeded with a C style routine name (if CodePrefix is
+      enabled). Otherwise they are identical to . labels.
+  $   Local label.
+      Labels a point locally, which is only available to the routine within
+      which it occurs (ie from . label to . label {or #Post/#End})
+All other lines are checked for being predefined macros before being passed
+on to the basic assembler.
+
+
+
+Labels
+------
+It is recommended that you use purely textual names for both routines and
+local labels (numerical inital characters are not allowed), ` prefixed names
+for variables - ie numbers or strings, and _ prefixed names for local labels
+which are local to a group of routines. eg .decimal, $`textstring,
+._filename. This is still a recommendation, and is not coded into the
+program.
+
+Local labels are defined as for normal labels, but instead of a . prefix, $
+is used. To reference such labels within the code, use the same form (ie
+$<variable name>. These will be expanded during compilation.
+
+Whilst compiling AOF code any lines with a | in are checked for exports or
+imports. Exports are achieved by using labels in the usual way :
+  .|<label>|
+will export the label <label>. To rename the label when exported you can use :
+  .|<label>-><export>|
+To refer to a label you can use either BL (or XBL) or one of the EQU
+commands :
+  BL     |<label>|
+  EQUD   |<label>|
+Dependant on the EQU used, the correct import type should be selected.
+Calculations may be performed on labels, but you may NOT add labels
+together :
+  EQUD   |<label>|+<constant>
+
+
+
+Predefined macros
+-----------------
+These are used in much the same manner as standard instuctions, and may for
+the most part be considered as normal instructions. Where ## is given, the
+instruction may be given a conditional code :
+
+LADR##   Long ADR, with an address range of 64k, rather than the 4k usually
+         given by ADR. 2 instructions will always be assembled.
+         Usage: LADR##   reg, address or label
+
+LMOV##   Long move
+         When MOV gives up and says 'argh, no more...' LMOV will do it's
+         best to perform the specified function. Multiple instuctions will
+         be used, variably according to the number given. Therefore, it is
+         imperitive that the value is not an unassigned label (ie no forward
+         references). You may also use -ve numbers.
+         Usage: LMOV    <reg>,<value>
+
+LADD##   Long addition
+         The complement to long move, long add performs addition on
+         registers using multiple instructions.
+         Usage: LADD##   <reg>,<reg>,<value>
+
+XSWI##   Extended SWI.
+XBL##    Extended BL.
+         These are used to pass parameters to a SWI call or routine in a
+         similar way to SYS and CALL in Basic. As in Basic, values may be
+         ignore, by using , on it's own. Note that these values are all set in o         rder, so if you want r0=r1 and r1=r0, you can't do it this way.
+         You can preceed the value with # to do an explicit MOV when you have
+         used a variable instead of a number. Preceeding a reference by ^ will
+         use ADR to get it's address rather than it's absolute value.
+         Usage: XSWI##  "<name>",<value>[,[value][,[value]...]
+         Usage: XBL##   "<name>",<value>[,[value][,[value]...]
+         (here, value may be a number or register prefixed by r, a or v)
+
+XLDMFD   Extended unstack.
+         Sometimes you will need to return from a routine with, either the
+         registers preserved, or with VS and r0 pointing to an error string.
+         By using XLDMFD, you can exit from a routine using just one line.
+
+REM      Remark for debugging
+REMP     Permanent remark (not removed by #REM OFF)
+         Whilst debugging you will find it extremely useful to be able to
+         display messages about the progress of the code. REM includes an
+         inline set of routines to display a message. Within the string, a
+         group of control codes may be used :
+           %%   Display a percent symbol.
+           %r#  Display register # in decimal (# is the register number in hex)
+           %&#  Display register # in hex
+           %$#  Display the string pointered to by register #
+           %a#  Display register # as an ascii character (OS_WriteC it)
+           %E#  Display error message pointed to by register #
+           %R   Display all registers in hex
+           %I   Ignored
+           %C   Don't append newline to the end of the string, if you want to
+                split the message over sections of code
+           %c## embed a control character, ## in decimal. Useful if you are
+                displaying things in the desktop, eg %c04 for text cursor.
+         All messages will by terminated by newline, unless %C specified.
+         If you specify streaming in the front-end, output will be streamed.
+         If #REM OFF is specified, REM's will be embedded in the basic as ;
+         comments.
+         Usage: REM <string>
+         Note: All registers preserved, flags altered.
+
+DIV      Divide routine (very sub-optimal)
+         Result is returned in top.
+         Usage: DIV <top>,<bottom>
+         Note: Large amounts of code assembled.
+          
+RES      Reserve space
+         If you need to reserve a lagrge block of memory, this is the
+         easiest way to do it. The space will be initialised to 0.
+         Usage: RES    <bytes>
+
+MODE##   Set processor mode
+         Sometimes it is imperitive to use a particular processor mode.
+         You are required to change to SVC mode in CallBack's so that
+         r14_svc is preserved, and this macro gives you an easy means of
+         doing this.
+         Usage: MODE##  <USR | FIQ | IRQ | SVC>[,<reg1>,<reg2>]
+         (reg1> and <reg2> default to r8 and r9, and contain the flags
+            or: MODE##  [+|-]SVC [ ,<reg1>,<reg2>,[<reg3>] | ,<reg3> ]
+         <reg1> and <reg2> default to r8 and r9, and contain the flags
+         <reg3> is the stack pointer to use
+
+LDRW##   Load register from workspace
+STRW##   Store register in workspace
+LDRBW##  Load register with byte from workspace
+STRBW##  Store register as byte in workspace
+         These are used by the Workspace module. If the registers are mapped
+         correctly, then these will perform operations on workspaces just as
+         LDR/STR do on inline addresses.
+         Usage: <cmd>[B]W##  <reg>,<offset>
+
+ADRW##   Address in workspace
+         This works like it's inline counterpart, but used long adds, so has
+         an infinite range.
+         Usage: ADR##   <reg>,<offset>
+
+SWAP##   Swap two registers
+         How may times have you had the two registers around the wrong way?
+         This gets around that with three lines of code (no temporary
+         register).
+         Usage: SWAP##  <reg1>,<reg2>
+         Note: Do not confuse with the SWP ARM3 instruction.
+
+EQUZ     Equate string with zero suffix
+EQUZA    Equate string with zero suffix, then align
+         Much easier than using EQUS "blah, blah"+CHR$0.
+         Usage: EQUZ[A]   <string>
+
+NOP##    No operation
+         This is often used to remove lines from patched code, or to delay
+         whilst register bank resync takes place. One instruction is
+         assembled.
+         Usage: NOP##
+          
+
+Pre-assembler directives
+------------------------
+Pre-assembler directives are prefixed by # and consist of a command followed
+by arguments :
+
+REM      Enables/disables REM debug comments (not REMP though).
+         Arguments: <boolean>
+CODEPREFIX Enables/disables prefixes to sections of code.
+         The name of routines followed by a SWINV code to indicate the length
+         of the name will be embedded prior to the start of the routine if
+         this is enabled.
+         Arguments: <boolean>
+LOAD     Load a file in line into the code
+         Arguments: <filename>, <length>
+         If length is -1, then just the length of the file will be reserved
+POST     Start of post assembly section; whatever follows is post assembly code
+         This code can be used for testing the routines you have written so
+         that you can be sure that they work before running the complete
+         code.
+END      End of code; whatever follows will be appended varbatum to the file.
+COND     Conditional assembly, see later
+CHECK    Verification of code validity, see later
+LIBRARY  Install library routines, see later
+INCLUDE  Install a local file, see later
+HERE     Locate objects, see later
+MAPWS    Map workspace block to a register
+         This changes the default mapping for a workspace block.
+         Arguments: <block name>[,<register>]
+         if no register is specifed, the default is used.
+
+<boolean> can be one of ON, TRUE, ENABLED, OFF, FALSE, DISABLED or =<file> to
+take the value from a particular file.
+
+
+Conditional assembly
+--------------------
+Conditional assembly allows you to cater for different possible
+configurations of the code so that it may be set up by the user to do
+different things.
+
+Conditional assembly can take place in two forms. The first, default, form is
+for the pre-assembler to remove all non-required code, leaving just that
+which is required to be assembled. This is called external conditional
+assembly because the conditionals are evaluated externally to the
+code.
+
+The second form is inline conditional assembly. This is where /all/ the code
+is created in the basic file, and the conditionals are evaluated at assembly
+time. The external method is useful for debugging, whilst the inline method
+is more useful if the code has options which the user may select.
+
+Conditionals in both forms are nestable, though you may become confused when
+trying to read such code :-)
+
+The directives are :
+COND INLINE    Selects inline conditional assembly
+COND EXTERNAL  Selects external conditional assembly
+COND SET       Sets a condition variable to a value
+               Usage: #COND SET <varname> <boolean>
+COND <varname> Sets a condition variable according to user reply
+               In External mode, this will display a error box type message
+               In Inline mode, the messages will be printed on the screen
+               and a OS_Confirm used to get the reply.
+               Usage: #COND <varname> <question>
+COND OF        Starts a conditional assembly structure
+               The following code within this structure will be assembled if
+               the named condition variable is true.
+               Usage: #COND OF <varname>
+COND ELSE      Else clause in structure
+COND END       End conditional assembly structure
+COND ENDIF     ditto
+
+
+Checking the validity of code
+-----------------------------
+When you are writing patches, it is useful to perform check on the code you
+are acting on to ensure that it is the correct version. The checks are :
+
+CHECK STRING   Check that a particular address contains a ctrl terminated
+               string.
+               Usage: #CHECK STRING <address> <string>
+               Note: The string may be enclosed in quotes
+
+CHECK WORD     Check that a particular word contains a particular value
+               Usage: #CHECK WORD <address> <value>
+
+CHECK LEN      Check that the length of the file is a certain value
+               Usage: #CHECK LEN <length>
+
+
+Including libraries of routines
+-------------------------------
+Library files are used when it is rather pointless to code the same thing
+over and over again. They are held within the JFPatch directory in the file
+Libraries. The only library provided is the Strings library - a set of
+routines I have collected, modified and written (the string comparison
+routines are my own work, and though probably not optimal, suffice for the
+most part).
+
+The syntax of the library inclusion command is :
+LIBRARY <filename>,[#]<routine>[[[.routine].routine]...]
+
+<filename> is an absolute filename if there is a path, otherwise the
+JFPatch.Libraries directory is searched.
+<routine> may be * if you want all libraries to be included in a file - not
+recommended.
+
+The # symbol means that the libraries will be included at this point in the
+code. Otherwise, a #HERE LIBRARIES directive will need to be issued.
+
+The library files themselves consist of a first line of LIBRARY <filename>
+followed by the routines in the library. Local labels may be used, but
+externally referenced variables may not due to the manner in which the
+inclusion occurs. Inclusion is from the first ; before the . prefix of the
+routine name to the line before the first ; before the next . (or the next .
+if there is no ;). See the Summary file for more details, and refer to
+Strings for examples.
+
+
+Including code files
+--------------------
+Just as library routines can be included in your code, so can files be
+included in the code. These can be used where you can't be bothered to code a
+section a number of times, but it is too specific for a full library.
+
+The syntax of the include command is :
+INCLUDE <filename>
+
+NOTE: This is still an experimental function. Please report problems or
+queries to Justin.
+
+
+Here directives (object location)
+---------------------------------
+At some future point there may be more HERE directives to include pre-defined
+things (I'm not sure what yet, but in AOF there seems to be a lot of scope
+for that sort of thing...) Currently, however only two directives exist :
+
+HERE FOOTER    Embed the Footer file at this point
+               This might be used as DoggySoft use to place "Anything after
+               this point is probably a virus")
+
+HERE LIBRARIES Embed all previously defined libraries
+               You should probably not need to use this unless you are very
+               organised. I use LIBRARY <filename>,#[routine] in preference.
+
+*****************************************************************************
+
+Pre-assembly section
+====================
+
+The pre-assembly section is used to define constants to be used, and other
+various actions which occur to the programmer. Usually #CHECK and #COND set
+up directives are included here. The section is preceeded by PRE, and
+terminated by END PRE.
+
+The only pre-assembler directives which make any sense are the #COND and
+#CHECK directives.
+
+If you are assembling AOF code you may assign constants here by using the
+form :
+  |<label>| = <value>
+
+*****************************************************************************
+
+
+Post-assembly section
+=====================
+
+This section is used for code which should be run after the code has been
+assembled. The section is enclosed by #Post and #End (or the end of the
+file). All the code given will be passed directly to Basic, unless it is
+prefixed by a # symbol. In which case, the following apply :
+
+RUN     Runs a particular file, if the file specified is <CODE> (note: upper
+        case), then the output file is run. If <THISDIR> is included, then it
+        is replaced by the directory the Patch file is in.
+        Usage: RUN <filename> | <pathname> | <THISDIR>.<filename> | <CODE>
+        
+WIMPRUN Performs the same as RUN, except that the file is Filer_Run.
+
+EXAMINE Used to examine memory to check that it is what you expect it to be.
+        Usually this is used after executing the code. The output is saved to
+        a file and loaded as a text file.
+        Usage: EXAMINE <start> <end> | +<length>
+
+CAPTURE Captures all output into a spool file.
+        This is usually used where the output cannot be captured in a
+        TaskWindow.
+        Usage: CAPTURE [ ON | OFF ]
+        Default is ON
+
+END     End section, start End section
+
+*****************************************************************************
+
+End section
+===========
+
+All text in the end section will be appended to the file and never be
+executed, unless it is called as a PROCedure or FuNction.
+
+This is useful for including information about the author, or program.
+However, it's real purpose is to allow functions to be used as macros.
+
+*****************************************************************************
+
+Workspace
+=========
+
+What is the point of using workspace blocks ? Well, it's easier to see a
+reference :
+   LDRW   r0,`taskhandle   means get the taskhandle
+than
+   LDR    r0,[r12,#8].
+
+Also, it's easy to use.
+
+Begin a workspace block with DEFINE WORKSPACE and end it with END WORKSPACE.
+
+Within these blocks, you should use the following commands :
+NAME     Sets the name of the block
+PREFIX   Allows you to specify a prefix to use within this block variables,
+         so a variable named x0 with a prefix of win becomes winx0. When
+         used, ` prefixes to the original name are retained, so `x0 would
+         become `winx0.
+DEFAULT  Sets the default register to use for the workspace.
+
+All other lines are treated in one of two ways. The first of these is the
+offset format, and the second is the relative format. Both give the same
+structure types, but the offset format gives the absolute offsets into the
+block. It is not recommended that you mix blocks.
+
+Offset format
+-------------
+This can be used when you know all the offsets will be fixed, or if the
+lengths of the blocks are so awkward that you can't be bothered to do it by
+reference. In this form, the definitions are :
+  <offset><spaces><identifier>[<spaces><comment>]
+where <offset> is either a decimal number, or a hex number prefixed by &.
+
+Relative format
+---------------
+This is a much more powerful format for creating workspace structures, and is
+similar (though in no way compatible) to that used by ObjAsm. In this form,
+the definitions are :
+  [=]<variable><spaces><type>[repetitions][<spaces><comment>]
+where <type> is :
+  !  an integer word (ie 4 bytes)
+  %  a byte
+  $  a string (<repetitions> is the number of characters including terminator)
+  ^  structure reference in the form
+     ^<name>[<space><repetitions>]
+     
+and <repititions> is the number of times the space is repeated (ie four words
+would be !4.
+
+Within this structure, blocks may be repeated, or "unioned" by using brackets
+to group the items. Placing a ( alone on a line begins a grouping, ) alone
+ends a grouping, and ) followed by a number sets a number repetitions for the
+block.
+
+Within a grouping, | on its own on a line sets a union. This means
+that the relative pointer is reset to the start of that group so that an
+alternate set of names may be given. This is used in ObjAsm OSLib header
+files to define things like the Wimp_SendMessage blocks where the data is
+dependant on the code.
+
+Such unions should be of equal length under the current version, or if not,
+the last union MUST be the largest. Later versions may remove this
+constraint, but should not be relied upon.
+
+Using workspace
+---------------
+To use workspace within the code, use [ LDR|STR ][B]W or ADRW commands. To
+find the length of a block of workspace, use `len_<name>.
+
+
+*****************************************************************************
+Yes, last section, and woooo, it's a biggy...
+
+Module section
+==============
+
+Modules are easy to write. You may not think that now, but after using
+JFPatch for some time to create modules, you will find that modules are so
+simple to program that you may have to get a life to fill the time you would
+have spent struggling ;-) Only kidding poeple...
+
+Module definitions are enclosed by DEFINE MODULE and END MODULE, and within
+this, the fields are :
+
+NAME       Module name as used in *Modules command (default=Untitled)
+VERSION    Version number to use in help string (default=1.00, or the version
+           in the header.
+AUTHOR     Author name to use in help string (default=not used)
+HELP       Name to use in *Help Modules (default=<NAME>)
+INIT       Initialisation address or label (default=no code)
+FINAL      Finalisation address or label (default=no code)
+START      Start address or label (default=no code)
+SERVICE    Service handler
+SERVICES   Begin services definition (instead of a user handler
+EVENTS     Begin events definition
+VECTORS    Begin vectors definition
+COMMANDS   Begin OSCLI/Help/Configure commands definition
+SWIHANDLER SWI handler code (default=handled automatically)
+SWIS       Begin SWI call definition
+WORKSPACE  Length of workspace to claim in r12, prefix with * to initialise 0
+WIMPSWIS   Begin WimpSWIVe handler definition (WimpSWIVe © Andrew Clover)
+PREFILTER  Begin a Pre-Poll filter
+POSTFILTER Begin a Post-Poll filter
+
+The only one which really ought to be defined is NAME, although all are
+optional.
+
+Init, final and service code
+----------------------------
+Whilst you may not have defined some of these, they may be created for you by
+the program to implement other features. The cases are as follows :
+
+Workspace used:   Init used to claim workspace, Final used to release it
+Filters used:     Init used to register, Final used to deregister, Service
+                  used to claim on FilterManager start up.
+WimpSWIs used:    Init used to claim, Final used to release.
+Services used:    Service handler caught /before/ 'Service' entry.
+Vectors used:     Init used to claim, Final used to release.
+Events used:      Init used to claim, Final used to release.
+
+
+Module workspace (private word)
+----------------
+Within each module there is a private word which is usually used to store the
+address of the modules workspace. Because of the way in JFPatch works (ie.
+creating it's own handlers), it is easier for these handlers to pass the
+address of the workspace to your routines, rather than a pointer to the
+workspace's address. This only applies if workspace is claimed; otherwise,
+r12 is a pointer to your private word just as normal.
+
+If workspace is claimed, the following will have r12 pointing to the private
+space :
+  Init
+  Final
+  Service
+  Services (definition type)
+  Events
+  Vectors
+  SWIs
+  WimpSWIs
+  Filters
+
+Commands will NOT receive r12 -> workspace, but r12 -> private word,
+which contains the pointer to the workspace. Therefore, you should use LDR
+r12,[r12] to get the pointer to the workspace. This is VERY important,
+otherwise you'll overwrite lots of very important pieces of data in the
+system heap.
+
+
+Services
+--------
+Services can be handled manually with the 'Service' entry, but a much easier
+way exists to do this by means of a definition block. Lines are in the form :
+  <service> <spaces> <code>
+
+Where <service> can be a decimal or hex number, or any string from the
+!JFPatch.Resources.Services file. This contains the service names
+(approximately) as given in OSLib header files. The block should be ended
+with :
+  End Services
+
+Vectors
+-------
+Vectors can be claimed and released manually using init and final code, but
+by using a definition block many of the problems you may come across are
+removed and things look a bit clearer. The lines are of the form :
+  <vector> <spaces> <code>
+
+Where <vector> can be a decimal or hex number, or any string from the
+!JFPatch.Resources.Vectors file. This contains the vector names
+(approximately) as given in OSLib header files. The block should be ended
+with :
+  End Vectors
+
+Events
+------
+Whilst you can trap events using the Vectors call or manually, it's probably
+easier to have these in a seperate section. The lines are of the form :
+  <event> <spaces> <code>
+
+Where <event> is a decimal or hex number, or a string from the
+!JFPatch.Resources.Events file. This contains the vector names as given in
+OSLib headers files except that I've prepended the module name if there is
+one. The block should end with :
+  End Events
+
+
+Commands
+--------
+Commands are denoted by COMMANDS to start, and END COMMANDS to end. Entries
+within this block, the fields are :
+
+NAME      The command name
+CODE      Code to execute when called (default= no code)
+MAX       Maximum number of parameters which may be passed
+MIN       Minimum number of parameters which may be passed
+TYPE      Type of command (default=command!)
+          Options : FS, CONFIG
+FLAGS     Value of the command flags. Overrides the max, min and type
+          settings.
+SYNTAX    Syntax of the command (defaults to no message)
+HELP      Help on the command (defaults to no message)
+
+SYNTAX and HELP may be followed by a single line, or alternatively by ... In
+the latter form, the next lines will be taken as being the message,
+terminating when the indentation reduce past that at the first line. To embed
+control strings, use GSTrans format.
+
+Note again that r12 is not passed as the workspace, but as a pointer to the
+private word if the workspace is set.
+
+
+SWIs
+----
+SWI blocks, like command blocks are surrounded by SWIs and END SWIs. Within
+this block, the following two fields are allowed :
+BASE     Sets the base number of the SWI calls, prefix with & for hex
+PREFIX   Sets the prefix for all the calls. Omit the trailling _.
+
+All other lines should be in the form :
+  <number> <spaces> <alias> <spaces> <code>
+
+
+WimpSWIs
+--------
+WimpSWIve is a gorgeous little module written by Andrew Clover which allows
+you to replace certain Wimp calls with other, much nicer calls :-)
+For more information, read the WSWI-Help documentation in Applics. Again, the
+section is surrounded by WIMPSWIS and END WIMPSWIS. And the fields are :
+
+SWI      Full name of WimpSWI to replace
+PRE      Pre-handler code (before real call being called)
+POST     Post-handler code (after real call being called)
+
+Either the Pre-Handler or the post handler may be prefixed by the ^ symbol.
+In which case, the code will have the high priority bit set. Mixed priority
+SWI handlers are not allowed, and you must use two seperate definitions if
+you wish to do that.
+
+Filters
+-------
+Filters are one of the most useful of the features of RO3 (to the programmer
+at least). Filters allow you to trap calls Wimp_Poll in much the same way
+that WimpSWIs do for the other calls. There are two types of Filters which
+can be used, Pre- and Post-poll filters. These are in seperate sections,
+delimited by <POST | PRE>FILTER and END [PRE | POST]FILTER, and both are
+handled in a similar manner :
+
+NAME     *  Name for the filter (for the list)
+CODE     *  Filter handler code
+MASK        Wimp_Poll mask (only post-filters)
+ACCEPT      An alternate way of specifying the filter mask
+TASK     *  Task name to apply filter to (or - for all tasks)
+
+Those marked * must be specified for both pre- and post-filters plus,
+post-filters must have either MASK or ACCEPT specified. ACCEPT commands must
+be given on seperate lines, and the names are :
+
+ Primary name     Secondary name            Tertiary name
+ --------------------------------------------------------
+ Null
+ Redraw
+ OpenWindow
+ CloseWindow
+ PointerLeaving
+ PointerEntering
+ MouseClick
+ UserDragBox      DragDropped
+ KeyPress         KeyPressed
+ Menu             MenuSelection
+ Scroll           ScrollRequest
+ LoseCaret
+ GainCaret
+ PollWord
+ UserMsg          UserMessage               Message
+ UserMsgRec       UserMessageRecorded       MessageRec
+ UserMsgAck       UserMessageAcknowledged   MessageAck
+
+*****************************************************************************
+
+Using Zap with JFPatch
+======================
+
+Firstly, due to the way in which Zap truncates filenames on the title bar,
+sometimes it may not be possible to find out which file the caret is in.
+This is only a problem when using non-throwback output.
+
+Secondly, and more importantly, you may find that the standard keymap is not
+so great for using with Zap. I suggest that you work out some sensible map
+for yourself - I've spent ages working on mine and so almost all of my
+friends hate it for being so non-standard.
+
+*****************************************************************************

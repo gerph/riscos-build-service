@@ -1,0 +1,190 @@
+In   -
+Out  printf
+Type AOF
+Ver  1.00q
+
+#Area "JFP:PrintF" Code ReadOnly
+#Rem =Rem
+#CodePrefix =Prefix
+; *******************************************************************
+; Subroutine:   printf
+; Description:  Incredibly simple printf
+; Parameters:   as printf
+;               r0-> format string
+;               r1-r3 params
+; Returns:      as printf
+; *******************************************************************
+>|printf|
+   STMFD   (sp)!,{r1-r3}                 ; so that registers are in order
+   MOV     r1,sp                         ; r1-> base of registers (fp !)
+   STMFD   (sp)!,{r2-r5,link}            ; Stack registers
+   MOV     r2,r0                         ; r2-> format
+$loop
+   LDRB    r0,[r2],#1                    ; read byte and inc
+   TEQ     r0,#0                         ; is it 0 ?
+   BEQ     $exit                         ; if so, jump out
+   TEQ     r0,#10                        ; is it 10 ?
+   SWIEQ   "OS_NewLine"                  ; if so, print a newline
+   BEQ     $loop                         ;        and get more
+   TEQ     r0,#ASC("%")                  ; is it % ?
+   SWINE   "OS_WriteC"                   ; if not, print it
+   BNE     $loop                         ;         and go for more
+   LDRB    r0,[r2],#1                    ; read byte and inc
+   TEQ     r0,#ASC("i")                  ; integer
+   TEQNE   r0,#ASC("d")                  ; integer (printf)
+   BEQ     $showint                      ; if so, show it
+   TEQ     r0,#ASC("s")                  ; string
+   BEQ     $showstr                      ; and go for more
+   TEQ     r0,#ASC("S")                  ; string - ctrl terminated
+   BEQ     $showstrctrl                  ; and go for more
+   TEQ     r0,#ASC("c")                  ; char
+   BEQ     $showchar                     ; show it
+   TEQ     r0,#ASC("x")                  ; hex number
+   TEQNE   r0,#ASC("X")                  ; hex number (upper case - ignored)
+   TEQNE   r0,#ASC("p")                  ; pointer
+   BEQ     $showhex                      ; show it
+   SWI     "OS_WriteC"                   ; if unknown, just print it
+   B       $loop
+
+$showint
+   LDR     r0,[r1],#4                    ; read value and inc
+   STMFD   (sp)!,{r1,r2}
+   SUB     sp,sp,#12                     ; space for the string
+   XSWI    "OS_ConvertInteger4",,r13,12  ; not a big buffer
+   MOV     r2,#0                         ; terminator
+   STRB    r2,[r1]                       ; terminate it
+   SWI     "OS_Write0"                   ; write it
+   ADD     sp,sp,#12                     ; skip the space we allocated
+   LDMFD   (sp)!,{r1,r2}
+   B       $loop                         ; and go for more
+
+
+$showhex
+   LDR     r0,[r1],#4                    ; read value and inc
+   STMFD   (sp)!,{r1,r2}
+   SUB     sp,sp,#12                     ; space for the string
+   XSWI    "OS_ConvertHex8",,r13,12      ; not a big buffer
+   MOV     r2,#0                         ; terminator
+   STRB    r2,[r1]                       ; terminate its
+   SWI     &100+ASC("&")                 ; prefix with &
+   SWI     "OS_Write0"                   ; write it
+   ADD     sp,sp,#12                     ; skip the space we allocated
+   LDMFD   (sp)!,{r1,r2}
+   B       $loop                         ; and go for more
+
+$showstr
+   LDR     r0,[r1],#4                    ; read value and inc
+   SWI     "OS_Write0"                   ; write it
+   B       $loop
+
+$showchar
+   LDR     r0,[r1],#4                    ; read value and inc
+   SWI     "OS_WriteC"                   ; write it
+   B       $loop
+
+$showstrctrl
+   LDR     r3,[r1],#4                    ; read pointer from stack
+$ssc_loop
+   LDRB    r0,[r3],#1                    ; read and inc
+   CMP     r0,#32                        ; is it 'ok' ?
+   SWIGE   "OS_WriteC"                   ; if so, write it
+   BGE     $ssc_loop                     ; keep writing
+   B       $loop                         ; and get more
+
+$exit
+   LDMFD   (sp)!,{r2-r5,link}            ; Restore registers
+   ADD     sp,sp,#3*4                    ; skip r1-r3
+   MOVS    pc,link                       ; return
+
+#Area "JFP:SPrintF" Code ReadOnly
+; *******************************************************************
+; Subroutine:   sprintf
+; Description:  Incredibly simple sprintf
+; Parameters:   as sprintf
+;               r0-> buffer
+;               r1-> format string
+;               r2-r3 params
+; Returns:      as sprintf
+; *******************************************************************
+>|sprintf|
+   STMFD   (sp)!,{r2-r3}                 ; so that registers are in order
+   STMFD   (sp)!,{r2-r6,link}            ; Stack registers
+   MOV     r6,r0                         ; r6-> output buffer
+   MOV     r2,r1                         ; r2-> format
+   ADD     r1,sp,#6*4                    ; r1-> base of registers (fp !)
+$loop
+   LDRB    r0,[r2],#1                    ; read byte and inc
+   TEQ     r0,#0                         ; is it 0 ?
+   BEQ     $exit                         ; if so, jump out
+   TEQ     r0,#10                        ; is it 10 ?
+   SWIEQ   "OS_NewLine"                  ; if so, print a newline
+   BEQ     $loop                         ;        and get more
+   TEQ     r0,#ASC("%")                  ; is it % ?
+   SWINE   "OS_WriteC"                   ; if not, print it
+   BNE     $loop                         ;         and go for more
+   LDRB    r0,[r2],#1                    ; read byte and inc
+   TEQ     r0,#ASC("i")                  ; integer
+   TEQNE   r0,#ASC("d")                  ; integer (printf)
+   BEQ     $showint                      ; if so, show it
+   TEQ     r0,#ASC("s")                  ; string
+   BEQ     $showstr                      ; and go for more
+   TEQ     r0,#ASC("S")                  ; string - ctrl terminated
+   BEQ     $showstrctrl                  ; and go for more
+   TEQ     r0,#ASC("c")                  ; char
+   BEQ     $showchar                     ; show it
+   TEQ     r0,#ASC("x")                  ; hex number
+   TEQNE   r0,#ASC("X")                  ; hex number (upper case - ignored)
+   TEQNE   r0,#ASC("p")                  ; pointer
+   BEQ     $showhex                      ; show it
+   SWI     "OS_WriteC"                   ; if unknown, just print it
+   B       $loop
+
+$showint
+   LDR     r0,[r1],#4                    ; read value and inc
+   STMFD   (sp)!,{r1,r2}
+   SUB     sp,sp,#12                     ; space for the string
+   XSWI    "OS_ConvertInteger4",,r13,12  ; not a big buffer
+   MOV     r2,#0                         ; terminator
+   STRB    r2,[r1]                       ; terminate it
+   SWI     "OS_Write0"                   ; write it
+   ADD     sp,sp,#12                     ; skip the space we allocated
+   LDMFD   (sp)!,{r1,r2}
+   B       $loop                         ; and go for more
+
+
+$showhex
+   LDR     r0,[r1],#4                    ; read value and inc
+   STMFD   (sp)!,{r1,r2}
+   SUB     sp,sp,#12                     ; space for the string
+   XSWI    "OS_ConvertHex8",,r13,12      ; not a big buffer
+   MOV     r2,#0                         ; terminator
+   STRB    r2,[r1]                       ; terminate its
+   SWI     &100+ASC("&")                 ; prefix with &
+   SWI     "OS_Write0"                   ; write it
+   ADD     sp,sp,#12                     ; skip the space we allocated
+   LDMFD   (sp)!,{r1,r2}
+   B       $loop                         ; and go for more
+
+$showstr
+   LDR     r0,[r1],#4                    ; read value and inc
+   SWI     "OS_Write0"                   ; write it
+   B       $loop
+
+$showchar
+   LDR     r0,[r1],#4                    ; read value and inc
+   SWI     "OS_WriteC"                   ; write it
+   B       $loop
+
+$showstrctrl
+   LDR     r3,[r1],#4                    ; read pointer from stack
+$ssc_loop
+   LDRB    r0,[r3],#1                    ; read and inc
+   CMP     r0,#32                        ; is it 'ok' ?
+   SWIGE   "OS_WriteC"                   ; if so, write it
+   BGE     $ssc_loop                     ; keep writing
+   B       $loop                         ; and get more
+
+$exit
+   LDMFD   (sp)!,{r2-r6,link}            ; Restore registers
+   ADD     sp,sp,#2*4                    ; skip r2-r3
+   MOVS    pc,link                       ; return

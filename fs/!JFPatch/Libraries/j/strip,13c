@@ -1,0 +1,47 @@
+In   -
+Out  string
+Type AOF
+Ver  1.01e
+
+#Rem =Rem
+#CodePrefix =Prefix
+#Area "JFP:String:Strip" Code ReadOnly
+; ***************************************************************
+; Name:         SkipWhitespace
+; Function:     Skips whitespace
+; On Entry:     r0 -> NUL-terminated string
+; On Exit:      r0 -> first non-whitespace character
+; Notes:        Not a standard ANSI routine
+; ***************************************************************
+>|SkipWhitespace|
+        STMFD   R13!,{R14}
+$lp
+        LDRB    R14,[R0],#1     ; read it and increment
+        TEQ     R14,#ASC" "
+        TEQNE   R14,#9          ; tab is whtspce
+        TEQNE   R14,#10
+        TEQNE   R14,#13         ; so is lf/cr
+        SUBNE   R0,R0,#1        ; move back over it
+        LDMNEFD R13!,{PC}^      ; ldm put first for optimization reasons
+        B       $lp
+:
+
+; ***************************************************************
+; Name:         SkipNonWhitespace
+; Function:     Skips to end of string, or next whitespace
+; On Entry:     r0 -> NUL-terminated string
+; On Exit:      r0 -> first whitespace character, or \0
+; Notes:        Not a standard ANSI routine
+; ***************************************************************
+>|SkipNonWhitespace|
+        STMFD   R13!,{R14}
+$lp
+        LDRB    R14,[R0],#1     ; read it and increment
+        TEQ     R14,#ASC" "
+        TEQNE   R14,#9          ; tab is whtspce
+        TEQNE   R14,#10
+        TEQNE   R14,#13         ; so is lf/cr
+        TEQNE   R14,#0          ; NUL is 'whitespace' in this definition
+        BNE     $lp
+        SUB     R0,R0,#1        ; go back if found
+        LDMFD   R13!,{PC}^

@@ -1,0 +1,5 @@
+This code can be found at &380C140 in the A5000 OS; you might like to use it :
+
+   CMP     r2,#ASC("a")
+   RSBGES  r14,r2,#ASC("z")
+   SUBGE   r2,r2,#&20

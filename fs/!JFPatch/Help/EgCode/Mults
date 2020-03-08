@@ -1,0 +1,20 @@
+These are a few simple multiplication routines for simple things.
+If you find another to be useful, add it to this file and you can
+refer to it in future.
+
+Multiply by 2^n (i.e. 2,4,8,16,32...)
+-------------------------------------
+MOV      R1,R1,LSL #n
+
+Multiply by 2^n+1 (i.e. 3,5,9,17,33...)
+---------------------------------------
+ADD      R1,R1,R1,LSL #n
+
+Multiply by 2^n-1 (i.e. 3,7,15,31...)
+-------------------------------------
+RSB      R1,R1,R1,LSL #n
+
+Multiply by 10
+--------------
+ADD      R1,R1,R1,LSL #2     ; Multiply by 5
+MOV      R1,R1,LSL #1        ; Multiply by 2

@@ -1,0 +1,41 @@
+%YAML 1.1
+---
+# Configuration for use with JFPatch
+
+config:
+  safe: true
+
+  emulation.disable_interrupt: yes
+  graphics.implementation: 'null'
+  memorymap.zeropage_enable: yes
+  memorymap.appspace_size: 12M
+  input.readline_native: yes
+  taskwindow.in_taskwindow: true
+  filesystem.native_directory: fs
+  input.eof_effect: exit
+
+modules:
+  internal: true
+  rom:
+    - fs/modules/BASIC,ffa
+    - fs/modules/SCL,ffa
+    - fs/modules/FPEmulator,ffa
+
+variables:
+  #'Alias$FX': '||'
+  #'Alias$If': '||'
+  #'Alias$Cdir': '||'
+  #'Alias$Unset': '||echo *Unset '
+  #'Alias$Set': '||echo *Set '
+  'Alias$WimpSlot': '||'
+  'JFPatch$ScrapDir': '$.tmp'
+  'JFPatch$Dir': '$.!JFPatch'
+  'C$Path': $.dev.
+
+#debug:
+#  - envcalls
+#  - exceptions
+
+execute:
+  - command: lib Library
+  - command: dir work

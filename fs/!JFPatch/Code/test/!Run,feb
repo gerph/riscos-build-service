@@ -1,0 +1,6 @@
+| !Run file for test
+| Produced by JFPatch 
+Set test$Dir <Obey$Dir>
+WimpSlot -min 128k -max 128k
+| Load module
+RMEnsure test 1.00 RMLoad <test$Dir>.test

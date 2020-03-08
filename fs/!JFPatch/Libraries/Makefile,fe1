@@ -1,0 +1,88 @@
+# Project:   jfplib
+
+
+# Toolflags:
+CCflags = -c -depend !Depend -IC: -throwback
+C++flags = -c -depend !Depend -IC: -throwback
+Linkflags = -aif -v -c++ -o $@ 
+ObjAsmflags = -throwback -NoCache -depend !Depend
+CMHGflags = 
+LibFileflags = -c -o $@
+Squeezeflags = -o $@
+PCflags = -c -depend !Depend -throwback -IP:
+JFPatchflags = -depend !Depend -throwback -out $@ -nobanner
+BasToTxtflags = { > $@ }
+BasicToCflags = -o $@ -4
+MakeDllflags = -o $@
+LinkDllflags = $(linkflags)
+
+
+# Final targets:
+@.test:   @.o.test @.o.jfplib 
+        link $(linkflags) @.o.test @.o.jfplib 
+@.o.jfplib:   @.o.fileio @.o.memory @.o.string @.o.main @.o.math @.o.stdio \
+        @.o.strip @.o.printf 
+        libfile $(libfileflags) @.o.fileio @.o.memory @.o.string @.o.main \
+        @.o.math @.o.stdio @.o.strip @.o.printf 
+
+
+# User-editable dependencies:
+
+
+# Static dependencies:
+@.o.fileio:   @.j.fileio
+        JFPatch -in @.j.fileio $(jfpatchflags)
+@.o.memory:   @.j.memory
+        JFPatch -in @.j.memory $(jfpatchflags)
+@.o.string:   @.j.string
+        JFPatch -in @.j.string $(jfpatchflags)
+@.o.main:   @.j.main
+        JFPatch -in @.j.main $(jfpatchflags)
+@.o.test:   @.j.test
+        JFPatch -in @.j.test $(jfpatchflags)
+@.o.math:   @.j.math
+        JFPatch -in @.j.math $(jfpatchflags)
+@.o.stdio:   @.j.stdio
+        JFPatch -in @.j.stdio $(jfpatchflags)
+@.o.strip:   @.j.strip
+        JFPatch -in @.j.strip $(jfpatchflags)
+@.o.printf:   @.j.printf
+        JFPatch -in @.j.printf $(jfpatchflags)
+
+
+# Dynamic dependencies:
+o.memory:	j.memory
+o.memory:	j.Rem
+o.memory:	j.Prefix
+o.memory:	j.memory
+o.main:	j.main
+o.main:	j.Rem
+o.main:	j.Prefix
+o.main:	j.main
+o.math:	j.math
+o.math:	j.Rem
+o.math:	j.Prefix
+o.math:	j.math
+o.stdio:	j.stdio
+o.stdio:	j.Rem
+o.stdio:	j.Prefix
+o.stdio:	j.stdio
+o.strip:	j.strip
+o.strip:	j.Rem
+o.strip:	j.Prefix
+o.strip:	j.strip
+o.printf:	j.printf
+o.printf:	j.Rem
+o.printf:	j.Prefix
+o.printf:	j.printf
+o.test:	j.test
+o.test:	j.Prefix
+o.test:	j.test
+o.fileio:	j.fileio
+o.fileio:	j.Rem
+o.fileio:	j.Prefix
+o.fileio:	j.fileio
+o.string:	j.string
+o.string:	j.Rem
+o.string:	j.Prefix
+o.string:	j.string

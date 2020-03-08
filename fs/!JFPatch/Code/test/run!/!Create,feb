@@ -1,0 +1,5 @@
+| !Create file for test
+| Produced by JFPatch 
+Set test$Dir <Obey$Dir>
+WimpSlot -min 128k -max 128k
+Run <test$Dir>.PatchBas

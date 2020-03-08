@@ -1,0 +1,4 @@
+WimpSlot -min %0 -max %0
+Basic -Quit <JFPatch$ScrapDir>.Patch
+||%1
+| The name of the application
