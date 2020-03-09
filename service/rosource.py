@@ -66,7 +66,14 @@ class RISCOSSource(object):
     def __del__(self):
         if getattr(self, 'dir'):
             if getattr(self, 'shutil'):
-                self.shutil.rmtree(self.dir)
+                try:
+                    self.shutil.rmtree(self.dir)
+                except Exception:
+                    pass
+
+    def close(self):
+        if self.dir and os.path.isdir(self.dir):
+            self.shutil.rmtree(self.dir)
 
     def make_filename(self, path, filetype=None):
         name = path
