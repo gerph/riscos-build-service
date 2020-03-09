@@ -13,6 +13,7 @@ FILETYPE_H = 0x2FFF
 FILETYPE_OBJASM = 0x3FFF
 FILETYPE_CMHG = 0x4FFF
 FILETYPE_PASCAL = 0x5FFF
+FILETYPE_PERL = 0x102
 FILETYPE_AMU = 0xFE1
 FILETYPE_JSON = 0xF75
 FILETYPE_THROWBACK = 0x1F75
@@ -22,7 +23,9 @@ BUILDABLE_FILETYPES = (FILETYPE_BASIC,
                        FILETYPE_JFPATCH,
                        FILETYPE_C,
                        FILETYPE_OBJASM,
-                       FILETYPE_PASCAL)
+                       FILETYPE_PASCAL,
+                       FILETYPE_PERL,
+                      )
 
 # For those times when we don't know
 FILETYPE_DEFAULT = FILETYPE_DATA

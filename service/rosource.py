@@ -164,7 +164,12 @@ class RISCOSSource(object):
                 data.startswith('program ')]):
             return FILETYPE_PASCAL
 
-        # FIXME: Recognise perl?
+        (firstline, rest) = data.split('\n', 1)
+
+        if any([data.startswith('#!') and 'perl' in firstline,
+                '\nBEGIN {' in data,]):
+            return FILETYPE_PERL
+
         # FIXME: Recognise Obey?
 
         return FILETYPE_DATA

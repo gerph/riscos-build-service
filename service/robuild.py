@@ -100,6 +100,20 @@ class ROBuilderBASTXT(ROBuilderBASIC):
 
 
 @register_builder
+class ROBuilderPerl(ROBuilderSingleFile):
+    tool_name = 'Perl'
+    tool_command = 'Perl'
+    tool_filetype = FILETYPE_PERL
+
+    def commands(self):
+        args = ['{}'.format(self.tool_command)]
+
+        args.append(self.ro_filename)
+
+        return [' '.join(args)]
+
+
+@register_builder
 class ROBuilderC(ROBuilderSingleFile):
     tool_name = 'Norcroft C'
     tool_command = 'CC'

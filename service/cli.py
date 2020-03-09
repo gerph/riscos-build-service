@@ -45,8 +45,13 @@ for line in output:
     print("  {}".format(line))
 print("")
 
+print("Builder messages:")
+for line in result.messages:
+    print("  {}".format(line))
+print("")
+
 if result.clipboard:
-    print("Output:")
+    print("Generated file:")
     for clip in result.clipboard:
         print("  Filetype:    {:03x}".format(clip.filetype))
         print("  Size:        {} bytes".format(len(clip.data)))
