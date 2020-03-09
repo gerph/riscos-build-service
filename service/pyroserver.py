@@ -78,6 +78,7 @@ class PyroServer(pyro.Pyro):
         else:
             self.post_scheme = scheme
             self.post_hostname = hostname or socket.getfqdn()
+            #print("Hostname is {}".format(self.post_hostname))
             self.post_port = port
             self.post_path = path
 
@@ -186,6 +187,7 @@ class PyroNativeServer(PyroServer):
             if not self.post_port:
                 # They requested an ephemeral port, so find out what that port is.
                 self.post_port = self.server.server_address[1]
+            #print("Listening at {}".format(self.server.server_address))
             self.server.timeout = 1
             # We want the server to run on another thread
             def start(pyro=self, server=self.server):

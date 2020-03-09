@@ -27,5 +27,9 @@ BUILDABLE_FILETYPES = (FILETYPE_BASIC,
                        FILETYPE_PERL,
                       )
 
+AOF_GENERATING = (FILETYPE_OBJASM,
+                  FILETYPE_C,
+                  FILETYPE_PASCAL)
+
 # For those times when we don't know
 FILETYPE_DEFAULT = FILETYPE_DATA

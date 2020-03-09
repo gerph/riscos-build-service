@@ -3,10 +3,12 @@
 RISC OS/Unix filename convention conversions.
 """
 
+import calendar
 import os
 import shutil
 import struct
 import tempfile
+import time
 import zipfile
 
 import roname
@@ -37,6 +39,11 @@ directory_filetype = {
 tempdir = os.path.join(os.getcwd(), 'tmp')
 if not os.path.isdir(tempdir):
     os.mkdir(tempdir)
+
+
+def touch(fname, times=None):
+    with open(fname, 'a'):
+        os.utime(fname, times)
 
 
 class RISCOSSource(object):
@@ -229,6 +236,9 @@ class RISCOSSource(object):
                 is_dir = (zi.external_attr & 1) or filename.endswith('/')
                 #print("%s : ext %x int %x" % (filename, zi.external_attr, zi.internal_attr))
 
+                (year, month, day, hour, minute, second) = zi.date_time
+                epoch_time = calendar.timegm((year, month, day, hour, minute, second))
+
                 # Filename is always in unix format, but may be missing the filetype if a RISC OS
                 # extension is present.
                 ro_extension = False
@@ -239,7 +249,7 @@ class RISCOSSource(object):
                         if acorn_block[:4] == 'ARC0':
                             # It's a Spark block
                             ro_extension = True
-                            word = struct.unpack('<I', acorn_block[4:8])
+                            (word,) = struct.unpack('<I', acorn_block[4:8])
                             if word & 0xFFF00000 == 0xFFF00000:
                                 filetype = (word>>8) & 0xFFF
                                 filename += ',%03x' % (filetype,)
@@ -277,6 +287,7 @@ class RISCOSSource(object):
                             buildables.append((name, filetype))
 
                     files.append(name)
+                    touch(absfile, (epoch_time, epoch_time))
 
         #print(makefile)
         #print(buildables)
@@ -285,6 +296,13 @@ class RISCOSSource(object):
             self.primary_file = makefile
         elif len(buildables) == 1:
             self.primary_file = buildables[0]
+
+        # Touch all the buildable files so that they have a later timestamp than
+        # any of the other files - then they should be built by amu.
+        for name, filetype in buildables:
+            filename = os.path.join(self.dir, name.unix_filename)
+            if os.path.exists(filename):
+                touch(filename)
 
         self.buildables = buildables
         self.makefile = makefile

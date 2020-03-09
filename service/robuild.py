@@ -169,8 +169,18 @@ class ROBuilderMakefile(ROBuilderBase):
         args.append(self.ro_leafname)
         args.append('BUILD32=1')
 
-        return ['dir {}'.format(self.ro_dirname),
-                ' '.join(args)]
+        cmds = ['dir {}'.format(self.ro_dirname)]
+
+        need_odirectory = False
+        for f in self.source.buildables:
+            if f[1] in AOF_GENERATING:
+                need_odirectory = True
+
+        if need_odirectory:
+            cmds.append('cdir o')
+
+        cmds.append(' '.join(args))
+        return cmds
 
     def recognise(self):
         return bool(self.source.makefile)

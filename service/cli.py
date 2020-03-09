@@ -67,7 +67,7 @@ try:
             if tb.reason != 0:
                 print("  Severity:  {}".format(tb.severity))
                 print("  Line:      {}".format(tb.lineno))
-                print("  Message:   {}".format(tb.message))
+                print("  Message:   {}".format(tb.message.rstrip()))
             print("")
 finally:
     builder.close()
