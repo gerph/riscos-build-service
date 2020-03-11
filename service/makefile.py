@@ -518,6 +518,51 @@ class Makefile(object):
         self.implicit_targets[target_name] = new_target
         return new_target
 
+    def target_commands(self, goal=None):
+        """
+        Return all the commands that would be run by each of the required goals.
+
+        @return: A list of tuples of the form (target, command)
+        """
+        commands = []
+        if not goal:
+            goal = self.first_target.target
+
+        rule = self.find_rule(goal)
+        if not rule:
+            return commands
+
+        dependencies = rule.dependencies
+        for dependency in dependencies:
+            commands.extend(self.target_commands(goal=dependency))
+
+        for command in rule.commands:
+            expansion = self.expand(command, rule.variables)
+            expansion = expansion.lstrip('*')
+            expansion = expansion.lstrip(' ')
+            commands.append((goal, expansion))
+
+        return commands
+
+    def linkables(self, goal=None, link_tools=('link', 'drlink')):
+        """
+        Return all the linkable targets.
+
+        @return: A set of the linkable target names
+        """
+        commands = self.target_commands(goal=goal)
+
+        linkables = set([])
+        for target, command in commands:
+            if ' ' in command:
+                cmd, _ = command.split(' ', 1)
+            else:
+                cmd = command
+            if cmd.lower() in link_tools:
+                linkables |= set([target])
+
+        return linkables
+
 
 def read_makefile(mf_filename):
     with open(mf_filename) as fh:
@@ -530,6 +575,9 @@ def read_makefile(mf_filename):
 
 def show_tree(makefile, goal=None, built={}, indent=0):
     if not goal:
+        if not makefile.first_target:
+            raise ValueError("No default target known in makefile")
+
         goal = makefile.first_target.target
 
     rule = makefile.find_rule(goal)
@@ -553,7 +601,15 @@ def show_tree(makefile, goal=None, built={}, indent=0):
 
 
 if __name__ == '__main__':
-    mf_filename = '../example/pico-master/Makefile,fe1'
-    mf_filename = '../example/smIRC/Makefile'
-    mf = read_makefile(mf_filename)
+    import argparse
+    import os
+    import sys
+
+    parser = argparse.ArgumentParser(usage="%s [<options>]" % (os.path.basename(sys.argv[0]),))
+    parser.add_argument('--makefile', type=str, required=True,
+                        help="Makefile to process")
+
+    options = parser.parse_args()
+
+    mf = read_makefile(options.makefile)
     show_tree(mf)
