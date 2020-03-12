@@ -141,7 +141,7 @@ def received(client, server, message):
             harness.set_source(data)
             response('Source loaded')
 
-        elif action == 'go':
+        elif action == 'build':
             if harness.server_running:
                 error("Cannot start build. Build is already running")
                 return

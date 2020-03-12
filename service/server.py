@@ -1,6 +1,34 @@
 #!/usr/bin/env python
 """
 Bare HTTP server for processing stuff.
+
+Protocol
+--------
+
+The HTTP build service allows building of RISC OS binaries through a POST request,
+with the response format selectable through the URI.
+
+POST requests are application/x-www-form-urlencoded with the following parameters:
+
+* 'source': the source data to build
+
+The response depends on format selected by the URI. The following URIs are supported:
+
+* `/build/binary`: Outputs a binary file from the build when successful, with the content
+  type `application/riscos`, supplying the filetype with the name. On a failed build a
+  400 response will be given with a content type of `text/plain`, and a body describing
+  the build messages.
+
+* `/build/json`: Outputs JSON encoded details of the build and output. The following
+  dictionary keys are defined:
+    * 'messages': A list of build management messages, explaining what the system did to
+        perform the build
+    * 'throwback': A list of throwback event structures. Each structure is the same format
+        as the 'throwback' server action in the WebSocket protocol.
+    * 'output': A list of text lines output by the build process.
+    * 'data': Base64 encoded binary which was built
+    * 'filetype': RISC OS file type of the built binary
+    * 'rc': Return code for the build. Usually 0 for success or 1 for failure.
 """
 
 import base64
