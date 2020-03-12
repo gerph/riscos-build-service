@@ -3,6 +3,16 @@
 Invoke a RISC OS build on a given file.
 """
 
+import threading
+import time
+
+try:
+    # Python 2 has Queue with a capital
+    import Queue as queue
+except ImportError:
+    # Python 3 does not have a capital
+    import queue        # pylint: disable=import-error
+
 import docker
 from rosource import RISCOSSource
 import pyroserver
@@ -75,7 +85,7 @@ class Builder(object):
             print("Failed to stop server? - {}".format(exc))
             # And fall through
 
-        self.result.rc = rc
+        self.result.set_rc(rc)
         self.result.message("Return code: {}".format(rc))
 
     def close(self):
@@ -84,3 +94,61 @@ class Builder(object):
         if self.pyro:
             self.pyro.stop_server()
         # FIXME: Stop any docker that might be running by killing it?
+
+
+class BuilderStream(Builder):
+    """
+    A version of the Builder which collects data from the running jobs and streams the results.
+    """
+
+    # How often we send heartbeat message when there's no other data
+    heartbeat_period = 1
+
+    def __init__(self, *args, **kwargs):
+        callback_function = kwargs.pop('callback_function')
+        super(BuilderStream, self).__init__(*args, **kwargs)
+        self.stream = queue.Queue()
+        self.result = result.BuildResultQueue(queue=self.stream)
+        self.callback_function = callback_function
+        self.thread = None
+
+    def run(self):
+        """
+        Run the job, getting with the results fed into the callback function.
+        """
+        threadrun = super(BuilderStream, self).run
+        self.thread = threading.Thread(target=threadrun)
+        self.thread.start()
+
+        # We keep the accumulator
+        output_accumulator = []
+        while self.thread.is_alive() or not self.stream.empty():
+            try:
+                message = self.stream.get(True, self.heartbeat_period)
+            except queue.Empty:
+                message = ('heartbeat',)
+            code = message[0]
+            data = message[1:]
+            if code == 'output':
+                if '\n' in data[0]:
+                    (before_newline, after_newline) = data[0].rsplit('\n', 1)
+                    output_accumulator.extend([before_newline, '\n'])
+                    self.callback_function(code=code, data=(''.join(output_accumulator),))
+                    if after_newline:
+                        output_accumulator = [after_newline]
+                    else:
+                        output_accumulator = []
+                else:
+                    output_accumulator.append(data[0])
+                continue
+            else:
+                if output_accumulator:
+                    self.callback_function(code=code, data=(''.join(output_accumulator),))
+                    output_accumulator = []
+            if code == 'heartbeat':
+                continue
+            self.callback_function(code=code, data=data)
+
+        # If there was anything left, send it on.
+        if output_accumulator:
+            self.callback_function(code=code, data=(''.join(output_accumulator),))

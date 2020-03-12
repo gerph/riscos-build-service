@@ -23,6 +23,7 @@ class ThrowbackData(object):
         self.message = data.get('message')
         self.lineno = data.get('lineno')
         self.severity = data.get('severity')
+        self.severity_name = data.get('severity_name')
 
     def __repr__(self):
         return "<{}({} for {}: {})>".format(self.__class__.__name__,
@@ -35,6 +36,7 @@ class ThrowbackData(object):
                 'reason': self.reason,
                 'reason_name': self.reason_name,
                 'severity': self.severity,
+                'severity_name': self.severity_name,
                 'filename': self.filename.ro_filename,
                 'message': self.message,
                 'lineno': self.lineno,
@@ -62,6 +64,9 @@ class BuildResult(object):
 
     def output_complete(self):
         self.finished = True
+
+    def set_rc(self, rc):
+        self.rc = rc
 
     def throwback_received(self, data):
         self.throwback.append(ThrowbackData(data))
@@ -96,3 +101,38 @@ class BuildResultLines(BuildResult):
                 self.output_full = False
             else:
                 self.output[-1] += data
+
+
+class BuildResultQueue(BuildResult):
+    """
+    Places all the output on to a queue.
+    """
+
+    def __init__(self, *args, **kwargs):
+        queue = kwargs.pop('queue')
+        super(BuildResultQueue, self).__init__(*args, **kwargs)
+        self.queue = queue
+
+    def output_data(self, data):
+        super(BuildResultQueue, self).output_data(data)
+        self.queue.put(('output', data))
+
+    def output_complete(self):
+        super(BuildResultQueue, self).output_complete()
+        self.queue.put(('finished', True))
+
+    def set_rc(self, rc):
+        super(BuildResultQueue, self).set_rc(rc)
+        self.queue.put(('rc', rc))
+
+    def throwback_received(self, data):
+        super(BuildResultQueue, self).throwback_received(data)
+        self.queue.put(('throwback', data))
+
+    def clipboard_received(self, data, filetype):
+        super(BuildResultQueue, self).clipboard_received(data, filetype)
+        self.queue.put(('clipboard', Clipboard(data, filetype)))
+
+    def message(self, message):
+        super(BuildResultQueue, self).message(message)
+        self.queue.put(('message', message))
