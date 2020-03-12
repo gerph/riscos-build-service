@@ -3,7 +3,11 @@
 Extract files from a source package ready for building.
 """
 
+import os
+
 from rofiletypes import *
+
+import makefile
 
 
 builder_classes = []
@@ -171,13 +175,30 @@ class ROBuilderMakefile(ROBuilderBase):
 
         cmds = ['dir {}'.format(self.ro_dirname)]
 
-        need_odirectory = False
-        for f in self.source.buildables:
-            if f[1] in AOF_GENERATING:
-                need_odirectory = True
+        needed_directories = set([])
+        try:
+            # Process the makefile to try to guess what we need
+            mf_filename = os.path.join(self.source.dir, self.source.makefile.unix_filename)
+            mf = makefile.read_makefile(mf_filename)
 
-        if need_odirectory:
-            cmds.append('cdir o')
+            for target, command in mf.target_commands():
+                if '/' not in target and '.' in target:
+                    target_dir, _name = target.rsplit('.', 1)
+                    needed_directories |= set([target_dir])
+
+        except Exception as exc:
+            print("Failed to read Makefile: {}".format(exc))
+
+            # Simple processing, looking at what buildables we have
+            need_odirectory = False
+            for f in self.source.buildables:
+                if f[1] in AOF_GENERATING:
+                    need_odirectory = True
+
+            if need_odirectory:
+                needed_directories |= set(['o'])
+
+        cmds.extend('cdir {}'.format(name) for name in needed_directories)
 
         cmds.append(' '.join(args))
         return cmds
