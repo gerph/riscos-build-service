@@ -1,2 +1,9 @@
-*.pyc
+# CI dirs
+artifacts/
+ci-logs/
 
+# Downloaded resources
+riscos-build/
+
+# Service temporary files
+*.pyc
