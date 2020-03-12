@@ -87,6 +87,7 @@ class Builder(object):
 
         self.result.set_rc(rc)
         self.result.message("Return code: {}".format(rc))
+        return rc
 
     def close(self):
         if self.rosource:
@@ -147,8 +148,14 @@ class BuilderStream(Builder):
                     output_accumulator = []
             if code == 'heartbeat':
                 continue
+            if code == 'finished':
+                # This is a message from the internal system that the execution has completed.
+                # It doesn't mean much to the end user, so we'll just drop it.
+                continue
             self.callback_function(code=code, data=data)
 
         # If there was anything left, send it on.
         if output_accumulator:
             self.callback_function(code=code, data=(''.join(output_accumulator),))
+
+        return self.result.rc

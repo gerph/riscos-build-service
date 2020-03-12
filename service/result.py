@@ -3,11 +3,22 @@
 Storage and communication for the results of a run.
 """
 
+import base64
 import collections
 
 import roname
 
-Clipboard = collections.namedtuple('Clipboard', 'data,filetype')
+class Clipboard(object):
+
+    def __init__(self, data, filetype):
+        self.data = data
+        self.filetype = filetype
+
+    def __jsonencode__(self):
+        return {
+                'data': base64.b64encode(self.data),
+                'filetype': self.filetype
+            }
 
 
 class ThrowbackData(object):
