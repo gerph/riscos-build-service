@@ -108,4 +108,7 @@ def url_build(format):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug = True
+    host = '0.0.0.0'
+    port = 13255
+    app.run(debug=True, host=host, port=port)

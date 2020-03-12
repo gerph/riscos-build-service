@@ -129,22 +129,25 @@ class BuilderStream(Builder):
             except queue.Empty:
                 message = ('heartbeat',)
             code = message[0]
-            data = message[1:]
+            if len(message) > 1:
+                data = message[1]
+            else:
+                data = None
             if code == 'output':
-                if '\n' in data[0]:
-                    (before_newline, after_newline) = data[0].rsplit('\n', 1)
+                if '\n' in data:
+                    (before_newline, after_newline) = data.rsplit('\n', 1)
                     output_accumulator.extend([before_newline, '\n'])
-                    self.callback_function(code=code, data=(''.join(output_accumulator),))
+                    self.callback_function(code=code, data=''.join(output_accumulator))
                     if after_newline:
                         output_accumulator = [after_newline]
                     else:
                         output_accumulator = []
                 else:
-                    output_accumulator.append(data[0])
+                    output_accumulator.append(data)
                 continue
             else:
                 if output_accumulator:
-                    self.callback_function(code=code, data=(''.join(output_accumulator),))
+                    self.callback_function(code=code, data=''.join(output_accumulator))
                     output_accumulator = []
             if code == 'heartbeat':
                 continue

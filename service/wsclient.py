@@ -13,8 +13,10 @@ def setup_parser():
     parser = argparse.ArgumentParser(usage="%s [<options>]" % (os.path.basename(sys.argv[0]),))
     parser.add_argument('--source', type=str,
                         help="Source file to build")
-    parser.add_argument('--server', type=str, default='localhost:13254',
-                        help="Use the streaming interface")
+    parser.add_argument('--server', type=str, default='jfpatch.riscos.online/ws',
+                        help="Server to connect to (default: 'jfpatch.riscos.online/ws')")
+    parser.add_argument('--output-base', type=str, default='built',
+                        help="Base name of the built binary, if any (default: 'built')")
 
     return parser
 
@@ -22,7 +24,7 @@ def setup_parser():
 parser = setup_parser()
 options = parser.parse_args()
 
-ws = create_connection("ws://{}/".format(options.server))
+ws = create_connection("ws://{}".format(options.server))
 
 STATE_AWAITWELCOME = 0
 STATE_SENDGO = 1
@@ -60,5 +62,12 @@ while state != STATE_COMPLETE:
     elif state == STATE_RUNNING:
         if action == 'complete':
             break
+
+        if action == 'clipboard':
+            # Received a result from the build, so let's save it
+            built = base64.b64decode(data['data'])
+            filename = '{},{:03x}'.format(options.output_base, data['filetype'] & 0xFFF)
+            with open(filename, 'wb') as fh:
+                fh.write(built)
 
 ws.close()

@@ -14,6 +14,11 @@ class Clipboard(object):
         self.data = data
         self.filetype = filetype
 
+    def __repr__(self):
+        return "<{}({} bytes, type &{:03x})>".format(self.__class__.__name__,
+                                                     len(self.data),
+                                                     self.filetype & 0xFFF)
+
     def __jsonencode__(self):
         return {
                 'data': base64.b64encode(self.data),

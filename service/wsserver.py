@@ -12,7 +12,8 @@ from websocket_server import WebsocketServer
 import build
 import json_funcs
 
-__version__ = '0.01'
+VERSION = '1.04'
+NAME = 'Linking over Internet with RISCOS Pyromaniac Agent'
 
 
 class HarnessStream(object):
@@ -84,7 +85,7 @@ class HarnessStreamWS(HarnessStream):
         self.server = kwargs.pop('server')
         self.client = kwargs.pop('client')
         super(HarnessStreamWS, self).__init__(*args, **kwargs)
-        self.send_message('welcome', ['RISC OS Build Service version {}'.format(__version__), __version__])
+        self.send_message('welcome', '{} version {}'.format(NAME, VERSION))
 
     def send_message(self, code, data):
         message = ''.join(json_funcs.json_iterable([code, data]))
@@ -92,7 +93,7 @@ class HarnessStreamWS(HarnessStream):
 
     def start_thread(self):
         super(HarnessStreamWS, self).start_thread()
-        self.send_message('complete', [True])
+        self.send_message('complete', True)
 
     def stream_callback(self, code, data):
         self.send_message(code, data)
@@ -120,7 +121,10 @@ def received(client, server, message):
 
     def response(msg, data=None):
         print("Sending Response: {}".format(msg))
-        harness.send_message('response', (msg, data))
+        if data is not None:
+            harness.send_message('response', (msg, data))
+        else:
+            harness.send_message('response', msg)
 
     print("Received message")
     try:
