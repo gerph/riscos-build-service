@@ -138,6 +138,7 @@ def received(client, server, message):
 
             data = base64.b64decode(data)
             print("  Setting data: {} bytes".format(len(data)))
+            #print("  Data: {!r}".format(data))
             harness.set_source(data)
             response('Source loaded')
 
@@ -145,8 +146,8 @@ def received(client, server, message):
             if harness.server_running:
                 error("Cannot start build. Build is already running")
                 return
-            response('Starting build')
             harness.start()
+            response('Started build')
 
         else:
             error("Unrecognised action '{}'".format(action))
