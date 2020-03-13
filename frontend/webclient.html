@@ -1,0 +1,530 @@
+<html>
+<head>
+  <title>JFPatch as a Service</title>
+  <script src="ansi_up.js" type="text/javascript"></script>
+  <script type="text/javascript">
+
+    var ws;
+    var ansi_up = new AnsiUp;
+
+    // Clipboard information
+    var clipboard_data = null;
+    var clipboard_filetype = null;
+
+    // Throwback state
+    var throwback_file = null;
+    var throwback_reason = null;
+
+    var filetype_names = {
+            0xFFD: 'Data',
+            0xFFC: 'Utility',
+            0xFF8: 'Absolute',
+            0xFFA: 'Module',
+        };
+
+    function init() {
+
+      // Connect to Web Socket
+      ws = new WebSocket("ws://jfpatch.riscos.online/ws");
+
+      // Set event handlers.
+      ws.onopen = function() {
+        debug("onopen");
+      };
+
+      ws.onmessage = function(e) {
+        // e.data contains received string.
+        debug("onmessage: " + e.data);
+        var message = JSON.parse(e.data);
+        var action = message[0];
+        var data = message[1];
+        if (action == 'output') {
+            show_output(data);
+        }
+        else if (action == 'message') {
+            show_message(data);
+        }
+        else if (action == 'rc') {
+            show_rc(data);
+        }
+        else if (action == 'clipboard') {
+            show_clipboard(data);
+        }
+        else if (action == 'throwback') {
+            show_throwback(data);
+        }
+        else if (action == 'error') {
+            show_error(data);
+        }
+        else if (action == 'complete') {
+            mark_running(false);
+        }
+      };
+
+      ws.onclose = function() {
+        debug("onclose");
+      };
+
+      ws.onerror = function(e) {
+        debug("onerror: " + e);
+        console.log(e)
+      };
+
+    }
+
+    function onSubmit() {
+        var input = document.getElementById("input");
+        var action = input.value;
+        var data = null;
+        var message = [action, data];
+        ws.send(JSON.stringify(message));
+        debug("send: " + input.value);
+        input.value = "";
+        input.focus();
+    }
+
+    function onBuild() {
+        var action = 'build'
+        var data = null;
+        var message = [action, data];
+        ws.send(JSON.stringify(message));
+        debug("send: " + input.value);
+        show_clear();
+        mark_running(true);
+    }
+
+    function onDownload() {
+        save('built,' + clipboard_filetype.toString(16),
+             clipboard_data,
+             'application/riscos')
+    }
+
+    function onSourceChange() {
+        var ele = document.getElementById('source');
+        var file = ele.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.readAsBinaryString(file);
+            reader.onload = function (evt) { onSourceLoad(evt.target.result) };
+            reader.onerror = function (evt) { onSourceError(evt.target.result) };
+            ele.value = '';
+        }
+    }
+
+    function onSourceLoad(data) {
+        action = 'source';
+
+        var message =[action, btoa(data)];
+        ws.send(JSON.stringify(message));
+        debug("send: " + message);
+
+        show_clear();
+        show_message('Source selected, size is ' + data.length + ' bytes');
+    }
+    function onSourceError(data) {
+        debug("error loading source");
+        alert("Could not lost source");
+        // FIXME: Report this to the user?
+    }
+
+    function onCloseClick() {
+        ws.close();
+    }
+
+    // Clears all the state when we start a fresh build
+    function show_clear(str) {
+        var cdiv = document.getElementById("output");
+        cdiv.innerHTML = '';
+
+        var dbutton = document.getElementById("download");
+        dbutton.disabled = true;
+        dbutton.innerHTML = 'Download'
+
+        var tdiv = document.getElementById("throwback");
+        tdiv.style = 'display: none';
+        tdiv.innerHTML = '';
+
+        throwback_file = null;
+        throwback_reason = null;
+    }
+
+    function show_error(str) {
+        mark_running(false);
+
+        var cdiv = document.getElementById("output");
+        html = "<div class='protoerror'>Protocol error: " + escapeHTML(str) + "</div>";
+        cdiv.innerHTML += html;
+    }
+
+    function show_output(str) {
+        html = ansi_up.ansi_to_html(str);
+        var cdiv = document.getElementById("output");
+        cdiv.innerHTML += html;
+    }
+
+    function show_throwback(data) {
+        var reason = data['reason_name']
+        if (reason == 'Processing') {
+            // I'm imitating Zap here, so I'll just ignore the 'processing' message.
+            // We could output a note that we're processing if we wanted, but it's probably
+            // not going to be useful as that information is commonly in the main build
+            // output.
+            // Note: Processing only has a filename; no other data present.
+            return
+        }
+        var file = data['filename']
+        var lineno = data['lineno']
+        var severity = data['severity_name']
+        var message = data['message']
+        // Zap doesn't show the severity for information (maybe it doesn't have a meaning there)
+
+        var html = '';
+        if (file != throwback_file || reason != throwback_reason) {
+            // Need to introduce a new section
+            var section_css = ''
+            if (reason == 'Error') {
+                section = "Errors in file: "
+                section_css = 'error'
+            }
+            else if (reason == 'Info') {
+                section = "Information for file: "
+                section_css = 'info'
+            }
+            else {
+                section = "Throwback for reason " + reason + ": "
+            }
+            html += "<div class='section " + section_css + "'>"
+            html += "<span class='reason'>" + section + "</span>"
+            html += "<span class='filename'>" + file + "</span>"
+            html += "</div>"
+
+            // And a new set of headings
+            html += "<div class='heading'>"
+            html += "<span class='line'>Line</span>"
+            if (reason != 'Info') {
+                // Info doesn't have a severity
+                html += "<span class='type'>Type</span>"
+            }
+            html += "<span class='message'>Message</span>"
+            html += "</div>"
+
+            // Update our throwback state
+            throwback_file = file
+            throwback_reason = reason
+        }
+
+        // Write out the event
+        html += "<div class='event'>"
+        html += "<span class='line'>" + lineno + "</span>"
+        if (reason != 'Info') {
+            // Info doesn't have a severity
+            var severity_css = ''
+            if (severity == 'Error') {
+                severity_css = 'error'
+            }
+            if (severity == 'Serious Error') {
+                severity_css = 'serious'
+            }
+            if (severity == 'Warning') {
+                severity_css = 'warning'
+            }
+
+            html += "<span class='type " + severity_css + "'>" + severity + "</span>"
+        }
+        html += "<span class='message'>" + escapeHTML(message) + "</span>"
+        html += "</div>"
+
+        var tdiv = document.getElementById("throwback");
+        tdiv.style = '';
+        tdiv.innerHTML += html;
+    }
+
+    function show_message(str) {
+        var cdiv = document.getElementById("output");
+        html = escapeHTML(str);
+        cdiv.innerHTML += "<span class='message'>" + html + "</span>";
+    }
+
+    function show_rc(rc) {
+        var status;
+        if (rc == 0)
+        {
+            message = 'Success';
+            status = 'success';
+        }
+        else
+        {
+            message = 'Failed (rc=' + rc + ')'
+            status = 'failure';
+        }
+        var cdiv = document.getElementById("output");
+        cdiv.innerHTML += "<span class='rc " + status + "'>" + message + "</span>";
+    }
+
+    function show_clipboard(data) {
+        clipboard_filetype = data['filetype'];
+        clipboard_data = atob(data['data'])
+
+        filetype_name = filetype_names.hasOwnProperty(clipboard_filetype) ? filetype_names[clipboard_filetype] : clipboard_filetype.toString(16);
+
+        message = 'Download available, filetype is ' + filetype_name;
+
+        var cdiv = document.getElementById("output");
+        cdiv.innerHTML += "<span class='clipboard'>" + message + "</span>";
+
+        var dbutton = document.getElementById("download");
+        dbutton.disabled = false;
+        dbutton.innerHTML = 'Download (' + filetype_name + ')'
+    }
+
+    function mark_running(running) {
+        var bdiv = document.getElementById("build");
+        var sdiv = document.getElementById("source");
+        bdiv.disabled = running;
+        sdiv.disabled = running;
+    }
+
+    function escapeHTML(unsafe) {
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+     }
+
+    function debug(str) {
+        var log = document.getElementById("log");
+        var escaped = escapeHTML(str);
+        log.innerHTML += "<br>" + escaped;
+    }
+
+    // https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+    function save(filename, data, mediatype) {
+        var blob = new Blob([data], {'type': mediatype});
+        if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveBlob(blob, filename);
+        }
+        else {
+            var elem = window.document.createElement('a');
+            elem.href = window.URL.createObjectURL(blob);
+            elem.download = filename;
+            document.body.appendChild(elem);
+            elem.click();
+            document.body.removeChild(elem);
+        }
+    }
+
+  </script>
+  <style type="text/css">
+    /* The main build result window */
+    div#output {
+        margin: 0;
+        padding: 0em 0.25em 0.5em 0.25em;
+        font-family: monaco, "Courier New", Courier, monospace;
+        line-height: 1.3;
+        background: black;
+        color: white;
+        white-space: pre;
+        min-height: 10em;
+        max-height: 80%;
+        overflow: auto;
+        resize: true
+    }
+    div#output::before {
+        content: "Build result";
+        border-bottom: white solid 2px;
+        border-top: white solid 2px;
+        display: block;
+        margin: 0em -0.25em 0.5em -0.25em;
+        padding: 0.25em 0.25em 0.25em 0.25em;
+        text-align: center;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: larger;
+        background-color: silver;
+        color: black;
+    }
+
+    /* The throwback window */
+    div#throwback {
+        margin: 0;
+        padding: 0em 0.25em 0.5em 0.25em;
+        font-family: monaco, "Courier New", Courier, monospace;
+        line-height: 1.3;
+        background: black;
+        color: white;
+        white-space: pre;
+        min-height: 4em;
+        max-height: 80%;
+        overflow: auto;
+        resize: true
+    }
+    div#throwback::before {
+        content: "Throwback";
+        border-bottom: white solid 2px;
+        border-top: white solid 2px;
+        display: block;
+        margin: 0em -0.25em 0.5em -0.25em;
+        padding: 0.25em 0.25em 0.25em 0.25em;
+        text-align: center;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: larger;
+        background-color: silver;
+        color: black;
+    }
+
+    div#output span.message {
+        color: mediumpurple;
+        font-weight: bold;
+        display: block;
+    }
+    div#output span.message::before {
+        content: "►";
+        font-weight: bold;
+        padding-left: 0.25em;
+        padding-right: 0.5em;
+        width: 1em;
+        display: inline-block;
+        text-align: right;
+    }
+
+    div#output span.rc {
+        color: mediumpurple;
+        font-weight: bold;
+        display: block;
+    }
+    div#output .rc.success {
+        color: mediumseagreen;
+    }
+    div#output .rc.failure {
+        color: crimson;
+    }
+    div#output span.rc.success::before {
+        content: "✓";
+        padding-left: 0.25em;
+        padding-right: 0.5em;
+        width: 1em;
+        display: inline-block;
+        text-align: right;
+    }
+    div#output span.rc.failure::before {
+        content: "✘";
+        padding-left: 0.25em;
+        padding-right: 0.5em;
+        width: 1em;
+        display: inline-block;
+        text-align: right;
+    }
+
+    div#output span.clipboard {
+        color: cornflowerblue;
+        font-weight: bold;
+        display: block;
+    }
+    div#output span.clipboard::before {
+        content: "⇩";
+        font-weight: bold;
+        padding-left: 0.25em;
+        padding-right: 0.5em;
+        width: 1em;
+        display: inline-block;
+        text-align: right;
+    }
+
+    /* Throwback window styles
+     * Colours taken from: https://github.com/jaylett/zap/blob/master/sources/!ZapSource/s/Mode11%2Cfff#L509
+     */
+    div#throwback div.section {
+        margin-bottom: 1em;
+    }
+    div#throwback div.heading {
+        /* It's possible that this light yellow should only be on the line number, not the
+         * heading line. I cannot tell from the Throwback source - haven't spent enough time
+         * reviewing it and it's been 20 years since I worked with Zap...
+         */
+        color: palegoldenrod; /* #eeeebb */
+    }
+    div#throwback div.event {
+    }
+    div#throwback div.event + div.section {
+        padding-top: 1.5em;
+    }
+
+    div#throwback div.section span.reason {
+    }
+    div#throwback div.section.info span.reason {
+        color: darkturquoise; /* #ffbb00 */
+    }
+    div#throwback div.section.error span.reason {
+        color: gold; /* #eeee00 */
+    }
+    div#throwback div.section span.filename {
+        color: deepskyblue; /* #00bbff */
+    }
+
+    div#throwback div.heading span.line {
+    }
+    div#throwback div.heading span.type {
+    }
+    div#throwback div.heading span.message {
+    }
+
+    div#throwback span.line {
+        width: 8em;
+        display: inline-block;
+        text-align: right;
+    }
+    div#throwback span.type {
+        width: 12em;
+        display: inline-block;
+        text-align: left;
+        margin-left: 1em;
+    }
+    div#throwback div.event {
+        color: white;
+    }
+    div#throwback span.type.error {
+        color: crimson; /* #DD0000 */
+    }
+    div#throwback span.type.serious {
+        color: red; /* #DD2222 */
+    }
+    div#throwback span.type.warning {
+        color: orange; /* #FFBB00 */
+    }
+    div#throwback span.message {
+        display: inline-block;
+        text-align: left;
+    }
+
+    /* Remove the tools used for debugging */
+    form#general { display: none; }
+    div#log { display: none }
+  </style>
+</head>
+
+<body onload="init();">
+  <!-- General command submission -->
+  <form id='general' onsubmit="onSubmit(); return false;">
+    <input type="text" id="input">
+    <input type="text" id="data">
+    <input type="submit" value="Send">
+    <button onclick="onCloseClick(); return false;">close</button>
+  </form>
+
+  <!-- File selection -->
+  <form onsubmit="onSubmit(); return false;">
+    <input type="file" id="source" onchange="onSourceChange(this.files)">
+  </form>
+
+  <button id='build' onclick="onBuild(); return false;">Build</button>
+
+  <button id='download' onclick="onDownload(); return false;" disabled='disabled'>Download</button>
+
+  <div id='output'></div>
+  <div id='throwback' style='display: none'></div>
+  <div id="log"></div>
+</body>
+</html>
