@@ -13,6 +13,7 @@ config:
   taskwindow.in_taskwindow: true
   filesystem.native_directory: fs
   input.eof_effect: exit
+  vdu.implementation: ansitext
 
 modules:
   internal: true
