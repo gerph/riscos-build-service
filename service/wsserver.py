@@ -9,6 +9,7 @@ import threading
 
 from websocket_server import WebsocketServer
 
+import robuild
 import build
 import json_funcs
 
@@ -56,6 +57,16 @@ class HarnessStream(object):
             self.builder.prepare_docker()
             rc = self.builder.run()
             print("Stream finished with rc: {}".format(rc))
+
+        except robuild.ROBuilderError as exc:
+            self.stream_callback('message', 'Source file format not recognised')
+            self.stream_callback('rc', -1)
+            self.stream_callback('complete', True)
+
+        except Exception as exc:
+            self.stream_callback('message', 'Build failure: ' + str(exc))
+            self.stream_callback('rc', -1)
+            self.stream_callback('complete', True)
 
         finally:
             self.server_running = False
