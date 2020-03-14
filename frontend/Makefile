@@ -16,7 +16,8 @@ HSCFLAGS = ignore=49 msgbrowser=throwback \
 
 ICON_SIZE = 128
 FILETYPE_SIZE = ${ICON_SIZE}
-COG_SIZE = 128
+COG_SIZE = ${ICON_SIZE}
+BUTTON_SIZE = ${ICON_SIZE}
 
 #.PHONY: all static all_hsc
 
@@ -29,14 +30,28 @@ static: ${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/icons/file_ff8.png \
  	 	${DESTDIR}/icons/file_ffa.png \
  	 	${DESTDIR}/icons/file_ffc.png \
+ 	 	${DESTDIR}/icons/file_xxx.png \
  	 	${DESTDIR}/icons/cog.png \
  	 	${DESTDIR}/icons/patched.png \
+ 	 	${DESTDIR}/icons/upload.png \
+ 	 	${DESTDIR}/icons/download.png \
+ 	 	${DESTDIR}/icons/build.png \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 	./make-icon.sh --inset 1 $? $@ ${FILETYPE_SIZE}
 
 ${DESTDIR}/icons/%.png: icons/%.svg
 	./make-icon.sh --trim --inset 1 $? $@ ${ICON_SIZE}
+
+${DESTDIR}/icons/upload.png: icons/140279.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
+
+${DESTDIR}/icons/download.png: icons/140283.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
+
+# 2746034 is another build icon; a crane, but I didn't feel as comfortable with that one.
+${DESTDIR}/icons/build.png: icons/2746034.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
 	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@

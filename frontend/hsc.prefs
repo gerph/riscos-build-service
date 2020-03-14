@@ -392,7 +392,7 @@
 <$deftag BIG /CLOSE /NAW="pre" /WHTSPC [__attrs]>
 <$deftag BLOCKQUOTE /CLOSE /NAW=(__elem-inline) [__attrs] CITE:uri>
 <$deftag BR /LAZY='k' /EMPTY [__coreattrs]>
-<$deftag BUTTON /CLOSE /NAW="a|input|select|textarea|label|button|isindex|fieldset|iframe" [__attrs] NAME:id VALUE:string TYPE:enum("button|submit|reset") DISABLED:bool [__Focus]>
+<$deftag BUTTON /CLOSE /NAW="a|input|select|textarea|button|isindex|fieldset|iframe" [__attrs] NAME:id VALUE:string TYPE:enum("button|submit|reset") DISABLED:bool [__Focus]>
 <$deftag CAPTION /CLOSE /MBI="fig|table" [__attrs] ALIGN:enum("top|bottom|left|right")>
 <$deftag CITE /CLOSE /WHTSPC [__attrs]>
 <$deftag CODE /CLOSE /WHTSPC [__attrs]>
@@ -420,7 +420,7 @@
 <$deftag INPUT /EMPTY /NAW="button" [__attrs] TYPE:enum("text|password|checkbox|radio|submit|reset|file|hidden|image|button") NAME:string VALUE:string CHECKED:bool DISABLED:bool READONLY:bool SIZE:string MAXLENGTH:num SRC:uri [__Alt] USEMAP:uri ISMAP:bool TABINDEX:num [__Focus] onSelect:string onChange:string ACCEPT:string [__IAlign]>
 <$deftag INS /CLOSE /WHTSPC [__attrs] CITE:uri DATETIME:string>
 <$deftag KBD /CLOSE /WHTSPC [__attrs]>
-<$deftag LABEL /CLOSE /NAW="button" [__attrs] FOR:string [__AccessKey] [__OnFocusOnBlur]>
+<$deftag LABEL /CLOSE /NAW="button" [__attrs] DISABLED:bool FOR:string [__AccessKey] [__OnFocusOnBlur]>
 <$deftag LEGEND /CLOSE /MBI="fieldset" /NAW=(__elem-inline) [__attrs] [__AccessKey] ALIGN:enum("top|bottom|left|right")>
 <$deftag LI /AUTOCLOSE /MBI="ul|ol|dir|menu" [__attrs] VALUE:string SKIP:string/O DINGBAT:string/O TYPE:string/J>
 <$deftag LINK /EMPTY /MBI="head" [__attrs] CHARSET:string HREF:uri/x HREFLANG:string TYPE:string REL:string REV:string MEDIA:string URN:string/JERK METHODS:string/JERK>

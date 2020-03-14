@@ -155,10 +155,15 @@ title=
 description=
 if [[ -f "$json" ]] ; then
     # We should extract the attribution information from the local JSON File
-    author="$(jq -r .icon.uploader.name "$json")"
-    copyright="$(jq -r .icon.license_description "$json"): $(jq -r .icon.attribution "$json")"
-    title="$(jq -r .icon.term "$json")"
-    iconnum=$(jq -r .icon.id "$json")
+    if [[ "$(jq -r .icon "$json")" != 'null' ]] ; then
+        root_element=.icon
+    else
+        root_element=
+    fi
+    author="$(jq -r $root_element.uploader.name "$json")"
+    copyright="$(jq -r $root_element.license_description "$json"): $(jq -r $root_element.attribution "$json")"
+    title="$(jq -r $root_element.term "$json")"
+    iconnum=$(jq -r $root_element.id "$json")
     uri="https://thenounproject.com/$(jq -r .icon.permalink "$json")"
 fi
 if [[ "$title" != "" && "$iconnum" != '' ]] ; then

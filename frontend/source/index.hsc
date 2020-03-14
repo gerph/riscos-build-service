@@ -28,6 +28,7 @@
             0xFFA: 'icons/file_ffa.png',
             0xFF8: 'icons/file_ff8.png',
         };
+    var filetype_unknown = 'icons/file_xxx.png';
 
     function init() {
 
@@ -87,6 +88,8 @@
         console.log(e)
       };
 
+      // Ensure that the state is consistent when we load.
+      show_clear();
     }
 
     function onSubmit() {
@@ -137,6 +140,9 @@
 
         show_clear();
         show_message('Source selected, size is ' + data.length + ' bytes');
+
+        var bbutton = document.getElementById("build-button");
+        bbutton.removeAttribute('disabled');
     }
     function onSourceError(data) {
         debug("error loading source");
@@ -153,9 +159,10 @@
         var cdiv = document.getElementById("output");
         cdiv.innerHTML = '';
 
-        var dbutton = document.getElementById("download");
-        dbutton.disabled = true;
-        dbutton.innerHTML = 'Download'
+        var dbutton = document.getElementById("download-button");
+        var dlabel = document.getElementById("download-label");
+        dbutton.setAttribute('disabled', 'disabled');
+        dlabel.innerHTML = ''
 
         var tboxdiv = document.getElementById("throwback-box");
         var tdiv = document.getElementById("throwback");
@@ -284,23 +291,42 @@
         clipboard_filetype = data['filetype'];
         clipboard_data = atob(data['data'])
 
-        filetype_name = filetype_names.hasOwnProperty(clipboard_filetype) ? filetype_names[clipboard_filetype] : clipboard_filetype.toString(16);
+        filetype_name = filetype_names.hasOwnProperty(clipboard_filetype) ? filetype_names[clipboard_filetype] : '&amp;' + clipboard_filetype.toString(16);
 
         message = 'Download available, filetype is ' + filetype_name;
 
         var cdiv = document.getElementById("output");
         cdiv.innerHTML += "<span class='clipboard'>" + message + "</span>";
 
-        var dbutton = document.getElementById("download");
-        dbutton.disabled = false;
-        dbutton.innerHTML = 'Download (' + filetype_name + ')'
+        var dbutton = document.getElementById("download-button");
+        var dlabel = document.getElementById("download-label");
+        dbutton.removeAttribute('disabled');
+
+        // Set up the label on the download button
+        if (0)
+        {
+            dlabel.innerHTML = 'Download (' + filetype_name + ')'
+        }
+        else
+        {
+            icon = filetype_names.hasOwnProperty(clipboard_filetype) ? filetype_icons[clipboard_filetype] : filetype_unknown;
+            html = "<img src='" + icon + "'>";
+            dlabel.innerHTML = html;
+        }
     }
 
     function mark_running(running) {
-        var bdiv = document.getElementById("build");
-        var sdiv = document.getElementById("source");
-        bdiv.disabled = running;
-        sdiv.disabled = running;
+        var bdiv = document.getElementById("build-button");
+        var sdiv = document.getElementById("source-button");
+        if (running) {
+            bdiv.setAttribute('disabled', 'disabled');
+            sdiv.setAttribute('disabled', 'disabled');
+        }
+        else
+        {
+            bdiv.removeAttribute('disabled');
+            sdiv.removeAttribute('disabled');
+        }
     }
 
     function escapeHTML(unsafe) {
@@ -333,6 +359,7 @@
             document.body.removeChild(elem);
         }
     }
+
 -->
   </script>
   <style type="text/css">
@@ -520,9 +547,72 @@
         text-align: left;
     }
 
+    label#source-button {
+        border: grey 3px solid;
+        border-style: outset;
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+        background-color: #eeeeee;
+        border-radius: 8px;
+    }
+    label#source-button input {
+        display: none
+    }
+
+    label#build-button {
+        border: grey 3px solid;
+        border-style: outset;
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+        background-color: #eeeeee;
+        border-radius: 8px;
+    }
+    label#build-button button {
+        display: none
+    }
+
+    label#download-button {
+        border: #808080 3px solid;
+        border-style: outset;
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+        background-color: #eeeeee;
+        border-radius: 8px;
+    }
+    label#download-button button {
+        display: none
+    }
+
+    label.disabled, label[disabled] {
+        opacity: .4;
+    }
+
+    div.workflow {
+    }
+    div.workflow span.divider {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+    }
+    div.workflow span.divider::before {
+        content: "⇨";
+        display: inline-block;
+    }
+    div.workflow form {
+        display: inline-block;
+    }
+    div.workflow label, div.workflow form {
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+    div.workflow label img {
+        height: 2em;
+        vertical-align: middle;
+    }
+
     /* Page styling */
     body {
         margin: 0;
+        font-family: sans-serif;
     }
     div.page-head {
         background-color: palegreen;
@@ -559,14 +649,30 @@
         <button onclick="onCloseClick(); return false;">close</button>
       </form>
 
-      <!-- File selection -->
-      <form onsubmit="onSubmit(); return false;">
-        <input type="file" id="source" onchange="onSourceChange(this.files)"/>
-      </form>
+      <div class='workflow'>
+          <!-- File selection -->
+          <form onsubmit="onSubmit(); return false;">
+            <label id="source-button" title="Upload source file">
+                <input type="file" id="source" onchange="onSourceChange(this.files)"/>
+                <img src="icons/upload.png" alt="[Upload]"/>
+            </label>
+          </form>
+          <span class='divider'></span>
 
-      <button id='build' onclick="onBuild(); return false;">Build</button>
+          <label id='build-button' disabled='disabled' title="Build the sources in the cloud">
+              <button id='build' onclick="onBuild(); return false;"></button>
+              <img src="icons/build.png" alt="[Build]"/>
+          </label>
 
-      <button id='download' onclick="onDownload(); return false;" disabled='disabled'>Download</button>
+          <span class='divider'></span>
+
+          <label id='download-button' disabled='disabled' title="Download the built RISC OS binary">
+              <button id='download' onclick="onDownload(); return false;"></button>
+              <img src="icons/download.png" alt="[Download]"/>
+              <span id='download-label'>
+              </span>
+          </label>
+      </div>
 
       <div id='output-box'>
         <div id='output-heading'>Build output</div>
