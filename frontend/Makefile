@@ -36,6 +36,7 @@ static: ${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/icons/upload.png \
  	 	${DESTDIR}/icons/download.png \
  	 	${DESTDIR}/icons/build.png \
+ 	 	${DESTDIR}/icons/nextstep.png \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 	./make-icon.sh --inset 1 $? $@ ${FILETYPE_SIZE}
@@ -51,6 +52,9 @@ ${DESTDIR}/icons/download.png: icons/140283.svg
 
 # 2746034 is another build icon; a crane, but I didn't feel as comfortable with that one.
 ${DESTDIR}/icons/build.png: icons/2746034.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
+
+${DESTDIR}/icons/nextstep.png: icons/1920786.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png

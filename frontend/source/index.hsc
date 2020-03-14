@@ -547,11 +547,14 @@
         text-align: left;
     }
 
+    label {
+        display: inline-block;
+        padding: 0.2em;
+    }
+
     label#source-button {
         border: grey 3px solid;
         border-style: outset;
-        padding-left: 0.2em;
-        padding-right: 0.2em;
         background-color: #eeeeee;
         border-radius: 8px;
     }
@@ -562,8 +565,6 @@
     label#build-button {
         border: grey 3px solid;
         border-style: outset;
-        padding-left: 0.2em;
-        padding-right: 0.2em;
         background-color: #eeeeee;
         border-radius: 8px;
     }
@@ -574,17 +575,15 @@
     label#download-button {
         border: #808080 3px solid;
         border-style: outset;
-        padding-left: 0.2em;
-        padding-right: 0.2em;
         background-color: #eeeeee;
         border-radius: 8px;
     }
     label#download-button button {
-        display: none
+        display: none;
     }
 
     label.disabled, label[disabled] {
-        opacity: .4;
+        opacity: .3;
     }
 
     div.workflow {
@@ -594,15 +593,21 @@
         padding-right: 0.5em;
     }
     div.workflow span.divider::before {
-        content: "⇨";
+        content: "";
+        background-image: url(icons/nextstep.png);
+        background-size: auto 1.5em;
+        height: 2em;
+        width: 1.5em;
+        vertical-align: middle;
         display: inline-block;
+        background-position: center center;
+        background-repeat: no-repeat;
+        opacity: 0.6;
     }
     div.workflow form {
         display: inline-block;
     }
     div.workflow label, div.workflow form {
-        padding-top: 0.5em;
-        padding-bottom: 0.5em;
     }
     div.workflow label img {
         height: 2em;
