@@ -4,6 +4,7 @@
   <title>JFPatch as a Service</title>
   <script src="ansi_up.js" type="text/javascript"></script>
   <script type="text/javascript">
+<!--
 
     var ws;
     var ansi_up = new AnsiUp;
@@ -19,8 +20,13 @@
     var filetype_names = {
             0xFFD: 'Data',
             0xFFC: 'Utility',
-            0xFF8: 'Absolute',
             0xFFA: 'Module',
+            0xFF8: 'Absolute',
+        };
+    var filetype_icons = {
+            0xFFC: 'icons/file_ffc.png',
+            0xFFA: 'icons/file_ffa.png',
+            0xFF8: 'icons/file_ff8.png',
         };
 
     function init() {
@@ -327,7 +333,7 @@
             document.body.removeChild(elem);
         }
     }
-
+-->
   </script>
   <style type="text/css">
     /* The main build result window */
@@ -514,6 +520,28 @@
         text-align: left;
     }
 
+    /* Page styling */
+    body {
+        margin: 0;
+    }
+    div.page-head {
+        background-color: palegreen;
+        padding: 0px;
+    }
+    div.page-head h1 {
+        padding-left: 0em;
+        font-family: sans-serif;
+        padding: 4px;
+    }
+    div.page-head img {
+        vertical-align: middle;
+        height: 1.5em;
+    }
+    div.content {
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+    }
+
     /* Remove the tools used for debugging */
     form#general { display: none; }
     div#log { display: none }
@@ -521,31 +549,34 @@
 </head>
 
 <body onload="init();">
-  <!-- General command submission -->
-  <form id='general' onsubmit="onSubmit(); return false;">
-    <input type="text" id="input">
-    <input type="text" id="data">
-    <input type="submit" value="Send">
-    <button onclick="onCloseClick(); return false;">close</button>
-  </form>
+    <page_title>
+    <div class='content'>
+      <!-- General command submission -->
+      <form id='general' onsubmit="onSubmit(); return false;">
+        <input type="text" id="input"/>
+        <input type="text" id="data"/>
+        <input type="submit" value="Send"/>
+        <button onclick="onCloseClick(); return false;">close</button>
+      </form>
 
-  <!-- File selection -->
-  <form onsubmit="onSubmit(); return false;">
-    <input type="file" id="source" onchange="onSourceChange(this.files)">
-  </form>
+      <!-- File selection -->
+      <form onsubmit="onSubmit(); return false;">
+        <input type="file" id="source" onchange="onSourceChange(this.files)"/>
+      </form>
 
-  <button id='build' onclick="onBuild(); return false;">Build</button>
+      <button id='build' onclick="onBuild(); return false;">Build</button>
 
-  <button id='download' onclick="onDownload(); return false;" disabled='disabled'>Download</button>
+      <button id='download' onclick="onDownload(); return false;" disabled='disabled'>Download</button>
 
-  <div id='output-box'>
-    <div id='output-heading'>Build output</div>
-    <div id='output'></div>
-  </div>
-  <div id='throwback-box' style='display: none'>
-      <div id='throwback-heading'>Throwback</div>
-      <div id='throwback'></div>
-  </div>
-  <div id="log"></div>
+      <div id='output-box'>
+        <div id='output-heading'>Build output</div>
+        <div id='output'></div>
+      </div>
+      <div id='throwback-box' style='display: none'>
+          <div id='throwback-heading'>Throwback</div>
+          <div id='throwback'></div>
+      </div>
+      <div id="log"></div>
+    </div>
 </body>
 </html>

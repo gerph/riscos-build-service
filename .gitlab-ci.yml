@@ -37,13 +37,21 @@ variables:
 #### Builds ####
 build-linux:
   <<: *common-cross
-  stage: build-cross
+  stage: build
   script:
     - ci/build.sh native install
   tags:
     - docker-build
 
+build-frontend:
+  <<: *common
+  stage: build
+  script:
+    - cd frontend/source && make
+  tags:
+    - linux
+
 
 #### Stages to execute ####
 stages:
-  - build-cross
+  - build

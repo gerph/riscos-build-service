@@ -1,0 +1,22 @@
+HSC_PROJECT
+VERSION 3 
+# Contains all data relevant for project.
+# Maintained by hsc, DO NOT MODIFY!
+# updated: 14-Mar-2020 17:54:21
+DOCUMENT ../dest/index.html
+SOURCE index.hsc
+TITLE 
+ID general
+ID input
+ID data
+ID source
+ID build
+ID download
+ID output-box
+ID output-heading
+ID output
+ID throwback-box
+ID throwback-heading
+ID throwback
+ID log
+INCLUDE ../macros.hsc
