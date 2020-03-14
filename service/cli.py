@@ -32,8 +32,8 @@ def show_throwback(tb, indent=''):
 
 
 def show_clipboard(clipboard, indent=''):
-    print("{}Filetype:    {:03x}".format(indent, clip.filetype))
-    print("{}Size:        {} bytes".format(indent, len(clip.data)))
+    print("{}Filetype:    {:03x}".format(indent, clipboard.filetype))
+    print("{}Size:        {} bytes".format(indent, len(clipboard.data)))
 
 
 def stream_callback(code, data):
