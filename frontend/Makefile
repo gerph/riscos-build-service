@@ -26,7 +26,9 @@ dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
 
-static: ${DESTDIR}/ansi_up.js \
+static: \
+		${DESTDIR}/.htaccess \
+ 	 	${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/site.css \
  	 	${DESTDIR}/icons/file_ff8.png \
  	 	${DESTDIR}/icons/file_ffa.png \
@@ -65,6 +67,9 @@ ${DESTDIR}/icons/menu.png: icons/2328436.svg
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
 	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@
 
+../dest/.htaccess: htaccess
+	cp $? $@
+
 
 ../dest/%: %
 	cp $? $@
@@ -77,13 +82,15 @@ ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Sunday 15-Mar-2020 00:14:41
+# dependencies updated: Sunday 15-Mar-2020 11:29:54
 
-all_hsc : ../dest/index.html ../dest/api.html
+all_hsc : ../dest/index.html ../dest/api.html ../dest/notfound.html
 
 ../dest/index.html : index.hsc ../macros.hsc
 
 ../dest/api.html : api.hsc ../macros.hsc
+
+../dest/notfound.html : notfound.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

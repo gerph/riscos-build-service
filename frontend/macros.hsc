@@ -6,6 +6,15 @@
 </div>
 </$macro>
 
+<$macro page_footer>
+<div class='page-foot'>
+    <span class='disclaimer'>
+        JFPatch as a service is not intended for use in safety critical applications.<br/>
+        No warranty is given for fitness for any particular purpose.<br/>
+        Do not feed after midnight.</span>
+</div>
+</$macro>
+
 
 <**** Documentation styles ****>
 <$macro param-list /CLOSE label:string="Parameter">

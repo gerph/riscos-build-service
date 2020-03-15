@@ -411,5 +411,6 @@
       </div>
       <div id="log"></div>
     </div>
+    <page_footer>
 </body>
 </html>

@@ -10,7 +10,7 @@ div#output {
     min-height: 10em;
     max-height: 80%;
     overflow: auto;
-    resize: true
+    resize: vertical;
 }
 div#output-heading {
     border-bottom: white solid 2px;
@@ -103,7 +103,7 @@ div#throwback {
     min-height: 4em;
     max-height: 80%;
     overflow: auto;
-    resize: true
+    resize: vertical;
 }
 div#throwback-heading {
     border-bottom: white solid 2px;
@@ -253,6 +253,8 @@ div.workflow label img {
 body {
     margin: 0;
     font-family: sans-serif;
+    flex-direction: column;
+    display: flex;
 }
 div.page-head {
     background-color: palegreen;
@@ -285,6 +287,20 @@ div.page-head span.section img {
 div.content {
     margin-left: 0.5em;
     margin-right: 0.5em;
+}
+
+div.page-foot {
+    background-color: palegreen;
+    font-family: sans-serif;
+    padding: 4px 2em 4px 8em;
+    margin-top: auto;
+    margin-bottom: 0em;
+}
+div.page-foot .disclaimer {
+    font-style: italic;
+    font-size: small;
+    display: block;
+    text-align: right;
 }
 
 
