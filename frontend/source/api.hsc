@@ -4,15 +4,24 @@
   <title>JFPatch as a Service</title>
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
-<body onload="init();">
+<body>
     <page_title section='API documentation'>
 
     <div class='content'>
 
+<h2>Introduction</h2>
+
+The build service operates on two separate protocols, which drive the underlying technology that provides the RISC OS building environment. The distinction between the protocols allows clients with different needs to get information in a different manners.
+
+<ul>
+    <li><b>HTTP protocol</b>: The HTTP protocol provides a blocking interface, where the client sends a POST request to the server, and there is no response until the build has completed. The protocol also has two variants - one where it responds with only the built binary (or an error report), and a second where it returns a structured JSON response from the build.</li>
+    <li><b>WebSocket protocol</b>: The Web Socket protocol provides a streaming interface, where the client connects to the service, then issues commands to direct it to perform actions, and the server responds to those actions in real time.</li>
+</ul>
+
+The HTTP protocol is useful for clients that want the operation to be performed and get the result, and do not care about what is happening at the server side. The WebSocket protocol is useful for clients that wish to report on the progress, or perform a number of operations in series.
+
+
 <h2>HTTP protocol<small>: Blocking HTTP build service</small></h2>
-
-
-FIXME: Insert words about why you use this protocol.
 
 <h4>Protocol</h4>
 <p>
@@ -148,5 +157,6 @@ The server may send other messages to the client at any time to explain its prog
 </param-list>
 
     </div>
+    <page_footer>
 </body>
 </html>
