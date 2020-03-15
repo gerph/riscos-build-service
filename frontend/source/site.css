@@ -363,6 +363,49 @@ span.method-name {
     font-weight: bold;
 }
 
+table.msg-table {
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+table.msg-table thead {
+    background-color: lightgrey;
+}
+
+table.msg-table th, table.msg-table td {
+    vertical-align: top;
+    padding: 0.4em;
+    border-top: 3px solid white;
+}
+
+table.msg-table tr.msg-sender-server {
+    background-color: cornsilk;
+}
+
+table.msg-table tr.msg-sender-client {
+    background-color: lightcyan;
+}
+
+table.msg-table td.msg-action {
+    font-family: monospace;
+}
+
+table.msg-table div.msg-body {
+    font-family: monospace;
+    color: mediumblue;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+table.msg-table div.msg-annotation {
+    font-style: italic;
+}
+
+li {
+    margin-top: 0.75em;
+}
+
+
 /* Remove the tools used for debugging */
 form#general { display: none; }
 div#log { display: none }

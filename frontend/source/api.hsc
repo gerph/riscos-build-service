@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service</title>
+  <title>JFPatch as a Service: API docs</title>
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>
@@ -19,6 +19,24 @@ The build service operates on two separate protocols, which drive the underlying
 </ul>
 
 The HTTP protocol is useful for clients that want the operation to be performed and get the result, and do not care about what is happening at the server side. The WebSocket protocol is useful for clients that wish to report on the progress, or perform a number of operations in series.
+
+<h4>Principles</h4>
+
+<p>
+    The system is not complex, but it helps to understand how the service should be used. To function the service must be supplied source code, usually a JFPatch file. JFPatch files were originally intended to be used to patch a separate binary. In such cases, a zip archive can be supplied containing the files that are to be used for the build.
+</p>
+
+<p>
+    Additional options may (in the future) be given to determine how the build should take place. No such options have been defined in the protocol as yet, so there's nothing to supply to configure the build.
+</p>
+
+<p>
+    Once the source and any options have been supplied, the build can be started by the client. The cogs turn, archives are unpacked and the build tool (usually JFPatch) is invoked. Any character output is recorded, and sent back to the client as necessary. Throwback is captured and returned to the client as it happens (or buffered for the blocking protocols). Failures (exiting with an error, a non-0 return code, or an abort such as a data abort) cause the build to terminate and will be reported as non-0 return codes to the user. Successful build is recognised by copying the build file to the clipboard, which is then transferred to the client.
+</p>
+
+<p>
+    Multiple output files are not currently supported.
+</p>
 
 
 <h2>HTTP protocol<small>: Blocking HTTP build service</small></h2>
@@ -104,9 +122,11 @@ The server may send other messages to the client at any time to explain its prog
 </param>
 
 <param name='output'>Text produced by the build process itself.<br/>
-    Data is a string from the build. Each string may contain RISC OS control characters. The
+    Data is a string from the build. Each string may contain ANSI control characters. The
     strings will be delivered in a timely manner, but may have been concatenated in order
-    to reduce protocol overheads.
+    to reduce protocol overheads. The RISC OS environment uses the Latin-1 encoding, which
+    is converted to UTF-8 before transmission from the server - this output will always be
+    in UTF-8.
 </param>
 
 <param name='throwback'>Information about a throwback event in the build system.<br/>
@@ -121,6 +141,7 @@ The server may send other messages to the client at any time to explain its prog
         <param name='url'>A 'riscos' scheme URL for the file and line.</param>
         <param name='message'>Message reported by this event.</param>
     </param-list>
+    There may be multiple errors or warnings from the build tool. The front end on this site ignores any throwback reasons of 'Processing'.
 </param>
 
 <param name='clipboard'>Built binary content (this is delivered by a clipboard copy operation internally).<br/>
@@ -155,6 +176,179 @@ The server may send other messages to the client at any time to explain its prog
     Data is ignored.
 </param>
 </param-list>
+
+
+<h2>Example WebSocket communication</h2>
+
+The following examples show the interaction between the client and the WebSocket server.
+
+<$macro message-table /CLOSE title:string/REQUIRED>
+<h4>Exchange for a successful build</h4>
+<table class='msg-table'>
+    <!-- <caption><(title)></caption> -->
+    <thead>
+        <tr>
+            <th>Sender</th>
+            <th>Action</th>
+            <th>Content</th>
+        </tr>
+    </thead>
+    <tbody>
+<$content>
+    </tbody>
+</table>
+</$macro>
+
+<$macro message /CLOSE sender:string/REQUIRED
+                       action:string/REQUIRED
+                       content:string/REQUIRED>
+<tr class=('msg-sender-'+sender)>
+    <td class='msg-sender'><(sender)></td>
+    <td class='msg-action'><(action)></td>
+    <td class='msg-data'><div class='msg-body'><(content)></div>
+        <div class='msg-annotation'><$content></div>
+    </td>
+</tr>
+</$macro>
+
+
+<!-- Build successful -->
+<message-table title='WebSocket exchange for a successful build'>
+<message sender='server' action='welcome'
+         content="'Linking over Internet with RISCOS Pyromaniac Agent version 1.04'">
+     Server announcement and version number.
+</message>
+
+<message sender='client' action='source'
+         content="&lt;base64 source data&gt;">
+     Client supplies source data to be processed.
+</message>
+
+<message sender='server' action='response'
+         content="'Source loaded'">
+     Server acknowledges receipt of the source. This does not mean that the source is buildable by the service.
+</message>
+
+<message sender='client' action='build'
+         content="None">
+     Client requests that the build start.
+</message>
+
+<message sender='server' action='response'
+         content="'Started build'">
+     Server acknowledges the request to start a build and begins processing it.
+</message>
+
+<message sender='server' action='message'
+         content="'Build tool selected: JFPatch'">
+     Server has determined the build tool to use; if the source was not understood a different message would be produced, and the exchange would report the build completion.
+</message>
+
+<message sender='server' action='output'
+         content="'JFPatch ARM assembler v2.56\xdf (02 Mar 2020) [Justin Fletcher]\r\n'">
+     Output from the build tool.
+</message>
+
+<message sender='server' action='output'
+         content="'Pre-processing...\r\n'">
+</message>
+
+<message sender='server' action='output'
+         content="'Assembling...\r\n'">
+</message>
+
+<message sender='server' action='clipboard'
+         content="{'filetype': 4092, 'data': &lt;base64 data&gt;}">
+     The output file is supplied, together with its RISC OS filetype.
+
+</message>
+
+<message sender='server' action='rc'
+         content="0">
+     A return code of 0 indicating that the tool exited without error. This is the machine readable format, which is followed by a human-readable message...
+</message>
+
+<message sender='server' action='message'
+         content="'Return code: 0'">
+</message>
+
+<message sender='server' action='complete'
+         content="True">
+     The server has finished the build and is now waiting for more source.
+</message>
+</message-table>
+
+
+<!-- Build with errors -->
+<message-table title='WebSocket exchange for a build with errors'>
+<message sender='server' action='welcome'
+         content="'Linking over Internet with RISCOS Pyromaniac Agent version 1.04'">
+     Server announcement and version number.
+</message>
+
+<message sender='client' action='source'
+         content="&lt;base64 source data&gt;">
+     Client supplies source data to be processed.
+</message>
+
+<message sender='server' action='response'
+         content="'Source loaded'">
+     Server acknowledges receipt of the source. This does not mean that the source is buildable by the service.
+</message>
+
+<message sender='client' action='build'
+         content="None">
+     Client requests that the build start.
+</message>
+
+<message sender='server' action='response'
+         content="'Started build'">
+     Server acknowledges the request to start a build and begins processing it.
+</message>
+
+<message sender='server' action='message'
+         content="'Build tool selected: JFPatch'">
+     Server has determined the build tool to use; if the source was not understood a different message would be produced, and the exchange would report the build completion.
+</message>
+
+<message sender='server' action='output'
+         content="'JFPatch ARM assembler v2.56\xdf (02 Mar 2020) [Justin Fletcher]\r\n'">
+     Output from the build tool.
+</message>
+
+<message sender='server' action='output'
+         content="'Pre-processing...\r\n'">
+</message>
+
+<message sender='server' action='output'
+         content="'Assembling...\r\n'">
+</message>
+
+<message sender='server' action='throwback'
+         content="{'severity': 2, 'url': 'riscos:///source#70', 'filename': 'source', 'reason': 1, 'severity_name': 'Serious Error', 'lineno': 70, 'message': 'Unknown or missing variable', 'reason_name': 'Error'}">
+     An error was found whilst trying to assemble the file. The structured data in the throwback report indicates what type of errors were seen.
+</message>
+
+<message sender='server' action='output'
+         content="'Error: Unknown or missing variable (Error number &amp;1a)\n'">
+     Further character output from the build tool, describing the error message.
+</message>
+
+<message sender='server' action='rc'
+         content="1">
+     A return code of 1 indicating that the tool failed. This is the machine readable format, which is followed by a human-readable message...
+</message>
+
+<message sender='server' action='message'
+         content="'Return code: 1'">
+</message>
+
+<message sender='server' action='complete'
+         content="True">
+     The server has finished the build and is now waiting for more source.
+</message>
+</message-table>
+
 
     </div>
     <page_footer>
