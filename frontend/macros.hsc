@@ -1,8 +1,22 @@
 <$macro page_title section:string/REQUIRED>
 <div class='page-head'>
-<img src='icons/patched.png' alt='[Patched Cog]' />
+<script type='text/javascript'><!--
+function toggle_header_menu() {
+    var menu = document.getElementById("header-menu");
+    menu.style.display = menu.style.display == 'block' ? 'none' : 'block';
+}
+--></script>
+<a href=':index.html'><img class='site-logo' src='icons/patched.png' alt='[Patched Cog]' /></a>
 <h1 class='title'>JFPatch <small><i>as a Service</i></small></h1>
-<span class='section'><(section)><img src='icons/menu.png' alt='[menu]'/></span>
+<nav class='header-menu'>
+    <a href="#" onclick="toggle_header_menu()"><img src='icons/menu.png' alt='[menu]'/></a>
+    <ul class='header-menu-block' id='header-menu' style='display: none;'>
+        <li><a href=':index.html'>Home</a></li>
+        <li><a href=':api.html'>API documentation</a></li>
+        <li><a href=':about.html'>About</a></li>
+    </ul>
+</nav>
+<div class='section'><(section)></div>
 </div>
 </$macro>
 

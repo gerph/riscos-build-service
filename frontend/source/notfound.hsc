@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service</title>
+  <title>JFPatch as a Service: Not found</title>
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>

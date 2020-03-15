@@ -263,26 +263,24 @@ div.page-head {
     padding: 4px;
     margin-bottom: 0.5em;
 }
+div.page-head a {
+    text-decoration: none;
+}
 div.page-head h1 {
     display: inline-block;
     vertical-align: middle;
     margin: 0;
     font-size: 1em;
 }
-div.page-head img {
+div.page-head img.site-logo {
     vertical-align: middle;
     height: 1.5em;
 }
-div.page-head span.section {
+div.page-head .section {
     float: right;
     font-variant: small-caps;
     display: inline-block;
     padding-top: 0.2em;
-}
-div.page-head span.section img {
-    height: 0.85em;
-    vertical-align: baseline;
-    margin-left: 0.25em;
 }
 div.content {
     margin-left: 0.5em;
@@ -301,6 +299,34 @@ div.page-foot .disclaimer {
     font-size: small;
     display: block;
     text-align: right;
+}
+
+/* Header menu */
+.header-menu {
+    float: right;
+    display: inline-block;
+}
+.header-menu img {
+    height: 1em;
+    margin-left: 0.25em;
+    margin-top: 0.25em;
+}
+ul.header-menu-block {
+    position: absolute;
+    font-size: 0.5em;
+    margin: 0;
+    right: 0;
+    padding: 0em;
+    border: 4px solid green;
+}
+.header-menu-block li {
+    margin: 0;
+    list-style: none;
+    padding: 0.25em;
+    background-color: palegreen;
+}
+.header-menu-block li + li {
+    border-top: 4px solid green;
 }
 
 

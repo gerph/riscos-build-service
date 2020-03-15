@@ -518,6 +518,8 @@
   <$deftag WBR /JERK>
 </$if>
 
+<$deftag NAV /CLOSE [__attrs]>
+
 <* vi: set nowrap tw=0 et ts=2: *>
 <* EOF *>
 
