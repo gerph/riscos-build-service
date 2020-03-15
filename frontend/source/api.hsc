@@ -20,7 +20,7 @@ The build service operates on two separate protocols, which drive the underlying
 
 The HTTP protocol is useful for clients that want the operation to be performed and get the result, and do not care about what is happening at the server side. The WebSocket protocol is useful for clients that wish to report on the progress, or perform a number of operations in series.
 
-<h4>Principles</h4>
+<h3>Principles</h3>
 
 <p>
     The system is not complex, but it helps to understand how the service should be used. To function the service must be supplied source code, usually a JFPatch file. JFPatch files were originally intended to be used to patch a separate binary. In such cases, a zip archive can be supplied containing the files that are to be used for the build.
@@ -41,7 +41,7 @@ The HTTP protocol is useful for clients that want the operation to be performed 
 
 <h2>HTTP protocol<small>: Blocking HTTP build service</small></h2>
 
-<h4>Protocol</h4>
+<h3>Protocol</h3>
 <p>
 The HTTP build service allows building of RISC OS binaries through a POST request,
 with the response format selectable through the URI.</p>
@@ -84,7 +84,7 @@ protocol, it must be supplied with the source in order to build. This tool handl
 in a way that allows a very simple command line invocation of the tool and to obtain its binary
 output from the clipboard.
 
-<h4>Protocol</h4>
+<h3>Protocol</h3>
 
 <p>The server and client communicate through messages. Each message is a JSON encoded list of two
 items.</p>
@@ -101,7 +101,7 @@ Each message from the client will be responded to with either a 'response' or 'e
 The server may send other messages to the client at any time to explain its progress.
 </p>
 
-<h4>Server actions</h4>
+<h3>Server actions</h3>
 
 <param-list label='Action'>
 <param name='welcome'>Introduces the server.<br/>
@@ -164,7 +164,7 @@ The server may send other messages to the client at any time to explain its prog
 
 
 
-<h4>Client actions</h4>
+<h3>Client actions</h3>
 
 <param-list label='Action'>
 
@@ -183,7 +183,7 @@ The server may send other messages to the client at any time to explain its prog
 The following examples show the interaction between the client and the WebSocket server.
 
 <$macro message-table /CLOSE title:string/REQUIRED>
-<h4>Exchange for a successful build</h4>
+<h3>Exchange for a successful build</h3>
 <table class='msg-table'>
     <!-- <caption><(title)></caption> -->
     <thead>

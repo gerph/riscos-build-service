@@ -338,6 +338,13 @@ h2 {
     padding: 0.25em;
 }
 
+h3 {
+    background-color: darkgrey;
+    color: white;
+    margin-left: 1em;
+    padding: 0.25em;
+}
+
 table.param-list {
     margin-left: 2.5em;
     border-spacing: 0.5em;
@@ -345,6 +352,7 @@ table.param-list {
 }
 table.param-list tr.heading > th {
     text-align: left;
+    vertical-align: bottom;
 }
 
 table.param-list tr.row > th {
@@ -352,6 +360,7 @@ table.param-list tr.row > th {
     font-family: monospace;
     font-weight: normal;
     vertical-align: top;
+    white-space: pre
 }
 
 table.param-list tr.row > td {

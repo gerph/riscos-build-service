@@ -12,6 +12,7 @@ function toggle_header_menu() {
     <a href="#" onclick="toggle_header_menu()"><img src='icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>
         <li><a href=':index.html'>Home</a></li>
+        <li><a href=':fileformat.html'>File Format</a></li>
         <li><a href=':api.html'>API documentation</a></li>
         <li><a href=':about.html'>About</a></li>
     </ul>
@@ -31,19 +32,19 @@ function toggle_header_menu() {
 
 
 <**** Documentation styles ****>
-<$macro param-list /CLOSE label:string="Parameter">
+<$macro param-list /CLOSE label:string="Parameter" hasrequired:bool=''>
 <table class='param-list'>
     <tr class='heading'>
-        <th><(label)></th>
+        <th><(label)><$if COND=(hasrequired)><br/><small>(&dagger;&nbsp;&rArr;&nbsp;required)</small></$if></th>
         <th>Meaning</th>
     </tr>
 <$content>
 </table>
 </$macro>
 
-<$macro param /CLOSE name:string/REQUIRED>
+<$macro param /CLOSE name:string/REQUIRED required:bool=''>
 <tr class='row'>
-    <th><(name)></th>
+    <th><(name)><$if COND=(required)>&nbsp;&dagger;</$if></th>
     <td><$content></td>
 </tr>
 </$macro>
@@ -70,4 +71,16 @@ function toggle_header_menu() {
 
 <$macro media-type /CLOSE>
 <span class='media-type'><$content></span>
+</$macro>
+
+
+
+<***** File format specific macros ****>
+
+<$macro jfpatch /CLOSE>
+<pre class='jfpatch'><$content></pre>
+</$macro>
+
+<$macro asm /CLOSE>
+<code class='asm'><$content></code>
 </$macro>
