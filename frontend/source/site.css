@@ -1,6 +1,6 @@
 /* The main build result window */
 div#output {
-    margin: 0;
+    margin: 0 0 0.25em 0;
     padding: 0em 0.25em 0.5em 0.25em;
     font-family: monaco, "Courier New", Courier, monospace;
     line-height: 1.3;
@@ -322,7 +322,7 @@ ul.header-menu-block {
 .header-menu-block li {
     margin: 0;
     list-style: none;
-    padding: 0.25em;
+    padding: 0.5em;
     background-color: palegreen;
 }
 .header-menu-block li + li {

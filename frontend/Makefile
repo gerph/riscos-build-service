@@ -82,15 +82,18 @@ ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Sunday 15-Mar-2020 11:29:54
+# dependencies updated: Sunday 15-Mar-2020 17:43:47
 
-all_hsc : ../dest/index.html ../dest/api.html ../dest/notfound.html
+all_hsc : ../dest/index.html ../dest/api.html ../dest/notfound.html \
+    ../dest/about.html
 
 ../dest/index.html : index.hsc ../macros.hsc
 
 ../dest/api.html : api.hsc ../macros.hsc
 
 ../dest/notfound.html : notfound.hsc ../macros.hsc
+
+../dest/about.html : about.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 
