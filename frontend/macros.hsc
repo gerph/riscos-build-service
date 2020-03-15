@@ -1,5 +1,7 @@
-<$macro page_title>
+<$macro page_title section:string/REQUIRED>
 <div class='page-head'>
-<h1 class='title'><img src='icons/patched.png' alt='[Patched Cog]' />JFPatch as a Service</h1>
+<img src='icons/patched.png' alt='[Patched Cog]' />
+<h1 class='title'>JFPatch<small><i> as a Service</i></small></h1>
+<span class='section'><(section)><img src='icons/menu.png' alt='[menu]'/></span>
 </div>
 </$macro>

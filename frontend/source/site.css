@@ -1,0 +1,352 @@
+/* The main build result window */
+div#output {
+    margin: 0;
+    padding: 0em 0.25em 0.5em 0.25em;
+    font-family: monaco, "Courier New", Courier, monospace;
+    line-height: 1.3;
+    background: black;
+    color: white;
+    white-space: pre-wrap;
+    min-height: 10em;
+    max-height: 80%;
+    overflow: auto;
+    resize: true
+}
+div#output-heading {
+    border-bottom: white solid 2px;
+    border-top: white solid 2px;
+    display: block;
+    margin: 0;
+    padding: 0.25em 0.25em 0.25em 0.25em;
+    text-align: center;
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: larger;
+    background-color: silver;
+    color: black;
+}
+
+div#output span.message {
+    color: mediumpurple;
+    font-weight: bold;
+    display: block;
+}
+div#output span.message::before {
+    content: "►";
+    font-weight: bold;
+    padding-left: 0.25em;
+    padding-right: 0.5em;
+    width: 1em;
+    display: inline-block;
+    text-align: right;
+}
+
+div#output span.rc {
+    color: mediumpurple;
+    font-weight: bold;
+    display: block;
+}
+div#output .rc.success {
+    color: mediumseagreen;
+}
+div#output .rc.failure {
+    color: crimson;
+}
+div#output span.rc.success::before {
+    content: "✓";
+    padding-left: 0.25em;
+    padding-right: 0.5em;
+    width: 1em;
+    display: inline-block;
+    text-align: right;
+}
+div#output span.rc.failure::before {
+    content: "✘";
+    padding-left: 0.25em;
+    padding-right: 0.5em;
+    width: 1em;
+    display: inline-block;
+    text-align: right;
+}
+
+div#output span.clipboard {
+    color: cornflowerblue;
+    font-weight: bold;
+    display: block;
+}
+div#output span.clipboard::before {
+    content: "⇩";
+    font-weight: bold;
+    padding-left: 0.25em;
+    padding-right: 0.5em;
+    width: 1em;
+    display: inline-block;
+    text-align: right;
+}
+
+/* Throwback window styles
+ * Colours taken from: https://github.com/jaylett/zap/blob/master/sources/!ZapSource/s/Mode11%2Cfff#L509
+ */
+
+/* The throwback window */
+div#throwback-box {
+    margin-top: 0.5em;
+}
+div#throwback {
+    margin: 0;
+    padding: 0em 0.25em 0.5em 0.25em;
+    font-family: monaco, "Courier New", Courier, monospace;
+    line-height: 1.3;
+    background: black;
+    color: white;
+    white-space: pre;
+    min-height: 4em;
+    max-height: 80%;
+    overflow: auto;
+    resize: true
+}
+div#throwback-heading {
+    border-bottom: white solid 2px;
+    border-top: white solid 2px;
+    display: block;
+    margin: 0;
+    padding: 0.25em 0.25em 0.25em 0.25em;
+    text-align: center;
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: larger;
+    background-color: silver;
+    color: black;
+}
+
+div#throwback div.section {
+    margin-bottom: 1em;
+}
+div#throwback div.heading {
+    /* It's possible that this light yellow should only be on the line number, not the
+     * heading line. I cannot tell from the Throwback source - haven't spent enough time
+     * reviewing it and it's been 20 years since I worked with Zap...
+     */
+    color: palegoldenrod; /* #eeeebb */
+}
+div#throwback div.event {
+}
+div#throwback div.event + div.section {
+    padding-top: 1.5em;
+}
+
+div#throwback div.section span.reason {
+}
+div#throwback div.section.info span.reason {
+    color: darkturquoise; /* #ffbb00 */
+}
+div#throwback div.section.error span.reason {
+    color: gold; /* #eeee00 */
+}
+div#throwback div.section span.filename {
+    color: deepskyblue; /* #00bbff */
+}
+
+div#throwback div.heading span.line {
+}
+div#throwback div.heading span.type {
+}
+div#throwback div.heading span.message {
+}
+
+div#throwback span.line {
+    width: 5em;
+    display: inline-block;
+    text-align: right;
+}
+div#throwback span.type {
+    width: 12em;
+    display: inline-block;
+    text-align: left;
+    margin-left: 1em;
+}
+div#throwback div.event {
+    color: white;
+}
+div#throwback span.type.error {
+    color: crimson; /* #DD0000 */
+}
+div#throwback span.type.serious {
+    color: red; /* #DD2222 */
+}
+div#throwback span.type.warning {
+    color: orange; /* #FFBB00 */
+}
+div#throwback span.message {
+    display: inline-block;
+    text-align: left;
+}
+
+label {
+    display: inline-block;
+    padding: 0.2em;
+}
+
+label#source-button {
+    border: grey 3px solid;
+    border-style: outset;
+    background-color: #eeeeee;
+    border-radius: 8px;
+}
+label#source-button input {
+    display: none
+}
+
+label#build-button {
+    border: grey 3px solid;
+    border-style: outset;
+    background-color: #eeeeee;
+    border-radius: 8px;
+}
+label#build-button button {
+    display: none
+}
+
+label#download-button {
+    border: #808080 3px solid;
+    border-style: outset;
+    background-color: #eeeeee;
+    border-radius: 8px;
+}
+label#download-button button {
+    display: none;
+}
+
+label.disabled, label[disabled] {
+    opacity: .3;
+}
+
+div.workflow {
+}
+div.workflow span.divider {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+div.workflow span.divider::before {
+    content: "";
+    background-image: url(icons/nextstep.png);
+    background-size: auto 1.5em;
+    height: 2em;
+    width: 1.5em;
+    vertical-align: middle;
+    display: inline-block;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+div.workflow form {
+    display: inline-block;
+}
+div.workflow label, div.workflow form {
+}
+div.workflow label img {
+    height: 2em;
+    vertical-align: middle;
+}
+
+/* Page styling */
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+div.page-head {
+    background-color: palegreen;
+    font-family: sans-serif;
+    font-size: 2em;
+    padding: 4px;
+    margin-bottom: 0.5em;
+}
+div.page-head h1 {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    font-size: 1em;
+}
+div.page-head img {
+    vertical-align: middle;
+    height: 1.5em;
+}
+div.page-head span.section {
+    float: right;
+    font-variant: small-caps;
+    display: inline-block;
+    padding-top: 0.2em;
+}
+div.page-head span.section img {
+    height: 0.85em;
+    vertical-align: baseline;
+    margin-left: 0.25em;
+}
+div.content {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+
+/* Documentation styles */
+
+h2 {
+    background-color: darkgrey;
+    color: white;
+    padding: 0.25em;
+}
+
+table.param-list {
+    margin-left: 2.5em;
+    border-spacing: 0.5em;
+    border-collapse: separate;
+}
+table.param-list tr.heading > th {
+    text-align: left;
+}
+
+table.param-list tr.row > th {
+    text-align: left;
+    font-family: monospace;
+    font-weight: normal;
+    vertical-align: top;
+}
+
+table.param-list tr.row > td {
+    text-align: left;
+    vertical-align: top;
+}
+
+
+table.endpoint-list {
+    margin-left: 2.5em;
+    border-spacing: 0.5em;
+    border-collapse: separate;
+}
+table.endpoint-list tr.heading > th {
+    text-align: left;
+}
+
+table.endpoint-list tr.row > th {
+    text-align: left;
+    font-family: monospace;
+    font-weight: normal;
+    vertical-align: top;
+}
+
+table.endpoint-list tr.row > td {
+    text-align: left;
+    vertical-align: top;
+}
+
+span.media-type {
+    font-family: monospace;
+}
+
+span.method-name {
+    font-weight: bold;
+}
+
+/* Remove the tools used for debugging */
+form#general { display: none; }
+div#log { display: none }
