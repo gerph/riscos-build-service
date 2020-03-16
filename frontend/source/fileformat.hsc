@@ -518,12 +518,12 @@ The syntax of the library inclusion command is :
 </p>
 
 <jfpatch>
-LIBRARY <i>filename</i>,[#]<i>routine</i>[[[.routine].routine]...]
+#LIBRARY <i>filename</i>,[#]<i>routine</i>[[[.routine].routine]...]
 </jfpatch>
 
 <p>
 <i>filename</i> is an absolute filename if there is a path, otherwise the
-JFPatch.Libraries directory is searched.
+<code>JFPatch.Libraries</code> directory is searched.
 <i>routine</i> may be * if you want all libraries to be included in a file - not
 recommended.
 </p>
@@ -536,7 +536,9 @@ code. Otherwise, a <code>#HERE LIBRARIES</code> directive will need to be issued
 <p>
 The library files themselves consist of a first line which should be:
 
-<jfpatch>LIBRARY <i>filename</i></jfpatch>
+<jfpatch>
+LIBRARY <i>filename</i>
+</jfpatch>
 
 Followed by the routines in the library. Local labels may be used, but
 externally referenced variables may not due to the manner in which the
@@ -560,7 +562,7 @@ The syntax of the include command is :
 </p>
 
 <jfpatch>
-INCLUDE <i>filename</i>
+#INCLUDE <i>filename</i>
 </jfpatch>
 
 <p>
@@ -577,12 +579,12 @@ for that sort of thing...) Currently, however only two directives exist :
 </p>
 
 <directive-list>
-<directive label='HERE FOOTER' summary='Embed the Footer file at this point'>
+<directive label='#HERE FOOTER' summary='Embed the Footer file at this point'>
                This might be used as DoggySoft use to place "Anything after
                this point is probably a virus")
 </directive>
 
-<directive label='HERE LIBRARIES' summary='Embed all previously defined libraries'>
+<directive label='#HERE LIBRARIES' summary='Embed all previously defined libraries'>
                You should probably not need to use this unless you are very
                organised. I use <code>LIBRARY <i>filename</i>,#[routine]</code> in preference.
 </directive>
@@ -627,29 +629,29 @@ prefixed by a # symbol. In which case, the following apply:
 </p>
 
 <directive-list>
-<directive label='RUN' summary='Runs a particular file'>
+<directive label='#RUN' summary='Runs a particular file'>
         If the file specified is <i>CODE</i> (note: upper case), then the output file is run.
         If <i>THISDIR</i> is included, then it
         is replaced by the directory the Patch file is in.
-        <usage syntax="RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>">
+        <usage syntax="#RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>">
 </directive>
 
-<directive label='WIMPRUN' summary='Performs the same as RUN, except that the file is Filer_Run.'>
+<directive label='#WIMPRUN' summary='Performs the same as RUN, except that the file is Filer_Run.'>
 </directive>
 
-<directive label='EXAMINE' summary='Used to examine memory to check that it is what you expect it to be.'>
+<directive label='#EXAMINE' summary='Used to examine memory to check that it is what you expect it to be.'>
         Usually this is used after executing the code. The output is saved to
         a file and loaded as a text file.
-        <usage syntax='EXAMINE <i>start</i> <i>end</i> | +<i>length</i>'>
+        <usage syntax='#EXAMINE <i>start</i> <i>end</i> | +<i>length</i>'>
 </directive>
 
-<directive label='CAPTURE' summary='Captures all output into a spool file.'>
+<directive label='#CAPTURE' summary='Captures all output into a spool file.'>
         This is usually used where the output cannot be captured in a TaskWindow.
         <usage syntax='CAPTURE [ ON | OFF ]'>
         Default is ON
 </directive>
 
-<directive label='END' summary='End section, start End section'>
+<directive label='#END' summary='End section, start End section'>
 </directive>
 </directive-list>
 
@@ -679,11 +681,11 @@ reference:
 </p>
 
 <jfpatch>
-   LDRW   r0,`taskhandle   means get the taskhandle
+   LDRW   r0,`taskhandle
 </jfpatch>
 
 <p>
-Is simpler to understand than:
+It is easier see that it means get the task handle from workspace than:
 </p>
 
 <jfpatch>
@@ -796,8 +798,7 @@ have spent struggling... Only kidding people...
 </p>
 
 <p>
-Module definitions are enclosed by <code>DEFINE MODULE</code> and <code>END MODULE</code>, and within
-this, the fields are:
+Module definitions are enclosed by <code>DEFINE MODULE</code> and <code>END MODULE</code>. Within these statements, the fields are:
 </p>
 
 <param-list label='Field'>
@@ -817,8 +818,8 @@ this, the fields are:
 <param name='SWIS'>Begin SWI call definition</param>
 <param name='WORKSPACE'>Length of workspace to claim in r12, prefix with * to initialise 0</param>
 <param name='WIMPSWIS'>Begin WimpSWIVe handler definition (WimpSWIVe © Andrew Clover)</param>
-<param name='PREFILTER'>Begin a Pre-Poll filter</param>
-<param name='POSTFILTER'>Begin a Post-Poll filter</param>
+<param name='PREFILTER'>Begin a Pre-Poll filter definition</param>
+<param name='POSTFILTER'>Begin a Post-Poll filter definition</param>
 </param-list>
 
 <p>
@@ -832,13 +833,14 @@ optional.
 JFPatch to implement other features. The cases are as follows :
 </p>
 
-Workspace used:   Init used to claim workspace, Final used to release it
-Filters used:     Init used to register, Final used to deregister, Service
-                  used to claim on FilterManager start up.
-WimpSWIs used:    Init used to claim, Final used to release.
-Services used:    Service handler caught /before/ 'Service' entry.
-Vectors used:     Init used to claim, Final used to release.
-Events used:      Init used to claim, Final used to release.
+<param-list label='Fields&nbsp;used'>
+<param name='Workspace used'>Init used to claim workspace, Final used to release it</param>
+<param name='Filters used'>Init used to register, Final used to deregister, Service used to claim on FilterManager start up.</param>
+<param name='WimpSWIs used'>Init used to claim, Final used to release.</param>
+<param name='Services used'>Service handler caught /before/ 'Service' entry.</param>
+<param name='Vectors used'>Init used to claim, Final used to release.</param>
+<param name='Events used'>Init used to claim, Final used to release.</param>
+</param-list>
 
 
 <h3>Module workspace (private word)</h3>
@@ -857,15 +859,17 @@ If workspace is claimed, the following will have r12 pointing to the private
 space :
 </p>
 
-  Init
-  Final
-  Service
-  Services (definition type)
-  Events
-  Vectors
-  SWIs
-  WimpSWIs
-  Filters
+<ul>
+<li>Init</li>
+<li>Final</li>
+<li>Service</li>
+<li>Services (definition type)</li>
+<li>Events</li>
+<li>Vectors</li>
+<li>SWIs</li>
+<li>WimpSWIs</li>
+<li>Filters</li>
+</ul>
 
 <p>
 Commands will NOT receive r12 -&gt; workspace, but r12 -&gt; private word,
@@ -956,16 +960,16 @@ one. The block should end with :
 within this block, the fields are :
 </p>
 
-NAME      The command name
-CODE      Code to execute when called (default= no code)
-MAX       Maximum number of parameters which may be passed
-MIN       Minimum number of parameters which may be passed
-TYPE      Type of command (default=command!)
-          Options : FS, CONFIG
-FLAGS     Value of the command flags. Overrides the max, min and type
-          settings.
-SYNTAX    Syntax of the command (defaults to no message)
-HELP      Help on the command (defaults to no message)
+<param-list label='Field'>
+<param name='NAME'>The command name</param>
+<param name='CODE'>Code to execute when called (default= no code)</param>
+<param name='MAX'>Maximum number of parameters which may be passed</param>
+<param name='MIN'>Minimum number of parameters which may be passed</param>
+<param name='TYPE'>Type of command (default=COMMAND). Options : FS, CONFIG</param>
+<param name='FLAGS'>Value of the command flags. Overrides the max, min and type settings.</param>
+<param name='SYNTAX'>Syntax of the command (defaults to no message)</param>
+<param name='HELP'>Help on the command (defaults to no message)</param>
+</param-list>
 
 <p>
 <code>SYNTAX</code> and <code>HELP</code> may be followed by a single line, or alternatively by <code>...</code>.
@@ -981,14 +985,21 @@ private word if the workspace is set.
 
 <h3>SWIs</h3>
 
-SWI blocks, like command blocks are surrounded by SWIs and END SWIs. Within
-this block, the following two fields are allowed :
-BASE     Sets the base number of the SWI calls, prefix with &amp; for hex
-PREFIX   Sets the prefix for all the calls. Omit the trailling _.
+SWI blocks, like command blocks are surrounded by <code>SWIs</code> and END SWIs. Within
+this block, the following two fields are allowed:
 
+<param-list label='Field'>
+<param name='BASE'>Sets the base number of the SWI calls, prefix with <code>&amp;</code> for hex</param>
+<param name='PREFIX'>Sets the prefix for all the calls. Omit the trailling <code>_</code>.</param>
+</param-list>
+
+<p>
 All other lines should be in the form :
-  <i>number</i> <i>spaces</i> <i>alias</i> <i>spaces</i> <i>code</i>
+</p>
 
+<jfpatch>
+  <i>number</i>   <i>alias</i>   <i>code</i>
+</jfpatch>
 
 <h3>WimpSWIs</h3>
 
@@ -997,9 +1008,11 @@ you to replace certain Wimp calls with other, much nicer calls :-)
 For more information, read the WSWI-Help documentation in Applics. Again, the
 section is surrounded by WIMPSWIS and END WIMPSWIS. And the fields are :
 
-SWI      Full name of WimpSWI to replace
-PRE      Pre-handler code (before real call being called)
-POST     Post-handler code (after real call being called)
+<param-list label='Field'>
+<param name='SWI'>Full name of WimpSWI to replace</param>
+<param name='PRE'>Pre-handler code (before real call being called)</param>
+<param name='POST'>Post-handler code (after real call being called)</param>
+</param-list>
 
 Either the Pre-Handler or the post handler may be prefixed by the ^ symbol.
 In which case, the code will have the high priority bit set. Mixed priority
@@ -1017,11 +1030,13 @@ delimited by [PRE | POST]FILTER and END [PRE | POST]FILTER, and both are
 handled in a similar manner:
 </p>
 
-NAME     *  Name for the filter (for the list)
-CODE     *  Filter handler code
-MASK        Wimp_Poll mask (only post-filters)
-ACCEPT      An alternate way of specifying the filter mask
-TASK     *  Task name to apply filter to (or - for all tasks)
+<param-list label='Field'>
+<param name='NAME'>* Name for the filter (for the list)</param>
+<param name='CODE'>* Filter handler code</param>
+<param name='MASK'>Wimp_Poll mask (only post-filters)</param>
+<param name='ACCEPT'>An alternate way of specifying the filter mask</param>
+<param name='TASK'>* Task name to apply filter to (or - for all tasks)</param>
+</param-list>
 
 <p>
 Those marked * must be specified for both pre- and post-filters plus,
