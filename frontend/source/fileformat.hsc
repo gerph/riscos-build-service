@@ -10,28 +10,22 @@
 
 <h2>Introduction</h2>
 
-<pre>
-*****************************************************************************
-  &gt; Format                A description of the description file for JFPatch
-************************************************* © Justin Fletcher, 1997 ***
+<p>
+JFPatch files can contain up to 7 distinct sections, of which 2 are required and must be present:
+</p>
 
-Introduction
-============
-JFPatch files can contain up to seven distinct components :
- * Header     Describes what the file is going to do
-   Pre        Pre-assembly basic code which is to bo included
-   Workspace  Describes the workspace blocks to be used
-   Module     Describes the module header
- * Code       The actual code to be assembled (may include patch offsets)
-   Post       Post-assembly, prior to exiting for testing, and running code
-   End        End inclusion, after assembly, but before the auto-included
-              routines.
+<param-list label='Section' hasrequired>
+<param name='Header' required>Describes what the file is going to do</param>
+<param name='Pre'>Pre-assembly basic code which is to bo included</param>
+<param name='Workspace'>Describes the workspace blocks to be used</param>
+<param name='Module'>Describes the module header</param>
+<param name='Code' required>The actual code to be assembled (may include patch offsets)</param>
+<param name='Post'>Post-assembly, prior to exiting for testing, and running code</param>
+<param name='End'>End inclusion, after assembly, but before the auto-included
+              routines.</param>
+</param-list>
 
-Those sections marked * are compulsory and must be include. These will be
-described first, followed by the other sections.
-
-*****************************************************************************
-</pre>
+The required sections - the Header and the Code sections - are described first, below..
 
 <h2>Header section</h2>
 
@@ -311,7 +305,7 @@ instruction may be given a conditional code:
 <directive label="RES" summary="Reserve space">
          If you need to reserve a lagrge block of memory, this is the
          easiest way to do it. The space will be initialised to 0.
-         <usage syntax="RES    <i>bytes</i>">
+         <usage syntax="RES <i>bytes</i>">
 </directive>
 
 <directive label="MODE##" summary="Set processor mode">
