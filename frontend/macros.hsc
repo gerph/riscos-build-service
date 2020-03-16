@@ -1,5 +1,5 @@
-<$macro page_title section:string/REQUIRED>
-<div class='page-head'>
+<$macro page /CLOSE section:string/REQUIRED>
+<header class='page-head'>
 <script type='text/javascript'><!--
 function toggle_header_menu() {
     var menu = document.getElementById("header-menu");
@@ -18,16 +18,16 @@ function toggle_header_menu() {
     </ul>
 </nav>
 <div class='section'><(section)></div>
-</div>
-</$macro>
-
-<$macro page_footer>
-<div class='page-foot'>
+</header>
+<main>
+<$content>
+</main>
+<footer class='page-foot'>
     <span class='disclaimer'>
         JFPatch as a service is not intended for use in safety critical applications.<br/>
         No warranty is given for fitness for any particular purpose.<br/>
         Do not feed after midnight.</span>
-</div>
+</footer>
 </$macro>
 
 

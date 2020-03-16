@@ -5,9 +5,9 @@
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>
-    <page_title section='File Format'>
-    <div class='content'>
+    <page section='File Format'>
 
+<section>
 <h2>Introduction</h2>
 
 <p>
@@ -26,7 +26,9 @@ JFPatch files can contain up to 7 distinct sections, of which 2 are required and
 </param-list>
 
 The required sections - the Header and the Code sections - are described first, below..
+</section>
 
+<section>
 <h2>Header section</h2>
 
 <p>
@@ -80,7 +82,10 @@ been returned to.
     assumed, unless APP is specified, in which case, all references will be from
     that system variable (&lt;name&gt;$Dir).
 </p>
+</section>
 
+
+<section>
 <h2>Code section</h2>
 
 <p>
@@ -481,16 +486,20 @@ When you are writing patches, it is useful to perform check on the code you
 are acting on to ensure that it is the correct version. The checks are :
 </p>
 
-CHECK STRING   Check that a particular address contains a ctrl terminated
-               string.
-               Usage: #CHECK STRING &lt;address&gt; &lt;string&gt;
-               Note: The string may be enclosed in quotes
+<directive-list>
+<directive label='CHECK STRING' summary='Check that a particular address contains a ctrl terminated string.'>
+               <usage syntax='#CHECK STRING <i>address</i> <i>string</i>'>
+               Note: The string may be enclosed in quotes.
+</directive>
 
-CHECK WORD     Check that a particular word contains a particular value
-               Usage: #CHECK WORD &lt;address&gt; &lt;value&gt;
+<directive label='CHECK WORD' summary='Check that a particular word contains a particular value'>
+               <usage syntax='#CHECK WORD <i>address</i> <i>value</i>'>
+</directive>
 
-CHECK LEN      Check that the length of the file is a certain value
-               Usage: #CHECK LEN &lt;length&gt;
+<directive label='CHECK LEN' summary='Check that the length of the file is a certain value'>
+               <usage syntax='#CHECK LEN <i>length</i>'>
+</directive>
+</directive-list>
 
 
 <h3>Including libraries of routines</h3>
@@ -508,7 +517,9 @@ most part).
 The syntax of the library inclusion command is :
 </p>
 
+<jfpatch>
 LIBRARY <i>filename</i>,[#]<i>routine</i>[[[.routine].routine]...]
+</jfpatch>
 
 <p>
 <i>filename</i> is an absolute filename if there is a path, otherwise the
@@ -518,18 +529,21 @@ recommended.
 </p>
 
 <p>
-The # symbol means that the libraries will be included at this point in the
-code. Otherwise, a #HERE LIBRARIES directive will need to be issued.
+The <code>#</code> symbol means that the libraries will be included at this point in the
+code. Otherwise, a <code>#HERE LIBRARIES</code> directive will need to be issued.
 </p>
 
 <p>
-The library files themselves consist of a first line of LIBRARY <i>filename</i>
-followed by the routines in the library. Local labels may be used, but
+The library files themselves consist of a first line which should be:
+
+<jfpatch>LIBRARY <i>filename</i></jfpatch>
+
+Followed by the routines in the library. Local labels may be used, but
 externally referenced variables may not due to the manner in which the
-inclusion occurs. Inclusion is from the first ; before the . prefix of the
-routine name to the line before the first ; before the next . (or the next .
-if there is no ;). See the Summary file for more details, and refer to
-Strings for examples.
+inclusion occurs. Inclusion is from the first <code>;</code> before the <code>.</code> prefix of the
+routine name to the line before the first <code>;</code> before the next <code>.</code> (or the next <code>.</code>
+if there is no <code>;</code>). See the Summary file for more details, and refer to
+Strings for examples. FIXME
 </p>
 
 
@@ -545,7 +559,9 @@ section a number of times, but it is too specific for a full library.
 The syntax of the include command is :
 </p>
 
+<jfpatch>
 INCLUDE <i>filename</i>
+</jfpatch>
 
 <p>
 NOTE: This is still an experimental function. Please report problems or
@@ -560,14 +576,21 @@ things (I'm not sure what yet, but in AOF there seems to be a lot of scope
 for that sort of thing...) Currently, however only two directives exist :
 </p>
 
-HERE FOOTER    Embed the Footer file at this point
+<directive-list>
+<directive label='HERE FOOTER' summary='Embed the Footer file at this point'>
                This might be used as DoggySoft use to place "Anything after
                this point is probably a virus")
+</directive>
 
-HERE LIBRARIES Embed all previously defined libraries
+<directive label='HERE LIBRARIES' summary='Embed all previously defined libraries'>
                You should probably not need to use this unless you are very
-               organised. I use LIBRARY <i>filename</i>,#[routine] in preference.
+               organised. I use <code>LIBRARY <i>filename</i>,#[routine]</code> in preference.
+</directive>
 
+</directive-list>
+</section>
+
+<section>
 <h2>Pre-assembly section</h2>
 
 <p>
@@ -590,36 +613,49 @@ form :
 <jfpatch>
   |<i>label</i>| = <i>value</i>
 </jfpatch>
+</section>
 
 
+<section>
 <h2>Post-assembly section</h2>
 
+<p>
 This section is used for code which should be run after the code has been
 assembled. The section is enclosed by #Post and #End (or the end of the
 file). All the code given will be passed directly to Basic, unless it is
-prefixed by a # symbol. In which case, the following apply :
+prefixed by a # symbol. In which case, the following apply:
+</p>
 
-RUN     Runs a particular file, if the file specified is <i>CODE</i> (note: upper
-        case), then the output file is run. If <i>THISDIR</i> is included, then it
+<directive-list>
+<directive label='RUN' summary='Runs a particular file'>
+        If the file specified is <i>CODE</i> (note: upper case), then the output file is run.
+        If <i>THISDIR</i> is included, then it
         is replaced by the directory the Patch file is in.
-        Usage: RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>
+        <usage syntax="RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>">
+</directive>
 
-WIMPRUN Performs the same as RUN, except that the file is Filer_Run.
+<directive label='WIMPRUN' summary='Performs the same as RUN, except that the file is Filer_Run.'>
+</directive>
 
-EXAMINE Used to examine memory to check that it is what you expect it to be.
+<directive label='EXAMINE' summary='Used to examine memory to check that it is what you expect it to be.'>
         Usually this is used after executing the code. The output is saved to
         a file and loaded as a text file.
-        Usage: EXAMINE <i>start</i> <i>end</i> | +<i>length</i>
+        <usage syntax='EXAMINE <i>start</i> <i>end</i> | +<i>length</i>'>
+</directive>
 
-CAPTURE Captures all output into a spool file.
-        This is usually used where the output cannot be captured in a
-        TaskWindow.
-        Usage: CAPTURE [ ON | OFF ]
+<directive label='CAPTURE' summary='Captures all output into a spool file.'>
+        This is usually used where the output cannot be captured in a TaskWindow.
+        <usage syntax='CAPTURE [ ON | OFF ]'>
         Default is ON
+</directive>
 
-END     End section, start End section
+<directive label='END' summary='End section, start End section'>
+</directive>
+</directive-list>
 
+</section>
 
+<section>
 <h2>End section</h2>
 
 <p>
@@ -631,8 +667,10 @@ executed, unless it is called as a PROCedure or FuNction.
 This is useful for including information about the author, or program.
 However, it's real purpose is to allow functions to be used as macros.
 </p>
+</section>
 
 
+<section>
 <h2>Workspace</h2>
 
 <p>
@@ -657,12 +695,17 @@ Begin a workspace block with DEFINE WORKSPACE and end it with END WORKSPACE.
 Within these blocks, you should use the following commands :
 </p>
 
-NAME     Sets the name of the block
-PREFIX   Allows you to specify a prefix to use within this block variables,
-         so a variable named x0 with a prefix of win becomes winx0. When
-         used, ` prefixes to the original name are retained, so `x0 would
-         become `winx0.
-DEFAULT  Sets the default register to use for the workspace.
+<directive-list>
+<directive label='NAME' summary='Sets the name of the block'>
+</directive>
+<directive label='PREFIX' summary='Allows you to specify a prefix to use within this block'>
+         A variable named <code>x0</code> with a prefix of <code>win</code> becomes <code>winx0</code>. When
+         used, <code>`</code> prefixes to the original name are retained, so <code>`x0</code> would
+         become <code>`winx0</code>.
+</directive>
+<directive label='DEFAULT' summary='Sets the default register to use for the workspace.'>
+</directive>
+</directive-list>
 
 <p>
 All other lines are treated in one of two ways. The first of these is the
@@ -678,8 +721,11 @@ lengths of the blocks are so awkward that you can't be bothered to do it by
 reference. In this form, the definitions are :
 </p>
 
-  <i>offset</i><i>spaces</i><i>identifier</i>[<i>spaces</i><i>comment</i>]
-where <i>offset</i> is either a decimal number, or a hex number prefixed by &amp;.
+<jfpatch>
+  <i>offset</i>  <i>identifier</i>[  <i>comment</i>]
+</jfpatch>
+
+where <i>offset</i> is either a decimal number, or a hex number prefixed by <code>&amp;</code>.
 
 
 <h3>Relative format</h3>
@@ -689,13 +735,22 @@ similar (though in no way compatible) to that used by ObjAsm. In this form,
 the definitions are :
 </p>
 
-  [=]<i>variable</i><i>spaces</i><i>type</i>[repetitions][<i>spaces</i><i>comment</i>]
+<jfpatch>
+  [=]<i>variable</i>  <i>type</i>[repetitions][  <i>comment</i>]
+</jfpatch>
+
 where <i>type</i> is :
-  !  an integer word (ie 4 bytes)
-  %  a byte
-  $  a string (<i>repetitions</i> is the number of characters including terminator)
-  ^  structure reference in the form
-     ^<i>name</i>[<i>space</i><i>repetitions</i>]
+
+<param-list label='type'>
+  <param name='!'>an integer word (ie 4 bytes)</param>
+  <param name='%'>a byte</param>
+  <param name='$'>a string (<i>repetitions</i> is the number of characters including terminator)</param>
+  <param name='^'>a structure reference in the form
+<jfpatch>
+     ^<i>name</i>[  <i>repetitions</i>]
+ </jfpatch>
+</param>
+</param-list>
 
 <p>
 <i>repititions</i> is the number of times the space is repeated (ie four words
@@ -704,13 +759,13 @@ would be !4.
 
 <p>
 Within this structure, blocks may be repeated, or "unioned" by using brackets
-to group the items. Placing a ( alone on a line begins a grouping, ) alone
-ends a grouping, and ) followed by a number sets a number repetitions for the
+to group the items. Placing a <code>(</code> alone on a line begins a grouping, <code>)</code> alone
+ends a grouping, and <code>)</code> followed by a number sets a number repetitions for the
 block.
 </p>
 
 <p>
-Within a grouping, | on its own on a line sets a union. This means
+Within a grouping, <code>|</code> on its own on a line sets a union. This means
 that the relative pointer is reset to the start of that group so that an
 alternate set of names may be given. This is used in ObjAsm OSLib header
 files to define things like the Wimp_SendMessage blocks where the data is
@@ -728,40 +783,43 @@ constraint, but should not be relied upon.
     To use workspace within the code, use [ LDR|STR ][B]W or ADRW commands. To
 find the length of a block of workspace, use `len_<i>name</i>.
 </p>
+</section>
 
-*****************************************************************************
-Yes, last section, and woooo, it's a biggy...
-
+<section>
 <h2>Module section</h2>
-==============
 
+<p>
 Modules are easy to write. You may not think that now, but after using
 JFPatch for some time to create modules, you will find that modules are so
 simple to program that you may have to get a life to fill the time you would
-have spent struggling ;-) Only kidding poeple...
+have spent struggling... Only kidding people...
+</p>
 
-Module definitions are enclosed by DEFINE MODULE and END MODULE, and within
-this, the fields are :
+<p>
+Module definitions are enclosed by <code>DEFINE MODULE</code> and <code>END MODULE</code>, and within
+this, the fields are:
+</p>
 
-NAME       Module name as used in *Modules command (default=Untitled)
-VERSION    Version number to use in help string (default=1.00, or the version
-           in the header.
-AUTHOR     Author name to use in help string (default=not used)
-HELP       Name to use in *Help Modules (default=<i>NAME</i>)
-INIT       Initialisation address or label (default=no code)
-FINAL      Finalisation address or label (default=no code)
-START      Start address or label (default=no code)
-SERVICE    Service handler
-SERVICES   Begin services definition (instead of a user handler
-EVENTS     Begin events definition
-VECTORS    Begin vectors definition
-COMMANDS   Begin OSCLI/Help/Configure commands definition
-SWIHANDLER SWI handler code (default=handled automatically)
-SWIS       Begin SWI call definition
-WORKSPACE  Length of workspace to claim in r12, prefix with * to initialise 0
-WIMPSWIS   Begin WimpSWIVe handler definition (WimpSWIVe © Andrew Clover)
-PREFILTER  Begin a Pre-Poll filter
-POSTFILTER Begin a Post-Poll filter
+<param-list label='Field'>
+<param name='NAME'>Module name as used in *Modules command (default=Untitled)</param>
+<param name='VERSION'>Version number to use in help string (default=1.00, or the version in the header.</param>
+<param name='AUTHOR'>Author name to use in help string (default=not used)</param>
+<param name='HELP'>Name to use in *Help Modules (default=<i>NAME</i>)</param>
+<param name='INIT'>Initialisation address or label (default=no code)</param>
+<param name='FINAL'>Finalisation address or label (default=no code)</param>
+<param name='START'>Start address or label (default=no code)</param>
+<param name='SERVICE'>Service handler</param>
+<param name='SERVICES'>Begin services definition (instead of a user handler</param>
+<param name='EVENTS'>Begin events definition</param>
+<param name='VECTORS'>Begin vectors definition</param>
+<param name='COMMANDS'>Begin OSCLI/Help/Configure commands definition</param>
+<param name='SWIHANDLER'>SWI handler code (default=handled automatically)</param>
+<param name='SWIS'>Begin SWI call definition</param>
+<param name='WORKSPACE'>Length of workspace to claim in r12, prefix with * to initialise 0</param>
+<param name='WIMPSWIS'>Begin WimpSWIVe handler definition (WimpSWIVe © Andrew Clover)</param>
+<param name='PREFILTER'>Begin a Pre-Poll filter</param>
+<param name='POSTFILTER'>Begin a Post-Poll filter</param>
+</param-list>
 
 <p>
 The only one which really ought to be defined is NAME, although all are
@@ -992,8 +1050,8 @@ be given on seperate lines, and the names are :
  UserMsgRec       UserMessageRecorded       MessageRec
  UserMsgAck       UserMessageAcknowledged   MessageAck
 </pre>
+</section>
 
-    </div>
-    <page_footer>
+    </page>
 </body>
 </html>

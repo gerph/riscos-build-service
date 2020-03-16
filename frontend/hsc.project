@@ -2,17 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 16-Mar-2020 17:35:53
-DOCUMENT ../dest/about.html
-SOURCE about.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/notfound.html
-SOURCE notfound.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
+# updated: 16-Mar-2020 20:05:04
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
 TITLE 
@@ -37,6 +27,16 @@ ID log
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/about.html
+SOURCE about.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/notfound.html
+SOURCE notfound.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc

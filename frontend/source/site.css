@@ -256,45 +256,45 @@ body {
     flex-direction: column;
     display: flex;
 }
-div.page-head {
+header {
     background-color: palegreen;
     font-family: sans-serif;
     font-size: 2em;
     padding: 4px;
     margin-bottom: 0.5em;
 }
-div.page-head a {
+header a {
     text-decoration: none;
 }
-div.page-head h1 {
+header h1 {
     display: inline-block;
     vertical-align: middle;
     margin: 0;
     font-size: 1em;
 }
-div.page-head img.site-logo {
+header img.site-logo {
     vertical-align: middle;
     height: 1.5em;
 }
-div.page-head .section {
+header .section {
     float: right;
     font-variant: small-caps;
     display: inline-block;
     padding-top: 0.2em;
 }
-div.content {
+main {
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
 
-div.page-foot {
+footer {
     background-color: palegreen;
     font-family: sans-serif;
     padding: 4px 2em 4px 8em;
     margin-top: auto;
     margin-bottom: 0em;
 }
-div.page-foot .disclaimer {
+footer .disclaimer {
     font-style: italic;
     font-size: small;
     display: block;
@@ -331,17 +331,23 @@ ul.header-menu-block {
 
 
 /* Documentation styles */
-
+section {
+    padding-left: 2em;
+    padding-right: 2em;
+}
 h2 {
     background-color: darkgrey;
     color: white;
     padding: 0.25em;
+    margin-left: -1.25em;
+    margin-right: -1.25em;
 }
 
 h3 {
     background-color: darkgrey;
     color: white;
-    margin-left: 1em;
+    margin-left: -0.75em;
+    margin-right: -1.5em;
     padding: 0.25em;
 }
 

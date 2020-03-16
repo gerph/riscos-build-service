@@ -5,12 +5,10 @@
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>
-    <page_title section='API documentation'>
+    <page section='API documentation'>
 
-    <div class='content'>
-
+<section>
 <h2>Introduction</h2>
-
 The build service operates on two separate protocols, which drive the underlying technology that provides the RISC OS building environment. The distinction between the protocols allows clients with different needs to get information in a different manners.
 
 <ul>
@@ -37,8 +35,9 @@ The HTTP protocol is useful for clients that want the operation to be performed 
 <p>
     Multiple output files are not currently supported.
 </p>
+</section>
 
-
+<section>
 <h2>HTTP protocol<small>: Blocking HTTP build service</small></h2>
 
 <h3>Protocol</h3>
@@ -76,7 +75,9 @@ POST requests are <media-type>application/x-www-form-urlencoded</media-type> wit
         </param-list>
     </endpoint>
 </endpoint-list>
+</section>
 
+<section>
 <h2>WebSocket protocol<small>: Streaming protocol</small></h2>
 
 The WebSocket build protocol is based on messages to and from the server. Like the regular HTTP
@@ -176,8 +177,9 @@ The server may send other messages to the client at any time to explain its prog
     Data is ignored.
 </param>
 </param-list>
+</section>
 
-
+<section>
 <h2>Example WebSocket communication</h2>
 
 The following examples show the interaction between the client and the WebSocket server.
@@ -348,9 +350,8 @@ The following examples show the interaction between the client and the WebSocket
      The server has finished the build and is now waiting for more source.
 </message>
 </message-table>
+</section>
 
-
-    </div>
-    <page_footer>
+    </page>
 </body>
 </html>

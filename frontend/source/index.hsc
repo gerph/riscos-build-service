@@ -366,8 +366,7 @@
 </head>
 
 <body onload="init();">
-    <page_title section='Build'>
-    <div class='content'>
+    <page section='Build'>
       <!-- General command submission -->
       <form id='general' onsubmit="onSubmit(); return false;">
         <input type="text" id="input"/>
@@ -410,7 +409,6 @@
           <div id='throwback'></div>
       </div>
       <div id="log"></div>
-    </div>
-    <page_footer>
+    </page>
 </body>
 </html>

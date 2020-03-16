@@ -5,14 +5,14 @@
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>
-    <page_title section='API documentation'>
-    <div class='content'>
+    <page section='API documentation'>
 
+<section>
 <h2>Not found</h2>
 
 The page you requested was not found. How about you <a href=":">return to the root</a>?
+</section>
 
-    </div>
-    <page_footer>
+    </page>
 </body>
 </html>

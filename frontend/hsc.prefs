@@ -431,7 +431,7 @@
 <$deftag OBJECT /CLOSE /NAW="pre" [__attrs] DECLARE:bool CLASSID:uri CODEBASE:uri DATA:uri TYPE:string CODETYPE:string ARCHIVE:string STANDBY:string HEIGHT:string WIDTH:string USEMAP:uri NAME:string TABINDEX:num [__IAlign] BORDER:num HSPACE:num VSPACE:num>
 <$deftag OPTGROUP /CLOSE /MBI="select" [__attrs] DISABLED:bool LABEL:string>
 <$deftag OPTION /AUTOCLOSE /MBI="select|optgroup" [__attrs] SELECTED:bool DISABLED:bool VALUE:string LABEL:string>
-<$deftag P /AUTOCLOSE /MBI=(__applet + "address|blockquote|body|button|center|del|dd|div|fieldset|form|iframe|ins|li|map|noframes|noscript|object|td|th") /NAW=(__elem-inline) [__attrs] NOWRAP:bool/O [__Align]>
+<$deftag P /AUTOCLOSE /MBI=(__applet + "address|blockquote|body|button|center|del|dd|div|fieldset|form|iframe|ins|li|map|noframes|noscript|object|td|th|main|section|article") /NAW=(__elem-inline) [__attrs] NOWRAP:bool/O [__Align]>
 <$deftag PARAM /EMPTY /LAZY='i' /MBI=(__applet + "object") NAME:string VALUE:string VALUETYPE:enum("data|ref|object") TYPE:string>
 <$deftag PRE /CLOSE /NAW=(__elem-inline) [__attrs] WIDTH:num>
 <$deftag Q /CLOSE /WHTSPC [__attrs] CITE:uri>
@@ -519,6 +519,10 @@
 </$if>
 
 <$deftag NAV /CLOSE [__attrs]>
+<$deftag HEADER /CLOSE [__attrs]>
+<$deftag FOOTER /CLOSE [__attrs]>
+<$deftag MAIN /CLOSE [__attrs]>
+<$deftag SECTION /CLOSE [__attrs]>
 
 <* vi: set nowrap tw=0 et ts=2: *>
 <* EOF *>

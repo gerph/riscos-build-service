@@ -5,9 +5,9 @@
   <link rel="stylesheet" type="text/css" href="site.css" />
 </head>
 <body>
-    <page_title section='About'>
-    <div class='content'>
+    <page section='About'>
 
+<section>
 <h2>What is JFPatch?</h2>
 
 <p>
@@ -25,7 +25,9 @@
     boilerplate that was otherwise very common. Eventually, the tool also gained the ability to
     create AOF (linkable object files) and was thus usable with the rest of Acorn's DDE toolchain.
 </p>
+</section>
 
+<section>
 <h2>Why would you need JFPatch as a service?</h2>
 
 <p>
@@ -33,7 +35,9 @@
     system, but you <em>need</em> to build a RISC OS utility? Or maybe... No. I can't do it... I
     don't know what might cause you to need JFPatch... But if you do, it now exists.
 </p>
+</section>
 
+<section>
 <h2>How does it work?</h2>
 
 <p>
@@ -76,8 +80,8 @@
     RISC OS service we're talking about, and even if both users hit it at once, the system can
     cope.
 </p>
+</section>
 
-    </div>
-    <page_footer>
+    </page>
 </body>
 </html>
