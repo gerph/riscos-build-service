@@ -1,9 +1,5 @@
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service: About</title>
-  <link rel="stylesheet" type="text/css" href="site.css" />
-</head>
+<html-header title='About'></html-header>
 <body>
     <page section='About'>
 

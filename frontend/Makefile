@@ -30,6 +30,7 @@ static: \
 		${DESTDIR}/.htaccess \
  	 	${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/site.css \
+ 	 	${DESTDIR}/favicon.ico \
  	 	${DESTDIR}/icons/file_ff8.png \
  	 	${DESTDIR}/icons/file_ffa.png \
  	 	${DESTDIR}/icons/file_ffc.png \
@@ -63,6 +64,9 @@ ${DESTDIR}/icons/nextstep.png: icons/1920786.svg
 
 ${DESTDIR}/icons/menu.png: icons/2328436.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
+
+${DESTDIR}/favicon.ico: ${DESTDIR}/icons/patched.png
+	convert $? -define icon:auto-resize=64,48,32,16 $@
 
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
 	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@

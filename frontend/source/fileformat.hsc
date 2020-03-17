@@ -1,9 +1,5 @@
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service: File Format</title>
-  <link rel="stylesheet" type="text/css" href="site.css" />
-</head>
+<html-header title='File format'></html-header>
 <body>
     <page section='File Format'>
 

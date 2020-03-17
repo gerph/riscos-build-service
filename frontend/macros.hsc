@@ -1,3 +1,13 @@
+<$macro html-header /CLOSE title:string/REQUIRED>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>JFPatch as a Service: <(title)></title>
+  <link rel="shortcut icon" href=":favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="site.css" />
+  <$content>
+</head>
+</$macro>
+
 <$macro page /CLOSE section:string/REQUIRED>
 <header class='page-head'>
 <script type='text/javascript'><!--

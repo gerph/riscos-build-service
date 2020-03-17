@@ -1,8 +1,5 @@
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service</title>
-  <link rel="stylesheet" type="text/css" href="site.css" />
+<html-header title='Builder'>
   <script src="ansi_up.js" type="text/javascript"></script>
   <script type="text/javascript">
 <!--
@@ -363,7 +360,7 @@
 
 -->
   </script>
-</head>
+</html-header>
 
 <body onload="init();">
     <page section='Build'>
