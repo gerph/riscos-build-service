@@ -19,12 +19,22 @@ FILETYPE_SIZE = ${ICON_SIZE}
 COG_SIZE = ${ICON_SIZE}
 BUTTON_SIZE = ${ICON_SIZE}
 
+CODEMIRROR = ${DESTDIR}/codemirror/lib/codemirror.js \
+             ${DESTDIR}/codemirror/lib/codemirror.css \
+             ${DESTDIR}/codemirror/theme/liquibyte.css \
+             ${DESTDIR}/codemirror/addon/mode/simple.js \
+             ${DESTDIR}/codemirror/mode/assembler/jfpatch.js \
+
 #.PHONY: all static all_hsc
 
 all: dirs static all_hsc
 dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
+	mkdir -p ${DESTDIR}/codemirror/lib
+	mkdir -p ${DESTDIR}/codemirror/theme
+	mkdir -p ${DESTDIR}/codemirror/mode/assembler
+	mkdir -p ${DESTDIR}/codemirror/addon/mode
 
 static: \
 		${DESTDIR}/.htaccess \
@@ -42,6 +52,7 @@ static: \
  	 	${DESTDIR}/icons/build.png \
  	 	${DESTDIR}/icons/nextstep.png \
  	 	${DESTDIR}/icons/menu.png \
+ 	 	${CODEMIRROR} \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 	./make-icon.sh --inset 1 $? $@ ${FILETYPE_SIZE}
@@ -71,7 +82,10 @@ ${DESTDIR}/favicon.ico: ${DESTDIR}/icons/patched.png
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
 	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@
 
-../dest/.htaccess: htaccess
+${DESTDIR}/codemirror/%: codemirror/%
+	cp $? $@
+
+${DESTDIR}/.htaccess: htaccess
 	cp $? $@
 
 
@@ -86,10 +100,11 @@ ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Sunday 15-Mar-2020 20:48:26
+# dependencies updated: Saturday 21-Mar-2020 22:17:21
 
 all_hsc : ../dest/about.html ../dest/api.html ../dest/notfound.html \
-    ../dest/index.html ../dest/fileformat.html
+    ../dest/index.html ../dest/fileformat.html \
+    ../dest/codemirror-examples.html
 
 ../dest/about.html : about.hsc ../macros.hsc
 
@@ -100,6 +115,8 @@ all_hsc : ../dest/about.html ../dest/api.html ../dest/notfound.html \
 ../dest/index.html : index.hsc ../macros.hsc
 
 ../dest/fileformat.html : fileformat.hsc ../macros.hsc
+
+../dest/codemirror-examples.html : codemirror-examples.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

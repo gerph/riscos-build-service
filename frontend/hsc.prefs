@@ -446,7 +446,7 @@
 <$deftag SUP /CLOSE /NAW="pre" /WHTSPC [__attrs]>
 <$deftag TBODY /AUTOCLOSE /MBI="table" /NAW=(__elem-inline) [__attrs] [__HVAlign]>
 <$deftag TD /CLOSE /MBI="tr" /NAW=(__elem-inline) [__attrs] ABBR:string AXIS:string HEADERS:string SCOPE:enum("row|col|rowgroup|colgroup") ROWSPAN:string COLSPAN:string [__HVAlign] NOWRAP:bool NOFLOW:bool/O [__Background] [__WidthHeight]>
-<$deftag TEXTAREA /MBI="form" /CLOSE [__attrs] NAME:string ROWS:num/R COLS:num/R DISABLED:bool READONLY:bool [__Focus] onSelect:string onChange:string WRAP:enum("off|soft|hard")/O>
+<$deftag TEXTAREA /CLOSE [__attrs] NAME:string ROWS:num COLS:num DISABLED:bool READONLY:bool [__Focus] onSelect:string onChange:string WRAP:enum("off|soft|hard")/O>
 <$deftag TFOOT /AUTOCLOSE /MBI="table" /NAW=(__elem-inline) [__attrs] [__HVAlign]>
 <$deftag TH /CLOSE /MBI="tr" /NAW=(__elem-inline) [__attrs] [__Abbr] AXIS:string HEADERS:string SCOPE:enum("row|col|rowgroup|colgroup") ROWSPAN:string COLSPAN:string [__HVAlign] NOWRAP:bool NOFLOW:bool/O [__Background] [__WidthHeight]>
 <$deftag THEAD /AUTOCLOSE /MBI="table" /NAW=(__elem-inline) [__attrs] [__HVAlign]>
