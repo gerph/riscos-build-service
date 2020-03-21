@@ -334,6 +334,7 @@ ul.header-menu-block {
 section {
     padding-left: 2em;
     padding-right: 2em;
+    margin-bottom: 1em;
 }
 h2 {
     background-color: darkgrey;
@@ -395,6 +396,23 @@ table.endpoint-list tr.row > td {
     text-align: left;
     vertical-align: top;
 }
+
+table.filter-accept-list {
+    margin-left: 2.5em;
+    border-spacing: 0.5em;
+    border-collapse: separate;
+}
+table.filter-accept-list tr.heading > th {
+    text-align: left;
+}
+table.filter-accept-list tr.row > td {
+    text-align: left;
+    font-family: monospace;
+    font-weight: normal;
+    vertical-align: top;
+    white-space: pre
+}
+
 
 span.media-type {
     font-family: monospace;

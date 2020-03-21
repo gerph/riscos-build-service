@@ -7,7 +7,7 @@
 <h2>Introduction</h2>
 
 <p>
-JFPatch files can contain up to 7 distinct sections, of which 2 are required and must be present:
+JFPatch files can contain up to 8 distinct sections, of which 2 are required and must be present:
 </p>
 
 <param-list label='Section' hasrequired>
@@ -15,6 +15,7 @@ JFPatch files can contain up to 7 distinct sections, of which 2 are required and
 <param name='Pre'>Pre-assembly basic code which is to bo included</param>
 <param name='Workspace'>Describes the workspace blocks to be used</param>
 <param name='Module'>Describes the module header</param>
+<param name='Macros'>Describes the macro definitions</param>
 <param name='Code' required>The actual code to be assembled (may include patch offsets)</param>
 <param name='Post'>Post-assembly, prior to exiting for testing, and running code</param>
 <param name='End'>End inclusion, after assembly, but before the auto-included
@@ -76,7 +77,7 @@ been returned to.
 <p>
     If filenames are not full paths then the same path as the patch file is
     assumed, unless APP is specified, in which case, all references will be from
-    that system variable (&lt;name&gt;$Dir).
+    that system variable (<code>&lt;name&gt;$Dir</code>).
 </p>
 </section>
 
@@ -178,6 +179,13 @@ will export the label <code><i>label</i></code>. To rename the label when export
 
 <jfpatch>
 .|<i>label</i>-&gt;<i>export</i>|
+</jfpatch>
+
+Label definitions in AOF may also be suffixed by <code>ENTRY</code> to indicate that they are
+to be declared as the entrypoint, in the form:
+
+<jfpatch>
+.|<i>label</i>| ENTRY
 </jfpatch>
 
 <p>
@@ -297,6 +305,13 @@ instruction may be given a conditional code:
          Note: All registers preserved, flags altered.
 </directive>
 
+
+
+         FIXME: REMF and REMFP directives?
+         FIXME: GETBIT, SETBIT, CLRBIT
+         FIXME: SETV, SETC, SETN, SETZ (and CLR# variants)
+
+
 <directive label="DIV" summary="Divide routine (very sub-optimal)">
          Result is returned in top.
          <usage syntax="DIV <i>top</i>,<i>bottom</i>">
@@ -345,6 +360,11 @@ instruction may be given a conditional code:
 <directive label="EQUZ<br/>EQUZA" summary="Equate string with zero suffix<br/>Equate string with zero suffix, then align">
          Much easier than using <asm>EQUS "blah, blah"+CHR$0</asm>.
          <usage syntax="EQUZ[A]   <i>string</i>">
+</directive>
+
+<directive label="ERR" summary="Define an error block">
+         Defines an error block, in the form of a 32bit error number and a message.
+         <usage syntax="ERR     <i>number</i>, <i>message</i>">
 </directive>
 
 <directive label="NOP##" summary="No operation">
@@ -400,6 +420,18 @@ by arguments:
          This changes the default mapping for a workspace block.
          <usage syntax="#MAPWS <i>block name</i>[,<i>register</i>]">
          if no register is specifed, the default is used.
+</directive>
+
+<directive label="#AREA" summary="Begin an AOF area for the following code">
+         This declares the start of a named AOF area.
+         <usage syntax="#Area <i>area name</i> [<i>flags</i>]">
+         The area flags are a space separated list of flags for the area:
+         <param-list label='Flag'>
+          <param name='CODE'>Area is for Code (otherwise it is a Data area)</param>
+          <param name='32BIT'>Area contains 32bit code (otherwise it contains 26bit code)</param>
+          <param name='READONLY'>Area is read only (otherwise it is writeable)</param>
+          <param name='STACKCHECK'>Area is contains stack checked code (otherwise it is not stack limit checking)</param>
+         </param-list>
 </directive>
 
 </directive-list>
@@ -626,9 +658,8 @@ prefixed by a # symbol. In which case, the following apply:
 
 <directive-list>
 <directive label='#RUN' summary='Runs a particular file'>
-        If the file specified is <i>CODE</i> (note: upper case), then the output file is run.
-        If <i>THISDIR</i> is included, then it
-        is replaced by the directory the Patch file is in.
+        If the file specified is <code>&lt;CODE&gt;</code> (note: upper case), then the output file is run.
+        If <code>&lt;THISDIR&gt;</code> is included, then it is replaced by the directory the Patch file is in.
         <usage syntax="#RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>">
 </directive>
 
@@ -802,10 +833,11 @@ Module definitions are enclosed by <code>DEFINE MODULE</code> and <code>END MODU
 <param name='VERSION'>Version number to use in help string (default=1.00, or the version in the header.</param>
 <param name='AUTHOR'>Author name to use in help string (default=not used)</param>
 <param name='HELP'>Name to use in *Help Modules (default=<i>NAME</i>)</param>
+<param name='EXTRA'>Extra text to append after the date in *Help Modules (default=none)</param>
 <param name='INIT'>Initialisation address or label (default=no code)</param>
 <param name='FINAL'>Finalisation address or label (default=no code)</param>
 <param name='START'>Start address or label (default=no code)</param>
-<param name='SERVICE'>Service handler</param>
+<param name='SERVICE'>Service handler label</param>
 <param name='SERVICES'>Begin services definition (instead of a user handler</param>
 <param name='EVENTS'>Begin events definition</param>
 <param name='VECTORS'>Begin vectors definition</param>
@@ -816,7 +848,16 @@ Module definitions are enclosed by <code>DEFINE MODULE</code> and <code>END MODU
 <param name='WIMPSWIS'>Begin WimpSWIVe handler definition (WimpSWIVe © Andrew Clover)</param>
 <param name='PREFILTER'>Begin a Pre-Poll filter definition</param>
 <param name='POSTFILTER'>Begin a Post-Poll filter definition</param>
+<param name='RECTFILTER'>Begin a Pre-Rectangle redraw filter definition</param>
+<param name='POSTRECTFILTER'>Begin a Post-Rectangle redraw filter definition</param>
+<param name='COPYFILTER'>Begin a Copy region filter definition</param>
+<param name='POSTICONFILTER'>Begin a Post-icon redraw filter definition</param>
+<param name='MESSAGEFILE'>Declare the name of the messages file to use for commands (default=none)</param>
+<param name='RESOURCES'>Begin a ResourceFS files definition</param>
+<param name='IMAGEFS'>Begin an Image Filing System definition</param>
+<param name='FS'>Begin a full Filing System definition</param>
 </param-list>
+
 
 <p>
 The only one which really ought to be defined is NAME, although all are
@@ -833,7 +874,7 @@ JFPatch to implement other features. The cases are as follows :
 <param name='Workspace used'>Init used to claim workspace, Final used to release it</param>
 <param name='Filters used'>Init used to register, Final used to deregister, Service used to claim on FilterManager start up.</param>
 <param name='WimpSWIs used'>Init used to claim, Final used to release.</param>
-<param name='Services used'>Service handler caught /before/ 'Service' entry.</param>
+<param name='Services used'>Service handler caught <em>before</em> 'Service' entry.</param>
 <param name='Vectors used'>Init used to claim, Final used to release.</param>
 <param name='Events used'>Init used to claim, Final used to release.</param>
 </param-list>
@@ -1022,46 +1063,215 @@ Filters are one of the most useful of the features of RO3 (to the programmer
 at least). Filters allow you to trap calls Wimp_Poll in much the same way
 that WimpSWIs do for the other calls. There are two types of Filters which
 can be used, Pre- and Post-poll filters. These are in seperate sections,
-delimited by [PRE | POST]FILTER and END [PRE | POST]FILTER, and both are
-handled in a similar manner:
+delimited by opening and closing block statements. The filters which can be
+registered are:
 </p>
 
+<ul>
+    <li>Pre-poll filter.<br/>
+        Begin block with <code>PREFILTER</code>.<br/>
+        End block with <code>END PREFILTER</code> or <code>END FILTER</code>.
+    </li>
+
+    <li>Post-poll filter.<br/>
+        Begin block with <code>POSTFILTER</code>.<br/>
+        End block with <code>END POSTFILTER</code> or <code>END FILTER</code>.
+    </li>
+
+    <li>Pre-rectangle redraw filter.<br/>
+        Begin block with <code>RECTFILTER</code>.<br/>
+        End block with <code>END RECTFILTER</code> or <code>END FILTER</code>.
+    </li>
+
+    <li>Post-rectangle redraw filter.<br/>
+        Begin block with <code>POSTRECTFILTER</code>.<br/>
+        End block with <code>END POSTRECTFILTER</code> or <code>END FILTER</code>.
+    </li>
+
+    <li>Copy rectangle region filter (not currently implemented).
+    </li>
+
+    <li>Post-icon redraw filter.<br/>
+        Begin block with <code>POSTICONFILTER</code>.<br/>
+        End block with <code>END POSTICONFILTER</code> or <code>END FILTER</code>.
+    </li>
+</ul>
+
+The fields within each of the blocks are declared with the following definitions:
+
 <param-list label='Field'>
-<param name='NAME'>* Name for the filter (for the list)</param>
-<param name='CODE'>* Filter handler code</param>
-<param name='MASK'>Wimp_Poll mask (only post-filters)</param>
-<param name='ACCEPT'>An alternate way of specifying the filter mask</param>
-<param name='TASK'>* Task name to apply filter to (or - for all tasks)</param>
+<param name='NAME'>Name for the filter (for the list)</param>
+<param name='CODE'>Filter handler code</param>
+<param name='MASK'>Wimp_Poll mask as a number (only post-filters)</param>
+<param name='ACCEPT'>An alternate way of specifying the filter mask by giving names of poll reasons to accept (only post-filters)</param>
+<param name='TASK'>Task name to apply filter to (or - for all tasks)</param>
+<param name='METHOD'>How filter registration should be performed.
+ <param-list label='Method'>
+  <param name='ERROR'>If the task requested is not present, report an error and fail to initialise. This is the default.</param>
+  <param name='MULTIPLE'>Register filters on tasks as they start up.</param>
+ </param-list>
+ </param>
 </param-list>
 
 <p>
-Those marked * must be specified for both pre- and post-filters plus,
-post-filters must have either MASK or ACCEPT specified. ACCEPT commands must
+Post-filters must have either MASK or ACCEPT specified. ACCEPT commands must
 be given on seperate lines, and the names are :
 </p>
 
-<pre>
- Primary name     Secondary name            Tertiary name
- --------------------------------------------------------
- Null
- Redraw
- OpenWindow
- CloseWindow
- PointerLeaving
- PointerEntering
- MouseClick
- UserDragBox      DragDropped
- KeyPress         KeyPressed
- Menu             MenuSelection
- Scroll           ScrollRequest
- LoseCaret
- GainCaret
- PollWord
- UserMsg          UserMessage               Message
- UserMsgRec       UserMessageRecorded       MessageRec
- UserMsgAck       UserMessageAcknowledged   MessageAck
-</pre>
+<table class='filter-accept-list'>
+     <tr class='heading'>
+        <th>Primary name</th>
+        <th>Secondary name</th>
+        <th>Tertiary name</th>
+    </tr>
+<$macro filter-accept name1:string name2:string="" name3:string="">
+     <tr class='row'>
+        <td><(name1)></td>
+        <td><(name2)></td>
+        <td><(name3)></td>
+    </tr>
+</$macro>
+
+<filter-accept name1="Null">
+<filter-accept name1="Redraw">
+<filter-accept name1="OpenWindow">
+<filter-accept name1="CloseWindow">
+<filter-accept name1="PointerLeaving">
+<filter-accept name1="PointerEntering">
+<filter-accept name1="MouseClick">
+<filter-accept name1="UserDragBox" name2="DragDropped">
+<filter-accept name1="KeyPress" name2="KeyPressed">
+<filter-accept name1="Menu" name2="MenuSelection">
+<filter-accept name1="Scroll" name2="ScrollRequest">
+<filter-accept name1="LoseCaret">
+<filter-accept name1="GainCaret">
+<filter-accept name1="PollWord">
+<filter-accept name1="UserMsg" name2="UserMessage" name3="Message">
+<filter-accept name1="UserMsgRec" name2="UserMessageRecorded" name3="MessageRec">
+<filter-accept name1="UserMsgAck" name2="UserMessageAcknowledged" name3="MessageAck">
+</table>
+
+<h3>Resources</h3>
+
+Resources can be registered with ResourceFS when the module initialises by defining
+them in the Resources definition. The fields within the <code>RESOURCES</code> block take the form:
+
+<jfpatch>
+    <i>local-filename</i>    <i>resourcefs-filename</i>
+</jfpatch>
+
+Note: It is possible that the Resources registration is non-functional at present.
+
+
+<h3>ImageFSs</h3>
+
+The entry points and registrations for an ImageFS filesystem can be registered with the ImageFS
+block. The following fields are defined in the definition:
+
+<param-list label='Field'>
+<param name='TYPE<br/>FILETYPE'>Sets filetype which is handled by the ImageFS, which may be a hex value prefixed by <code>&amp;</code>, or a type name (or bare hex filetype)</param>
+<param name='FLAGS'>Flags to set for the filesystem. Flags are space separated list of names, and may be prefixed by a <code>-</code> character to indicate the the flag is not set. The flags field may be specified multiple times, and will accumulate flags (or subtract them, if the <code>-</code> prefix is used. Flags currently known are:
+    <param-list label='Flag name'>
+        <param name='TELLFSWHENFLUSHING<br/>TELLWHENFLUSHING'>Sets bit 27 of the flags word</param>
+    </param-list>
+</param>
+
+<param name='OPEN'>Entry point for ImageFS_Open</param>
+<param name='CLOSE'>Entry point for ImageFS_Close</param>
+<param name='GET<br/>GETBYTES'>Entry point for ImageFS_GetBytes</param>
+<param name='PUT<br/>PUTBYTES'>Entry point for ImageFS_PutBytes</param>
+<param name='ARGS'>Entry point for ImageFS_Args</param>
+<param name='FILE'>Entry point for ImageFS_File</param>
+<param name='FUNC'>Entry point for ImageFS_Func</param>
+
+</param-list>
+
+
+<h3>Full FSs</h3>
+
+The entry points and registrations for a full filesystem can be registered with the FS
+block. The following fields are defined in the definition:
+
+<param-list label='Field' hasrequired>
+<param name='NAME' required>Name of the filing system</param>
+<param name='STARTUP'>Text to print on filing system selection</param>
+<param name='NUMBER' required>Sets the filing system number for the filing system</param>
+<param name='FILES'>Number of open files supported by the filing system, or <code>INFINITE</code> if not limited</param>
+<param name='FLAGS' required>Flags to set for the filesystem. Flags are supplied as a space separated list of names, and may be prefixed by a <code>-</code> character to indicate that the flag is clear. The flags field may be specified multiple times, and will accumulate flags (or subtract them, if the <code>-</code> prefix is used. Flags currently known are:
+    <param-list label='Flag name'>
+        <param name="SPECIALFIELDS">Sets bit 31 in the flags</param>
+        <param name="INTERACTIVESTREAMS<br/>INTERACTIVE">Sets bit 30 in the flags</param>
+        <param name="NULLFILENAMES">Sets bit 29 in the flags</param>
+        <param name="ALWAYSOPENFILES">Sets bit 28 in the flags</param>
+        <param name="TELLFSWHENFLUSHING<br/>TELLWHENFLUSHING">Sets bit 27 in the flags</param>
+        <param name="SUPPORTSFILE9">Sets bit 26 in the flags</param>
+        <param name="SUPPORTSFUNC20">Sets bit 25 in the flags</param>
+        <param name="SUPPORTSFUNC18">Sets bit 24 in the flags</param>
+        <param name="SUPPORTSIMAGEFS">Sets bit 23 in the flags</param>
+        <param name="USEURDLIB">Sets bit 22 in the flags</param>
+        <param name="NODIRECTORIES<br/>NODIRS">Sets bit 21 in the flags</param>
+        <param name="NEVERLOAD<br/>USEOPENGETCLOSE">Sets bit 20 in the flags</param>
+        <param name="NEVERSAVE<br/>USEOPENPUTCLOSE">Sets bit 19 in the flags</param>
+        <param name="USEFUNC9">Sets bit 18 in the flags</param>
+        <param name="READONLY">Sets bit 16 in the flags</param>
+        <param name="SUPPORTSFILE34">Sets bit 0 in the extra flags</param>
+        <param name="SUPPORTSCAT">Sets bit 1 in the extra flags</param>
+        <param name="SUPPORTSEX">Sets bit 2 in the extra flags</param>
+    </param-list>
+</param>
+
+<param name='OPEN'>Entry point for FS_Open</param>
+<param name='CLOSE'>Entry point for FS_Close</param>
+<param name='GET<br/>GETBYTES'>Entry point for FS_GetBytes</param>
+<param name='PUT<br/>PUTBYTES'>Entry point for FS_PutBytes</param>
+<param name='ARGS'>Entry point for FS_Args</param>
+<param name='FILE'>Entry point for FS_File</param>
+<param name='FUNC'>Entry point for FS_Func</param>
+<param name='GBPB'>Entry point for FS_GBPB</param>
+
+</param-list>
+
+Note: The extra flags setting may be broken in the current implementation.
+
 </section>
+
+<section>
+<h2>Macros section</h2>
+
+<p>
+The macros section declares macros - templated blocks of instructions - which are to be
+used within the assembly. The macros are not widely used and probably contain many bugs.
+The macro section is started with <code>DEFINE MACROS</code> and ended with <code>END MACROS</code>. The fields within the section are:
+</p>
+
+<param-list label='Field' hasrequired>
+    <param name='COMMAND'>Name of the macro, to be used in place of the instruction mnemonic</param>
+    <param name='CONDS'>Which condition codes are allowed for this macro, as a space separated list, or a special word:
+        <param-list label='Cond'>
+            <param name='ALL'>All conditions are allowed</param>
+            <param name='NEVER'>No conditions are allowed</param>
+            <param name='INVERT'>All condition codes are allowed by inserting an inverted condition instruction to branch over the macro code</param>
+        </param-list>
+    </param>
+    <param name='TEMPS'>Number of temporary registers required</param>
+    <param name='MASK'>Parameters template for the macro. The template consists of a string which has substitution characters used to declare what parameters are passed to the macro. The substitutions are prefixed by <code>@</code> and take the form:
+        <param-list label='Substitution'>
+            <param name='@r<i>name</i>'>Names a single register parameter. <i>name</i> is a single character name for this parameter.</param>
+            <param name='@g<i>name</i>'>Names a group of registers, in the form <code>{<i>registers</i>}</code>. <i>name</i> is a single character name for this parameter.</param>
+            <param name='@c<i>name</i>'>Names a constant value prefixed by a <code>#</code> character. <i>name</i> is a single character name for this parameter.</param>
+            <param name='@t<i>name</i>'>Names a register that may be used as a temporary. <i>name</i> is a single character name for this parameter. Not currently implemented.</param>
+        </param-list>
+    </param>
+    <param name='CODE'>Begins the code to use for the macro, which ends at an <code>END CODE</code>.
+    Within the <code>CODE</code> block, the names <code>@[r|g|c]<i>name</i></code> may be used to substitute in the invocation.
+    </param>
+</param-list>
+
+<p>
+Macros are not well used within JFPatch code, so there will be bugs, and it may not work as described or as expected.
+</p>
+</section>
+
 
     </page>
 </body>
