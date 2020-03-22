@@ -470,6 +470,14 @@ CodeMirror.defineSimpleMode("jfpatch", {
     {regex: /Define Macros/i, sol: true, token: 'def', next: 'define_macros'},
     {regex: /(?=;|\.|>|#|@)/, sol: true, next: 'jfpatch'},
     {regex: /{/, sol: true, token: "comment", push: "multiline_comment"},
+
+    // If we get any instructions directly, we move into the jfpatch code
+    // Largely this is so that the documentation styling works; it's not actually valid in
+    // JFPatch itself.
+    {regex: new RegExp("(?=\\s+" + res_inst_jfpatch_all + ")"), token: 'none', next: 'jfpatch'},
+    {regex: new RegExp("(?=\\s+" + res_inst_all + ")"), token: 'none', next: 'jfpatch'},
+
+    {regex: /(.*)/, token: 'error'},
   ],
   pre: [
     // Before we assemble anything
@@ -477,6 +485,10 @@ CodeMirror.defineSimpleMode("jfpatch", {
 
     // Directives
     {regex: /\s*#\s*(?=[A-Za-z])/, sol: true, token: 'def', push: 'directive'},
+
+    // AOF exported constant
+    {regex: /(\s*)(\|)([`a-zA-Z][a-zA-Z0-9_]*)(\|)(\s*)(=)/, sol: true,
+     token: ['none', 'qualifier', 'variable', 'qualifier', 'none', 'operator'], posh: 'basic_line_continuation'},
 
     // Basic lines
     {regex: /[\s:]*/, token: 'none', push: 'basic_line'},

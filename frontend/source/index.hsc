@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <html-header title='Builder'>
   <script src="ansi_up.js" type="text/javascript"></script>

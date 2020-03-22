@@ -1,6 +1,7 @@
+<!DOCTYPE html>
 <html>
-<html-header title='File format'></html-header>
-<body>
+<html-header title='File format' codecolouring></html-header>
+<body onload='setup_colouring({autosize: true, linenumbers: false});'>
     <page section='File Format'>
 
 <section>
@@ -181,8 +182,10 @@ will export the label <code><i>label</i></code>. To rename the label when export
 .|<i>label</i>-&gt;<i>export</i>|
 </jfpatch>
 
+<p>
 Label definitions in AOF may also be suffixed by <code>ENTRY</code> to indicate that they are
 to be declared as the entrypoint, in the form:
+</p>
 
 <jfpatch>
 .|<i>label</i>| ENTRY
@@ -641,7 +644,9 @@ form :
 </p>
 
 <jfpatch>
-  |<i>label</i>| = <i>value</i>
+Pre
+  |label| = value
+End Pre
 </jfpatch>
 </section>
 

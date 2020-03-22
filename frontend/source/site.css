@@ -250,6 +250,9 @@ div.workflow label img {
 }
 
 /* Page styling */
+html, body {
+    height: 100%;
+}
 body {
     margin: 0;
     font-family: sans-serif;
@@ -313,6 +316,7 @@ footer .disclaimer {
 }
 ul.header-menu-block {
     position: absolute;
+    z-index: 10;
     font-size: 0.5em;
     margin: 0;
     right: 0;
@@ -462,6 +466,19 @@ table.msg-table div.msg-annotation {
 
 li {
     margin-top: 0.75em;
+}
+
+div.jfpatch {
+    margin-left: 1em;
+    margin-right: 1em;
+    padding: 0.25em 0.25em 0.25em 0.25em;
+    background-color: black;
+}
+.cm-s-autosize {
+    height: auto;
+}
+
+.CodeMirror {
 }
 
 

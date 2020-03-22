@@ -1,10 +1,6 @@
+<!DOCTYPE html>
 <html>
-<html-header title='Colouring Example'>
-<script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
-<link rel="stylesheet" href="codemirror/lib/codemirror.css"/>
-<link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
-<script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
-<script src="codemirror/mode/assembler/jfpatch.js" type='text/javascript'></script>
+<html-header title='Colouring Example' codecolouring>
 <script type='text/javascript'>
 <!--
     loaded = false;
@@ -12,29 +8,35 @@
         if (loaded)
             return;
         loaded = true;
-        areas = document.getElementsByClassName('source-code');
-        for (i = 0; i < areas.length; i++) {
-            var textarea = areas[i];
-            var options = {
-                    lineNumbers: true,
-                    mode: 'text/x-jfpatch',
-                    theme: 'liquibyte',
-                    lineWrapping: true,
-                };
-            if (textarea.readOnly)
-            {
-                // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
-                //options.readOnly = 'nocursor';
+        if (1) {
+            setup_colouring({autosize: true, linenumbers: true});
+        }
+        else
+        {
+            areas = document.getElementsByClassName('source-code');
+            for (i = 0; i < areas.length; i++) {
+                var textarea = areas[i];
+                var options = {
+                        lineNumbers: true,
+                        mode: 'text/x-jfpatch',
+                        theme: 'liquibyte',
+                        lineWrapping: true,
+                    };
+                if (textarea.readOnly)
+                {
+                    // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
+                    //options.readOnly = 'nocursor';
 
-                // true => cursor visible (but not blinking, with rate change), can use keyboard to
-                //         scroll, cannot exit, can select
-                options.readOnly = true;
-                options.cursorBlinkRate = 0;
+                    // true => cursor visible (but not blinking, with rate change), can use keyboard to
+                    //         scroll, cannot exit, can select
+                    options.readOnly = true;
+                    options.cursorBlinkRate = 0;
+                }
+                var cm = CodeMirror.fromTextArea(textarea, options);
+                var widget = document.getElementById('HELLO');
+                cm.addLineWidget(3, widget);
+                //alert(cm.getValue());
             }
-            var cm = CodeMirror.fromTextArea(textarea, options);
-            var widget = document.getElementById('HELLO');
-            cm.addLineWidget(3, widget);
-            //alert(cm.getValue());
         };
     }
     -->
@@ -42,7 +44,7 @@
 </html-header>
 <body onload='onload();'>
     <page section='Colouring Example'>
-    <textarea class='source-code' readonly>
+    <textarea class='source-code'>
 In   -
 Out  djf
 Type Utility

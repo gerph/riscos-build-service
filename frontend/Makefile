@@ -24,6 +24,7 @@ CODEMIRROR = ${DESTDIR}/codemirror/lib/codemirror.js \
              ${DESTDIR}/codemirror/theme/liquibyte.css \
              ${DESTDIR}/codemirror/addon/mode/simple.js \
              ${DESTDIR}/codemirror/mode/assembler/jfpatch.js \
+             ${DESTDIR}/colouring.js \
 
 #.PHONY: all static all_hsc
 

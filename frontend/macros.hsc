@@ -1,8 +1,16 @@
-<$macro html-header /CLOSE title:string/REQUIRED>
+<$macro html-header /CLOSE title:string/REQUIRED codecolouring:bool=false>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>JFPatch as a Service: <(title)></title>
   <link rel="shortcut icon" href=":favicon.ico" />
+  <$if COND=(codecolouring)>
+    <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
+    <script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
+    <script src="codemirror/mode/assembler/jfpatch.js" type='text/javascript'></script>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css"/>
+    <link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
+    <script src="colouring.js" type='text/javascript'></script>
+  </$if>
   <link rel="stylesheet" type="text/css" href="site.css" />
   <$content>
 </head>
@@ -88,7 +96,9 @@ function toggle_header_menu() {
 <***** File format specific macros ****>
 
 <$macro jfpatch /CLOSE>
-<pre class='jfpatch'><$content></pre>
+<div class='jfpatch'>
+    <textarea class='source-code jfpatch' readonly><$content><$stripws type=both></textarea>
+</div>
 </$macro>
 
 <$macro asm /CLOSE>
