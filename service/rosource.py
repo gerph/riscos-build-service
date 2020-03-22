@@ -129,17 +129,17 @@ class RISCOSSource(object):
         if data.startswith(b'\x0d\x00') and data.endswith(b'\x0d\xff'):
             return FILETYPE_BASIC
 
-        if data.startswith(('REM>', 'REM >', '0REM', '10REM')) or \
-           (data.startswith('10') and '\nPRINT' in data) or \
-           ('\nPRINT' in data and '\nSYS' in data) or \
-           ('\nDEF PROC' in data or '\nDEFPROC' in data):
-            return FILETYPE_BASTXT
-
         if data.startswith(b'\xc5\xc6\xcb\xc3'):
             return FILETYPE_AOF
 
         if data[0:3].upper() == 'IN ':
             return FILETYPE_JFPATCH
+
+        if data.startswith(('REM>', 'REM >', '0REM', '10REM')) or \
+           (data.startswith('10') and '\nPRINT' in data) or \
+           ('\nPRINT' in data and '\nSYS' in data) or \
+           ('\nDEF PROC' in data or '\nDEFPROC' in data):
+            return FILETYPE_BASTXT
 
         if unix_filename:
             # The filename will give us some hints if the prefix checks don't tell us what it is
