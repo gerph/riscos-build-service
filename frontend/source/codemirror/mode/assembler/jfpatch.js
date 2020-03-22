@@ -763,7 +763,7 @@ CodeMirror.defineSimpleMode("jfpatch", {
     {regex: /Post/i, token: 'def', next: 'post'},
     {regex: /End/i, token: 'def', next: 'end'},
 
-    {regex: /(REM|#CODEPREFIX|CAPTURE)(\s+)/i, token: ['def', 'none'], push: 'boolean'},
+    {regex: /(REM|CODEPREFIX|CAPTURE)(\s+)/i, token: ['def', 'none'], push: 'boolean'},
     {regex: /(LOAD)(\s+)([^ ,]+)(,\s*)(-?&[a-fA-F0-9]+|-?[0-9]+|[`a-zA-Z][a-zA-Z0-9_]*)$/i, token: ['def', 'none', 'string', 'operator', 'number'], pop: true},
     {regex: /(MAPWS)(\s+)([^ ,]+)(?:(,\s*)(r[0-9]+|register))?/i, token: ['def', 'none', 'variable', 'operator', 'atom'], pop: true},
     {regex: /(AREA)(\s+)("[^ ]+")((?:\s*(?:CODE|READONLY|32BIT|STACKCHECK))*)/i, token: ['def', 'none', 'variable', 'qualifier'], pop: true},

@@ -248,7 +248,7 @@ instruction may be given a conditional code:
 <directive label="LADR##" summary="Long ADR">
     Long address assignment with an address range of 64k, rather than the 4k usually
          given by <asm>ADR</asm>. 2 instructions will always be assembled.
-         <usage syntax="    LADR##   reg, address or label">
+         <usage syntax="    LADRcc   reg, address or label">
 </directive>
 
 <directive label="LMOV##" summary="Long move">
@@ -394,7 +394,7 @@ by arguments:
 
 <directive-list>
 <directive label="#REM" summary="Enables/disables REM debug comments (not REMP though).">
-         <usage syntax="#REMboolean">
+         <usage syntax="#REM boolean">
 </directive>
 <directive label="#CODEPREFIX" summary="Enables/disables prefixes to sections of code.">
          The name of routines followed by a SWINV code to indicate the length
