@@ -12,26 +12,37 @@
         if (loaded)
             return;
         loaded = true;
-        areas = ['source-area', 'source-area2', 'source-area3', 'source-area4', 'source-area5', 'source-area6'];
-        areas.forEach( (name) => {
-            var textarea = document.getElementById(name);
-            var cm = CodeMirror.fromTextArea(textarea, {
+        areas = document.getElementsByClassName('source-code');
+        for (i = 0; i < areas.length; i++) {
+            var textarea = areas[i];
+            var options = {
                     lineNumbers: true,
                     mode: 'text/x-jfpatch',
                     theme: 'liquibyte',
                     lineWrapping: true,
-                });
+                };
+            if (textarea.readOnly)
+            {
+                // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
+                //options.readOnly = 'nocursor';
+
+                // true => cursor visible (but not blinking, with rate change), can use keyboard to
+                //         scroll, cannot exit, can select
+                options.readOnly = true;
+                options.cursorBlinkRate = 0;
+            }
+            var cm = CodeMirror.fromTextArea(textarea, options);
             var widget = document.getElementById('HELLO');
             cm.addLineWidget(3, widget);
             //alert(cm.getValue());
-        });
+        };
     }
     -->
 </script>
 </html-header>
 <body onload='onload();'>
     <page section='Colouring Example'>
-    <textarea id='source-area'>
+    <textarea class='source-code' readonly>
 In   -
 Out  djf
 Type Utility
@@ -126,7 +137,7 @@ $`toplay
 REM  #Run &lt;CODE&gt;
 </textarea>
 <hr/>
-    <textarea id='source-area2'>
+    <textarea class='source-code'>
 In   -
 Out  DDEUtilsJF
 Type Module
@@ -854,7 +865,7 @@ $`fscsd_right
 <hr/>
 
 
-<textarea id='source-area3'>
+<textarea class='source-code'>
 In   -
 Out  EE
 Type AOF
@@ -1464,7 +1475,7 @@ $`TW_Morite
 </textarea>
 <hr/>
 
-    <textarea id='source-area4'>
+    <textarea class='source-code'>
 In    -
 Out   NoCoverIB
 Type  Module
@@ -1667,7 +1678,7 @@ REM *Son
 </textarea>
 <hr/>
 
-<textarea id='source-area5'>
+<textarea class='source-code'>
 In   -
 Out  ControlAMPlayer
 Type Module
@@ -3321,7 +3332,7 @@ ENDIF
 
 <hr/>
 
-<textarea id='source-area6'>
+<textarea class='source-code'>
 In   -
 Out  test
 Type Module

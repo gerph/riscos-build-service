@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 21-Mar-2020 23:11:10
+# updated: 22-Mar-2020 09:58:12
 DOCUMENT ../dest/about.html
 SOURCE about.hsc
 TITLE 
@@ -49,11 +49,5 @@ DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
 ID header-menu
-ID source-area
-ID source-area2
-ID source-area3
-ID source-area4
-ID source-area5
-ID source-area6
 ID HELLO
 INCLUDE ../macros.hsc
