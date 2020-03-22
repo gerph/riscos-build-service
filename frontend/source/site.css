@@ -487,3 +487,39 @@ div.jfpatch {
 /* Remove the tools used for debugging */
 form#general { display: none; }
 div#log { display: none }
+
+
+/* Status of the WebSocket connection */
+.status {
+    display: none;
+    margin-right: -0.5em;
+    border-top-left-radius: 1em;
+    border-bottom-left-radius: 1em;
+    border-left: 4px solid black;
+    border-top: 4px solid black;
+    border-bottom: 4px solid black;
+    padding: 0.5em;
+    float: right;
+}
+
+.status-value {
+    border-radius: 0.25em;
+    border: 0.25em;
+    padding: 0.25em;
+}
+
+.status-unknown {
+    background-color: orange;
+}
+.status-connecting {
+    background-color: yellow;
+}
+.status-ok {
+    background-color: green;
+}
+.status-disconnected {
+    background-color: orchid;
+}
+.status-error {
+    background-color: red;
+}

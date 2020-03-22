@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
-<html-header title='Builder'>
+<html-header title='Builder' codecolouring>
   <script src="ansi_up.js" type="text/javascript"></script>
   <script type="text/javascript">
 <!--
 
     var ws;
+    var ws_timeout;
     var ansi_up = new AnsiUp;
 
     // Clipboard information
@@ -30,16 +31,30 @@
     var filetype_unknown = 'icons/file_xxx.png';
 
     function init() {
+      ws_connect();
+
+      // Ensure that the state is consistent when we load.
+      show_clear();
+    }
+
+    function ws_connect() {
+      ws = undefined;
+      ws_timeout = undefined;
 
       // Connect to Web Socket
+      debug("connect websocket");
       server = "ws://jfpatch.riscos.online/ws";
       if (window.location.protocol == "https:")
         server = server.replace('ws:', 'wss:')
+
+      ws_show_status('Connecting');
       try {
         ws = new WebSocket(server);
       }
       catch (err)
       {
+        debug("websocket error: " + err);
+        ws_show_status('Error');
         alert("WebSockets aren't working: " + err);
         return;
       }
@@ -55,7 +70,10 @@
         var message = JSON.parse(e.data);
         var action = message[0];
         var data = message[1];
-        if (action == 'output') {
+        if (action == 'welcome') {
+            ws_show_status('OK');
+        }
+        else if (action == 'output') {
             show_output(data);
         }
         else if (action == 'message') {
@@ -80,16 +98,44 @@
 
       ws.onclose = function() {
         debug("onclose");
+        ws_show_status('Closed');
+        console.log('Connection closed')
+
+        // Retry connection
+        ws_retry();
       };
 
       ws.onerror = function(e) {
         debug("onerror: " + e);
+        ws_show_status('Error');
         console.log(e)
-      };
 
-      // Ensure that the state is consistent when we load.
-      show_clear();
+        // Retry connection
+        ws_retry();
+      };
     }
+
+    function ws_retry() {
+        if (ws_timeout)
+        {
+            clearTimeout(ws_timeout);
+        }
+        // Retry after 15 seconds
+        ws_timeout = setTimeout(ws_connect, 1000 * 15);
+    }
+
+    function ws_show_status(str) {
+        var sdiv = document.getElementById("status-value");
+        sdiv.innerHTML = str;
+        sdiv.className = 'status-value status-' + str.toLowerCase();
+        hidden = (str == 'OK');
+
+        var sdiv = document.getElementById("status");
+        sdiv.style.display = (hidden ? 'none' : 'inline');
+        // FIXME: When I'm clever, use transitions to make this slide on and off the screen instead
+        //        of just vanishing.
+    }
+
 
     function onSubmit() {
         var input = document.getElementById("input");
@@ -372,6 +418,10 @@
         <input type="submit" value="Send"/>
         <button onclick="onCloseClick(); return false;">close</button>
       </form>
+
+      <div class='status' id='status'>
+        Service status: <span class='status-value status-unknown' id='status-value'>Unknown</span>
+      </div>
 
       <div class='workflow'>
           <!-- File selection -->

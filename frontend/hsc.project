@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 22-Mar-2020 20:40:29
+# updated: 22-Mar-2020 22:36:22
 DOCUMENT ../dest/about.html
 SOURCE about.hsc
 TITLE 
@@ -18,6 +18,17 @@ SOURCE notfound.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc
+DOCUMENT ../dest/codemirror-examples.html
+SOURCE codemirror-examples.hsc
+TITLE 
+ID header-menu
+ID HELLO
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/fileformat.html
+SOURCE fileformat.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
 TITLE 
@@ -25,6 +36,8 @@ ID header-menu
 ID general
 ID input
 ID data
+ID status
+ID status-value
 ID source-button
 ID source
 ID build-button
@@ -39,15 +52,4 @@ ID throwback-box
 ID throwback-heading
 ID throwback
 ID log
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/codemirror-examples.html
-SOURCE codemirror-examples.hsc
-TITLE 
-ID header-menu
-ID HELLO
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/fileformat.html
-SOURCE fileformat.hsc
-TITLE 
-ID header-menu
 INCLUDE ../macros.hsc
