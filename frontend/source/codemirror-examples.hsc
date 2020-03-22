@@ -9,7 +9,7 @@
             return;
         loaded = true;
         if (1) {
-            setup_colouring({autosize: true, linenumbers: true});
+            setup_colouring({autosize: false, linenumbers: true, scroll: true});
         }
         else
         {

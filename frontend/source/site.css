@@ -469,13 +469,15 @@ li {
 }
 
 div.jfpatch {
-    margin-left: 1em;
-    margin-right: 1em;
+    margin: 0.25em 1em 0.25em 1em;
     padding: 0.25em 0.25em 0.25em 0.25em;
     background-color: black;
 }
 .cm-s-autosize {
     height: auto;
+}
+.cm-s-scrolly {
+    height: 20em;
 }
 
 .CodeMirror {

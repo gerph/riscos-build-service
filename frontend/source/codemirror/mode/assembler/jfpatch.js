@@ -21,7 +21,9 @@ var conditions = ['EQ', 'NE',
                   'GE', 'GT',
                   'LE', 'LT',
                   'AL', /*'NV',*/
-                  ''];
+                  '',
+                  'cc', /* cc is used as a placeholder in examples for the condition code */
+                 ];
 
 // FIXME: Add 'modern' arithmetic instructions
 var inst_arithmetic = ['ADD', 'ADC',
@@ -105,7 +107,7 @@ var res_inst_directive = '(?:' + inst_directive.join('|') + ')';
 // JFPatch specific
 var inst_jfpatch_memoryworkspace = ['LDRW', 'STRW', 'LDRBW', 'STRBW', 'ADRW'];
 var inst_jfpatch_extended = ['XSWI', 'LMOV', 'LADR', 'LADD', 'XBL', 'REMP', 'REM', 'SWAP', 'NOP'];
-var inst_jfpatch_nocondition = ['RES', 'XLDMFD', 'DIV', 'EQUZA', 'EQUZ'];
+var inst_jfpatch_nocondition = ['RES', 'XLDMFD', 'DIV', 'EQUZA', 'EQUZ', 'ERR'];
 var res_inst_jfpatch_memoryworkspace = '(?:' + inst_jfpatch_memoryworkspace.join('|') + ')' +
                                        res_conditions
                                        'T?';
@@ -761,23 +763,26 @@ CodeMirror.defineSimpleMode("jfpatch", {
     {regex: /Post/i, token: 'def', next: 'post'},
     {regex: /End/i, token: 'def', next: 'end'},
 
-    {regex: /(REM\s+|#CODEPREFIX\s+)/i, token: 'def', push: 'boolean'},
-    {regex: /(LOAD)(\s+)([^ ,]+)(,\s*)(-?&[a-fA-F0-9]+|-?[0-9]+$)/i, token: ['def', 'none', 'string', 'operator', 'number'], pop: true},
-    {regex: /(MAPWS)(\s+)([^ ,]+)(?:(,\s*)(r[0-9]+))?/i, token: ['def', 'none', 'variable', 'operator', 'atom'], pop: true},
+    {regex: /(REM|#CODEPREFIX|CAPTURE)(\s+)/i, token: ['def', 'none'], push: 'boolean'},
+    {regex: /(LOAD)(\s+)([^ ,]+)(,\s*)(-?&[a-fA-F0-9]+|-?[0-9]+|[`a-zA-Z][a-zA-Z0-9_]*)$/i, token: ['def', 'none', 'string', 'operator', 'number'], pop: true},
+    {regex: /(MAPWS)(\s+)([^ ,]+)(?:(,\s*)(r[0-9]+|register))?/i, token: ['def', 'none', 'variable', 'operator', 'atom'], pop: true},
     {regex: /(AREA)(\s+)("[^ ]+")((?:\s*(?:CODE|READONLY|32BIT|STACKCHECK))*)/i, token: ['def', 'none', 'variable', 'qualifier'], pop: true},
 
     // This Library directive doesn't check the format
     {regex: /(LIBRARY)(\s+)(.*)/i, token: ['def', 'none', 'string'], pop: true},
-    {regex: /HERE LIBRARIES/i, token: 'def', pop: true},
+    {regex: /(INCLUDE)(\s+)(.*)/i, token: ['def', 'none', 'string'], pop: true},
+    {regex: /HERE\s+LIBRARIES/i, token: 'def', pop: true},
 
-    {regex: /(CHECK (?:STRING|WORD))(\s+)(&[a-fA-F0-9]+|[0-9]+$)(\s+)(.*)/i, token: ['def', 'none', 'number', 'none', 'string'], pop: true},
-    {regex: /(CHECK LEN)(\s+)(&[a-fA-F0-9]+|[0-9]+$)/i, token: ['def', 'none', 'number'], pop: true},
+    {regex: /(CHECK\s+(?:STRING|WORD))(\s+)(&[a-fA-F0-9]+|[0-9]+$|address)(\s+)(.*)/i, token: ['def', 'none', 'number', 'none', 'string'], pop: true},
+    {regex: /(CHECK\s+LEN)(\s+)(&[a-fA-F0-9]+|[0-9]+|length$)/i, token: ['def', 'none', 'number'], pop: true},
+
+    {regex: /(EXAMINE)(\s+)(&[a-fA-F0-9]+|[0-9]+$|address)(\s+)(\+?&[a-fA-F0-9]+|[0-9]+$|address|\+length)/i, token: ['def', 'none', 'number', 'none', 'number'], pop: true},
 
     {regex: /COND\s+(?:INTERNAL|EXTERNAL)/i, token: 'def', pop: true},
     {regex: /(COND\s+SET)(\s+)([`a-zA-Z][a-zA-Z0-9_]*)(\s+)/i, token: ['def', 'none', 'variable', 'none'], push: 'boolean', pop: true},
     {regex: /(COND\s+OF)(\s+)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['def', 'none', 'variable'], pop: true},
     {regex: /COND\s+(?:ELSE|ENDIF|END)/i, token: 'def', pop: true},
-    {regex: /(COND\s+)([`a-zA-Z][a-zA-Z0-9_]*)(\s+)(.*)/i, token: ['def', 'none', 'variable', 'none', 'string'], pop: true},
+    {regex: /(COND\s+)([`a-zA-Z][a-zA-Z0-9_]*)(\s+)(".*")/i, token: ['def', 'variable', 'none', 'string'], pop: true},
 
     {regex: /.*/, token: 'error'},
   ],
@@ -819,6 +824,7 @@ CodeMirror.defineSimpleMode("jfpatch", {
   // A boolean value
   boolean: [
     {regex: /ON|TRUE|ENABLED|OFF|FALSE|DISABLED/i, token: 'number', pop: true},
+    {regex: /boolean/, token: 'number', pop: true}, // used in documentation
     {regex: /(=)(.*)/, token: ('qualifier', 'string'), pop: true},
 
     // Not recognised, so show as an error

@@ -171,7 +171,7 @@ imports. Exports are achieved by using labels in the usual way:
 </p>
 
 <jfpatch>
-.|<i>label</i>|
+.|label|
 </jfpatch>
 
 <p>
@@ -179,7 +179,7 @@ will export the label <code><i>label</i></code>. To rename the label when export
 </p>
 
 <jfpatch>
-.|<i>label</i>-&gt;<i>export</i>|
+.|label-&gt;export|
 </jfpatch>
 
 <p>
@@ -188,7 +188,7 @@ to be declared as the entrypoint, in the form:
 </p>
 
 <jfpatch>
-.|<i>label</i>| ENTRY
+.|label| ENTRY
 </jfpatch>
 
 <p>
@@ -198,8 +198,8 @@ commands:
 </p>
 
 <jfpatch>
-  BL     |<i>label</i>|
-  EQUD   |<i>label</i>|
+  BL     |label|
+  EQUD   |label|
 </jfpatch>
 
 
@@ -210,7 +210,7 @@ together :
 </p>
 
 <jfpatch>
-  EQUD   |<i>label</i>| + <i>constant</i>
+  EQUD   |label| + constant
 </jfpatch>
 
 
@@ -236,15 +236,19 @@ instruction may be given a conditional code:
 </param>
 </$macro>
 
-<$macro usage syntax:string/REQUIRED>
-<div class='usage'>Usage: <asm><(syntax)></asm></div>
+<$macro usage syntax:string/REQUIRED alternate:bool>
+<div class='usage'><$if COND=(alternate)><$else>Usage:</$if><jfpatch><(syntax)></jfpatch></div>
+</$macro>
+
+<$macro usage-block /CLOSE alternate:bool>
+<div class='usage'><$if COND=(alternate)><$else>Usage:</$if><jfpatch><$content></jfpatch></div>
 </$macro>
 
 <directive-list label="Macro">
 <directive label="LADR##" summary="Long ADR">
     Long address assignment with an address range of 64k, rather than the 4k usually
          given by <asm>ADR</asm>. 2 instructions will always be assembled.
-         <usage syntax="LADR##   reg, address or label">
+         <usage syntax="    LADR##   reg, address or label">
 </directive>
 
 <directive label="LMOV##" summary="Long move">
@@ -253,13 +257,13 @@ instruction may be given a conditional code:
          be used, variably according to the number given. Therefore, it is
          imperitive that the value is not an unassigned label (ie no forward
          references). You may also use -ve numbers.
-         <usage syntax="LMOV    <i>reg</i>,<i>value</i>">
+         <usage syntax="    LMOV    reg,value">
 </directive>
 
 <directive label="LADD##" summary="Long addition">
          The complement to long move, long add performs addition on
          registers using multiple instructions.
-         <usage syntax="LADD##   <i>reg</i>,<i>reg</i>,<i>value</i>">
+         <usage syntax="    LADDcc  reg,reg,value">
 </directive>
 
 <directive label="XSWI##<br/>XBL##" summary="Extended SWI<br/>Extended BL">
@@ -270,8 +274,8 @@ instruction may be given a conditional code:
          You can preceed the value with <code>#</code> to do an explicit <asm>MOV</asm> when you have
          used a variable instead of a number. Preceeding a reference by <code>^</code> will
          use <asm>ADR</asm> to get it's address rather than it's absolute value.
-         <usage syntax="XSWI##  &quot;<i>name</i>&quot;,<i>value</i>[,[value][,[value]...]">
-         <usage syntax="XBL##   &quot;<i>name</i>&quot;,<i>value</i>[,[value][,[value]...]">
+         <usage syntax="    XSWIcc  &quot;name&quot;,value[,[value][,[value]...]">
+         <usage syntax="    XBLcc   &quot;name&quot;,value[,[value][,[value]...]">
          (here, <i>value</i> may be a number or register prefixed by r, a or v)
 </directive>
 
@@ -304,7 +308,8 @@ instruction may be given a conditional code:
          If you specify streaming in the front-end, output will be streamed.
          If <code>#REM OFF</code> is specified, <code>REM</code>'s will be embedded in the BASIC as
          <code>;</code> comments.
-         <usage syntax="REM <i>string</i>">
+         <usage syntax="    REM     &quot;string&quot;">
+         <usage syntax="    REMP    &quot;string&quot;" alternate>
          Note: All registers preserved, flags altered.
 </directive>
 
@@ -317,14 +322,14 @@ instruction may be given a conditional code:
 
 <directive label="DIV" summary="Divide routine (very sub-optimal)">
          Result is returned in top.
-         <usage syntax="DIV <i>top</i>,<i>bottom</i>">
+         <usage syntax="    DIV     rtop,rbottom">
          Note: Large amounts of code assembled.
 </directive>
 
 <directive label="RES" summary="Reserve space">
          If you need to reserve a lagrge block of memory, this is the
          easiest way to do it. The space will be initialised to 0.
-         <usage syntax="RES <i>bytes</i>">
+         <usage syntax="    RES     bytes">
 </directive>
 
 <directive label="MODE##" summary="Set processor mode">
@@ -332,9 +337,9 @@ instruction may be given a conditional code:
          You are required to change to SVC mode in CallBack's so that
          r14_svc is preserved, and this macro gives you an easy means of
          doing this.
-         <usage syntax="MODE##  USR | FIQ | IRQ | SVC[,<i>reg1</i>,<i>reg2</i>]">
+         <usage syntax="    MODEcc  USR | FIQ | IRQ | SVC[,reg1,reg2]">
          (<i>reg1</i> and <i>reg2</i> default to r8 and r9, and contain the flags
-         <usage syntax="MODE##  [+|-]SVC [ ,<i>reg1</i>,<i>reg2</i>,[<i>reg3</i>] | ,<i>reg3</i> ]">
+         <usage syntax="    MODEcc  [+|-]SVC [ ,reg1,reg2,[reg3] | ,reg3 ]">
          <i>reg1</i> and <i>reg2</i> default to r8 and r9, and contain the flags
          <i>reg3</i> is the stack pointer to use
 </directive>
@@ -342,39 +347,40 @@ instruction may be given a conditional code:
 <directive label="LDRW##<br/>STRW##<br/>LDRBW##<br/>STRBW##" summary="Load register from workspace<br/>Store register in workspace<br/>Load register with byte from workspace<br/>Store register as byte in workspace">
          These are used by the Workspace module. If the registers are mapped
          correctly, then these will perform operations on workspaces just as
-         <asm>LDR</asm>/<asm>STRM</asm> do on inline addresses.
-         <usage syntax="<i>cmd</i>[B]W##  <i>reg</i>,<i>offset</i>">
+         <asm>LDR</asm>/<asm>STR</asm> do on inline addresses.
+         <usage syntax="    LDRWcc   reg,offset">
 </directive>
 
 <directive label="ADRW##" summary="Address in workspace">
          This works like its inline counterpart, but used long adds, so has
          an infinite range.
-         <usage syntax="ADR##   <i>reg</i>,<i>offset</i>">
+         <usage syntax="    ADRcc    reg,offset">
 </directive>
 
 <directive label="SWAP##" summary="Swap two registers">
          How may times have you had the two registers around the wrong way?
          This gets around that with three lines of code (no temporary
          register).
-         <usage syntax="SWAP##  <i>reg1</i>,<i>reg2</i>">
+         <usage syntax="    SWAPcc   reg1,reg2">
          Note: Do not confuse with the <asm>SWP</asm> ARM3 instruction.
 </directive>
 
 <directive label="EQUZ<br/>EQUZA" summary="Equate string with zero suffix<br/>Equate string with zero suffix, then align">
          Much easier than using <asm>EQUS "blah, blah"+CHR$0</asm>.
-         <usage syntax="EQUZ[A]   <i>string</i>">
+         <usage syntax="    EQUZ     &quot;string&quot;">
+         <usage syntax="    EQUZA    &quot;string&quot;" alternate>
 </directive>
 
 <directive label="ERR" summary="Define an error block">
          Defines an error block, in the form of a 32bit error number and a message.
-         <usage syntax="ERR     <i>number</i>, <i>message</i>">
+         <usage syntax="    ERR      number, &quot;message&quot;">
 </directive>
 
 <directive label="NOP##" summary="No operation">
          This is often used to remove lines from patched code, or to delay
          whilst register bank resync takes place. One instruction is
          assembled.
-         <usage syntax="NOP##">
+         <usage syntax="    NOPcc">
 </directive>
 
 </directive-list>
@@ -388,17 +394,17 @@ by arguments:
 
 <directive-list>
 <directive label="#REM" summary="Enables/disables REM debug comments (not REMP though).">
-         <usage syntax="#REM <i>boolean</i>">
+         <usage syntax="#REMboolean">
 </directive>
 <directive label="#CODEPREFIX" summary="Enables/disables prefixes to sections of code.">
          The name of routines followed by a SWINV code to indicate the length
          of the name will be embedded prior to the start of the routine if
          this is enabled.
-         <usage syntax="#CODEPREFIX <i>boolean</i>">
+         <usage syntax="#CODEPREFIX boolean">
 </directive>
 
 <directive label="#LOAD" summary="Load a file in line into the code">
-         <usage syntax="#LOAD <i>filename</i>, <i>length</i>">
+         <usage syntax="#LOAD &quot;filename&quot;, length">
          If length is -1, then just the length of the file will be reserved
 </directive>
 
@@ -421,13 +427,13 @@ by arguments:
 
 <directive label="#MAPWS" summary="Map workspace block to a register">
          This changes the default mapping for a workspace block.
-         <usage syntax="#MAPWS <i>block name</i>[,<i>register</i>]">
+         <usage syntax="#MAPWS blockname[,register]">
          if no register is specifed, the default is used.
 </directive>
 
 <directive label="#AREA" summary="Begin an AOF area for the following code">
          This declares the start of a named AOF area.
-         <usage syntax="#Area <i>area name</i> [<i>flags</i>]">
+         <usage syntax="#Area &quot;areaname&quot; [flags]">
          The area flags are a space separated list of flags for the area:
          <param-list label='Flag'>
           <param name='CODE'>Area is for Code (otherwise it is a Data area)</param>
@@ -484,20 +490,20 @@ trying to read such code:
 <directive label='#COND EXTERNAL' summary="Selects external conditional assembly"></directive>
 
 <directive label='#COND SET' summary="Sets a condition variable to a value">
-               <usage syntax="#COND SET <i>varname</i> <i>boolean</i>">
+               <usage syntax="#COND SET varname boolean">
 </directive>
 
 <directive label='#COND <i>varname</i> ' summary="Sets a condition variable according to user reply">
                In External mode, this will display a error box type message
                In Inline mode, the messages will be printed on the screen
                and a OS_Confirm used to get the reply.
-               <usage syntax="#COND <i>varname</i> <i>question</i>">
+               <usage syntax="#COND varname &quot;question&quot;">
 </directive>
 
 <directive label='#COND OF' summary="Starts a conditional assembly structure">
                The following code within this structure will be assembled if
                the named condition variable is true.
-               <usage syntax="#COND OF <i>varname</i>">
+               <usage syntax="#COND OF varname">
 </directive>
 
 <directive label='#COND ELSE' summary="Else clause in structure">
@@ -519,16 +525,16 @@ are acting on to ensure that it is the correct version. The checks are :
 
 <directive-list>
 <directive label='CHECK STRING' summary='Check that a particular address contains a ctrl terminated string.'>
-               <usage syntax='#CHECK STRING <i>address</i> <i>string</i>'>
+               <usage syntax='#CHECK STRING address string'>
                Note: The string may be enclosed in quotes.
 </directive>
 
 <directive label='CHECK WORD' summary='Check that a particular word contains a particular value'>
-               <usage syntax='#CHECK WORD <i>address</i> <i>value</i>'>
+               <usage syntax='#CHECK WORD address value'>
 </directive>
 
 <directive label='CHECK LEN' summary='Check that the length of the file is a certain value'>
-               <usage syntax='#CHECK LEN <i>length</i>'>
+               <usage syntax='#CHECK LEN length'>
 </directive>
 </directive-list>
 
@@ -549,7 +555,7 @@ The syntax of the library inclusion command is :
 </p>
 
 <jfpatch>
-#LIBRARY <i>filename</i>,[#]<i>routine</i>[[[.routine].routine]...]
+#LIBRARY "filename",[#]routine[[[.routine].routine]...]
 </jfpatch>
 
 <p>
@@ -568,7 +574,7 @@ code. Otherwise, a <code>#HERE LIBRARIES</code> directive will need to be issued
 The library files themselves consist of a first line which should be:
 
 <jfpatch>
-LIBRARY <i>filename</i>
+LIBRARY filename
 </jfpatch>
 
 Followed by the routines in the library. Local labels may be used, but
@@ -593,7 +599,7 @@ The syntax of the include command is :
 </p>
 
 <jfpatch>
-#INCLUDE <i>filename</i>
+#INCLUDE "filename"
 </jfpatch>
 
 <p>
@@ -665,7 +671,13 @@ prefixed by a # symbol. In which case, the following apply:
 <directive label='#RUN' summary='Runs a particular file'>
         If the file specified is <code>&lt;CODE&gt;</code> (note: upper case), then the output file is run.
         If <code>&lt;THISDIR&gt;</code> is included, then it is replaced by the directory the Patch file is in.
-        <usage syntax="#RUN <i>filename</i> | <i>pathname</i> | <i>THISDIR</i>.<i>filename</i> | <i>CODE</i>">
+        <usage-block>
+#Post
+    #RUN filename
+    #RUN FS::disc.$.pathname
+    #RUN &lt;THISDIR&gt;.filename
+    #RUN &lt;CODE&gt;
+</usage-block>
 </directive>
 
 <directive label='#WIMPRUN' summary='Performs the same as RUN, except that the file is Filer_Run.'>
@@ -674,12 +686,13 @@ prefixed by a # symbol. In which case, the following apply:
 <directive label='#EXAMINE' summary='Used to examine memory to check that it is what you expect it to be.'>
         Usually this is used after executing the code. The output is saved to
         a file and loaded as a text file.
-        <usage syntax='#EXAMINE <i>start</i> <i>end</i> | +<i>length</i>'>
+        <usage syntax='#EXAMINE address address'>
+        <usage syntax='#EXAMINE address +length' alternate>
 </directive>
 
 <directive label='#CAPTURE' summary='Captures all output into a spool file.'>
         This is usually used where the output cannot be captured in a TaskWindow.
-        <usage syntax='CAPTURE [ ON | OFF ]'>
+        <usage syntax='#CAPTURE boolean'>
         Default is ON
 </directive>
 
@@ -755,9 +768,9 @@ lengths of the blocks are so awkward that you can't be bothered to do it by
 reference. In this form, the definitions are :
 </p>
 
-<jfpatch>
+<pre>
   <i>offset</i>  <i>identifier</i>[  <i>comment</i>]
-</jfpatch>
+</pre>
 
 where <i>offset</i> is either a decimal number, or a hex number prefixed by <code>&amp;</code>.
 
@@ -769,26 +782,28 @@ similar (though in no way compatible) to that used by ObjAsm. In this form,
 the definitions are :
 </p>
 
-<jfpatch>
+<pre>
   [=]<i>variable</i>  <i>type</i>[repetitions][  <i>comment</i>]
-</jfpatch>
+</pre>
 
+<p>
 where <i>type</i> is :
+</p>
 
 <param-list label='type'>
   <param name='!'>an integer word (ie 4 bytes)</param>
   <param name='%'>a byte</param>
   <param name='$'>a string (<i>repetitions</i> is the number of characters including terminator)</param>
   <param name='^'>a structure reference in the form
-<jfpatch>
+<pre>
      ^<i>name</i>[  <i>repetitions</i>]
- </jfpatch>
+</pre>
 </param>
 </param-list>
 
 <p>
-<i>repititions</i> is the number of times the space is repeated (ie four words
-would be !4.
+<i>repetitions</i> is the number of times the space is repeated (ie four words
+would be !4).
 </p>
 
 <p>
@@ -814,7 +829,7 @@ constraint, but should not be relied upon.
 
 <h3>Using workspace</h3>
 <p>
-    To use workspace within the code, use [ LDR|STR ][B]W or ADRW commands. To
+    To use workspace within the code, use <code>[ LDR|STR ][B]W</code> or <code>ADRW</code> commands. To
 find the length of a block of workspace, use `len_<i>name</i>.
 </p>
 </section>
@@ -933,9 +948,9 @@ system heap.
 way exists to do this by means of a definition block. Lines are in the form:
 </p>
 
-<jfpatch>
+<pre>
   <i>service</i>   <i>code</i>
-</jfpatch>
+</pre>
 
 <p>
 Where <i>service</i> can be a decimal or hex number, or any string from the
@@ -944,9 +959,9 @@ Where <i>service</i> can be a decimal or hex number, or any string from the
 with:
 </p>
 
-<jfpatch>
+<pre>
   End Services
-</jfpatch>
+</pre>
 
 
 <h3>Vectors</h3>
@@ -957,9 +972,9 @@ by using a definition block many of the problems you may come across are
 removed and things look a bit clearer. The lines are of the form :
 </p>
 
-<jfpatch>
+<pre>
   <i>vector</i>   <i>code</i>
-</jfpatch>
+</pre>
 
 <p>
 Where <i>vector</i> can be a decimal or hex number, or any string from the
@@ -968,9 +983,9 @@ Where <i>vector</i> can be a decimal or hex number, or any string from the
 with :
 </p>
 
-<jfpatch>
+<pre>
   End Vectors
-</jfpatch>
+</pre>
 
 <h3>Events</h3>
 
@@ -979,9 +994,9 @@ with :
 easier to have these in a seperate section. The lines are of the form :
 </p>
 
-<jfpatch>
+<pre>
   <i>event</i>   <i>code</i>
-</jfpatch>
+</pre>
 
 <p>
     Where <i>event</i> is a decimal or hex number, or a string from the
@@ -990,9 +1005,9 @@ OSLib headers files except that I've prepended the module name if there is
 one. The block should end with :
 </p>
 
-<jfpatch>
+<pre>
   End Events
-</jfpatch>
+</pre>
 
 
 <h3>Commands</h3>
@@ -1039,9 +1054,9 @@ this block, the following two fields are allowed:
 All other lines should be in the form :
 </p>
 
-<jfpatch>
+<pre>
   <i>number</i>   <i>alias</i>   <i>code</i>
-</jfpatch>
+</pre>
 
 <h3>WimpSWIs</h3>
 
@@ -1161,9 +1176,9 @@ be given on seperate lines, and the names are :
 Resources can be registered with ResourceFS when the module initialises by defining
 them in the Resources definition. The fields within the <code>RESOURCES</code> block take the form:
 
-<jfpatch>
+<pre>
     <i>local-filename</i>    <i>resourcefs-filename</i>
-</jfpatch>
+</pre>
 
 Note: It is possible that the Resources registration is non-functional at present.
 
