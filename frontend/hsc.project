@@ -2,22 +2,12 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 23-Mar-2020 19:38:45
-DOCUMENT ../dest/api.html
-SOURCE api.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
+# updated: 23-Mar-2020 19:49:34
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
 ID header-menu
 ID HELLO
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/fileformat.html
-SOURCE fileformat.hsc
-TITLE 
-ID header-menu
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
@@ -51,11 +41,6 @@ SOURCE about.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc
-DOCUMENT ../dest/notfound.html
-SOURCE notfound.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
 DOCUMENT ../dest/history.html
 SOURCE history.hsc
 TITLE 
@@ -69,3 +54,18 @@ ID mkaof
 ID mkmacros
 INCLUDE ../macros.hsc
 INCLUDE versions.hsc
+DOCUMENT ../dest/fileformat.html
+SOURCE fileformat.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/api.html
+SOURCE api.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/notfound.html
+SOURCE notfound.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc

@@ -543,3 +543,12 @@ div#log { display: none }
 .status-error {
     background-color: red;
 }
+
+/*
+body {
+    background-color: #ddd;
+}
+p {
+    background-color: #eef;
+}
+*/

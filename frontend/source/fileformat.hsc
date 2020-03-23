@@ -23,7 +23,9 @@ JFPatch files can contain up to 8 distinct sections, of which 2 are required and
               routines.</param>
 </param-list>
 
+<p>
 The required sections - the Header and the Code sections - are described first, below..
+</p>
 </section>
 
 <section>
@@ -314,12 +316,6 @@ instruction may be given a conditional code:
 </directive>
 
 
-
-         FIXME: REMF and REMFP directives?
-         FIXME: GETBIT, SETBIT, CLRBIT
-         FIXME: SETV, SETC, SETN, SETZ (and CLR# variants)
-
-
 <directive label="DIV" summary="Divide routine (very sub-optimal)">
          Result is returned in top.
          <usage syntax="    DIV     rtop,rbottom">
@@ -381,6 +377,15 @@ instruction may be given a conditional code:
          whilst register bank resync takes place. One instruction is
          assembled.
          <usage syntax="    NOPcc">
+</directive>
+
+<directive label="REMF##<br/>REMFP##" summary="FIXME: Not documented">
+</directive>
+
+<directive label="GETBIT##<br/>SETBIT##<br/>CLRBIT##" summary="FIXME: Not documented">
+</directive>
+
+<directive label="SETV##<br/>SETC##<br/>SETN##<br/>SETZ##" summary="FIXME: Not documented">
 </directive>
 
 </directive-list>
@@ -572,11 +577,13 @@ code. Otherwise, a <code>#HERE LIBRARIES</code> directive will need to be issued
 
 <p>
 The library files themselves consist of a first line which should be:
+</p>
 
 <jfpatch>
 LIBRARY filename
 </jfpatch>
 
+<p>
 Followed by the routines in the library. Local labels may be used, but
 externally referenced variables may not due to the manner in which the
 inclusion occurs. Inclusion is from the first <code>;</code> before the <code>.</code> prefix of the
@@ -772,7 +779,9 @@ reference. In this form, the definitions are :
   <i>offset</i>  <i>identifier</i>[  <i>comment</i>]
 </pre>
 
+<p>
 where <i>offset</i> is either a decimal number, or a hex number prefixed by <code>&amp;</code>.
+</p>
 
 
 <h3>Relative format</h3>
@@ -1042,8 +1051,10 @@ private word if the workspace is set.
 
 <h3>SWIs</h3>
 
+<p>
 SWI blocks, like command blocks are surrounded by <code>SWIs</code> and END SWIs. Within
 this block, the following two fields are allowed:
+</p>
 
 <param-list label='Field'>
 <param name='BASE'>Sets the base number of the SWI calls, prefix with <code>&amp;</code> for hex</param>
@@ -1060,10 +1071,12 @@ All other lines should be in the form :
 
 <h3>WimpSWIs</h3>
 
+<p>
 WimpSWIve is a gorgeous little module written by Andrew Clover which allows
 you to replace certain Wimp calls with other, much nicer calls :-)
 For more information, read the WSWI-Help documentation in Applics. Again, the
 section is surrounded by WIMPSWIS and END WIMPSWIS. And the fields are :
+</p>
 
 <param-list label='Field'>
 <param name='SWI'>Full name of WimpSWI to replace</param>
@@ -1071,10 +1084,12 @@ section is surrounded by WIMPSWIS and END WIMPSWIS. And the fields are :
 <param name='POST'>Post-handler code (after real call being called)</param>
 </param-list>
 
+<p>
 Either the Pre-Handler or the post handler may be prefixed by the ^ symbol.
 In which case, the code will have the high priority bit set. Mixed priority
 SWI handlers are not allowed, and you must use two seperate definitions if
 you wish to do that.
+</p>
 
 <h3>Filters</h3>
 
@@ -1117,7 +1132,9 @@ registered are:
     </li>
 </ul>
 
+<p>
 The fields within each of the blocks are declared with the following definitions:
+</p>
 
 <param-list label='Field'>
 <param name='NAME'>Name for the filter (for the list)</param>
@@ -1173,20 +1190,25 @@ be given on seperate lines, and the names are :
 
 <h3>Resources</h3>
 
+<p>
 Resources can be registered with ResourceFS when the module initialises by defining
 them in the Resources definition. The fields within the <code>RESOURCES</code> block take the form:
+</p>
 
 <pre>
     <i>local-filename</i>    <i>resourcefs-filename</i>
 </pre>
 
+<p>
 Note: It is possible that the Resources registration is non-functional at present.
-
+</p>
 
 <h3>ImageFSs</h3>
 
+<p>
 The entry points and registrations for an ImageFS filesystem can be registered with the ImageFS
 block. The following fields are defined in the definition:
+</p>
 
 <param-list label='Field'>
 <param name='TYPE<br/>FILETYPE'>Sets filetype which is handled by the ImageFS, which may be a hex value prefixed by <code>&amp;</code>, or a type name (or bare hex filetype)</param>
@@ -1209,8 +1231,10 @@ block. The following fields are defined in the definition:
 
 <h3>Full FSs</h3>
 
+<p>
 The entry points and registrations for a full filesystem can be registered with the FS
 block. The following fields are defined in the definition:
+</p>
 
 <param-list label='Field' hasrequired>
 <param name='NAME' required>Name of the filing system</param>
@@ -1251,7 +1275,9 @@ block. The following fields are defined in the definition:
 
 </param-list>
 
+<p>
 Note: The extra flags setting may be broken in the current implementation.
+</p>
 
 </section>
 
