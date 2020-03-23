@@ -5,7 +5,25 @@
     <page section='History'>
 
 <section>
-<h2>History</h2>
+<h2>Introduction</h2>
+
+<p>
+JFPatch has a history that covers its many components. Each of the parts of the tool had its
+own history log at the top of the file, and the main application had a history that wrapped
+up the descriptions of each of the parts. Now, the service itself has another history. There's
+also the technologies that the service is built upon, which have separate histories covering
+about 11 months, which are not described here.
+</p>
+
+<ul>
+    <li><a href='#jfpaas'>JFPatch as a service</a></li>
+    <li><a href='#jfpapp'>JFPatch the RISC OS application</a>, incorporating general changes from the components that make it up</li>
+    <li><a href='#jfpatch'>JFPatch back end build tool</a></li>
+    <li><a href='#mkmodule'>Module generation</a></li>
+    <li><a href='#mkws'>Workspace</a></li>
+    <li><a href='#mkaof'>AOF generation</a></li>
+    <li><a href='#mkmacros'>Macros</a></li>
+</ul>
 
 <$macro version-table /CLOSE nodate:bool>
 <table class='versions'>
@@ -30,12 +48,14 @@
     </tr>
 </$macro>
 
-<h3>!JFPatch as a Service</h3>
+<h2 id='jfpaas'>JFPatch as a Service</h2>
 <version-table>
-FIXME: Put stuff in here.
+<$include FILE="versions.hsc">
 </version-table>
+</section>
 
-<h3>!JFPatch RISC OS application and back end</h3>
+<section>
+<h2 id='jfpapp'>!JFPatch RISC OS application and back end</h2>
 <version-table nodate>
     <version number='2.55ß' date=''>Note: (partial releases were 2.54ß)
         <ul>
@@ -423,133 +443,148 @@ Notes:
 </version>
 </version-table>
 
-<h3>JFPatch back end</h3>
+</section>
+
+<section>
+<h2 id='jfpatch'>JFPatch back end</h2>
 
 <version-table>
-<version number='2.00' date='25 Feb 1995'>no application making</version>
-<version number='2.02' date='18 Mar 1995'>application making added</version>
-<version number='2.03' date='03 May 1995'>internal version numbering</version>
-<version number='2.04' date='06 May 1995'>bug fix for stamping</version>
-<version number='2.05' date='11 Jun 1995'>Workspace added; Long MOV; Local labels</version>
-<version number='2.06' date='22 Jun 1995'>VDUStream forcing</version>
-<version number='2.07' date='20 Jul 1995'>XSWI and XBL added</version>
-<version number='2.08' date='09 Aug 1995'>Flag setting added</version>
-<version number='2.09' date='10 Aug 1995'>NOP instructiXon added</version>
-<version number='2.10' date='18 Aug 1995'>; comments remove :'s</version>
-<version number='2.11' date='18 Aug 1995'>LADD instruction added</version>
-<version number='2.12' date='20 Aug 1995'>MODE instruction added</version>
-<version number='2.13' date='30 Aug 1995'>EXAMINE post assembly added</version>
-<version number='2.14' date='02 Sep 1995'>CAPTURE post assembly added</version>
-<version number='2.15' date='05 Sep 1995'>XLDMFD added for errors</version>
-<version number='2.16' date='05 Sep 1995'>Library file reorganisation</version>
-<version number='2.17' date='08 Sep 1995'>-ve LMOVs implemented</version>
-<version number='2.18' date='29 Dec 1995'>SWAP instruction added</version>
-<version number='2.19' date='28 Jan 1996'>Tabs in source file added</version>
-<version number='2.20' date='19 Feb 1996'>includes and Compile_A added</version>
-<version number='2.21' date='14 Apr 1996'>Compile_A removed to allow vague Make support</version>
-<version number='2.22' date='15 Apr 1996'>Throwback support added</version>
-<version number='2.23' date='09 May 1996'>Damned tiny bug fixed !</version>
-<version number='2.24' date='22 May 1996'>Fixed naff handling of TB</version>
-<version number='2.25' date='22 May 1996'>Fixed no DDEUtils bug</version>
-<version number='2.26' date='28 May 1996'>Added macro support</version>
-<version number='2.27' date='25 Jul 1996'>Added hourglass option</version>
-<version number='2.28' date='30 Oct 1996'>Added export of locals</version>
-<version number='2.29' date='14 Nov 1996'>Modified Conditionals for 3.1</version>
-<version number='2.30' date='21 Dec 1996'>Directory structure changed</version>
-<version number='2.31' date='19 Jan 1997'>fixed REM &amp;, added OS_NewLine!</version>
-<version number='2.32' date='22 Jan 1997'>^ and # in XSWI supported</version>
-<version number='2.33' date='05 Feb 1997'>Added E REM message</version>
-<version number='2.34' date='06 Mar 1997'>PROCGetRegs 'r' bug fixed !</version>
-<version number='2.35' date='08 Mar 1997'>version$ added to code</version>
-<version number='2.36' date='09 Mar 1997'>FNmess improved</version>
-<version number='2.37' date='08 Apr 1997'>;'s for comments in Pre/Post</version>
-<version number='2.38' date='08 Apr 1997'>AOF support</version>
-<version number='2.39' date='09 Apr 1997'>Pre support (constants)</version>
-<version number='2.40' date='09 Apr 1997'>XBL/XSWI supports apcs</version>
-<version number='2.41' date='25 Apr 1997'>Cond Set fixed</version>
-<version number='2.42' date='29 Apr 1997'>&gt; macro for code prefixes</version>
-<version number='2.43' date='16 May 1997'>&gt; is a function, new bool</version>
-<version number='2.44' date='28 May 1997'>AOFModule header allows AOF</version>
-<version number='2.45' date='29 May 1997'>Includes work inline</version>
-<version number='2.46' date='11 Aug 1997'>$$ now translates to $</version>
-<version number='2.47' date='09 Sep 1997'>REM's now use stack as ws</version>
-<version number='2.48' date='26 Sep 1997'>AOF Debug support</version>
-<version number='2.49' date='22 Oct 1997'>Many module changes</version>
-<version number='2.50' date='15 Nov 1997'>AOF module filter/wimpswis fix</version>
-<version number='2.51' date='18 Nov 1997'>Output buffering added</version>
-<version number='2.52' date='05 Dec 1997'>ERR changed and REMF[P] added</version>
-<version number='2.53' date='26 Dec 1997'>Fixed bugs in REM, Resources, Workspace changes, PostFilter improvements, optimisations for modules, ImageFS and FS blocks, Module help improved.</version>
-<version number='2.54' date='07 Apr 1998'>Service entry fixed, Code-in fixed now. Other things.</version>
-<version number='2.55' date='09 Apr 1999'>JB's modifications added</version>
 <version number='2.56' date='02 Mar 2020'>Added ClipboardHolder operation</version>
+<version number='2.55' date='09 Apr 1999'>JB's modifications added</version>
+<version number='2.54' date='07 Apr 1998'>Service entry fixed, Code-in fixed now. Other things.</version>
+<version number='2.53' date='26 Dec 1997'>Fixed bugs in REM, Resources, Workspace changes, PostFilter improvements, optimisations for modules, ImageFS and FS blocks, Module help improved.</version>
+<version number='2.52' date='05 Dec 1997'>ERR changed and REMF[P] added</version>
+<version number='2.51' date='18 Nov 1997'>Output buffering added</version>
+<version number='2.50' date='15 Nov 1997'>AOF module filter/wimpswis fix</version>
+<version number='2.49' date='22 Oct 1997'>Many module changes</version>
+<version number='2.48' date='26 Sep 1997'>AOF Debug support</version>
+<version number='2.47' date='09 Sep 1997'>REM's now use stack as ws</version>
+<version number='2.46' date='11 Aug 1997'>$$ now translates to $</version>
+<version number='2.45' date='29 May 1997'>Includes work inline</version>
+<version number='2.44' date='28 May 1997'>AOFModule header allows AOF</version>
+<version number='2.43' date='16 May 1997'>&gt; is a function, new bool</version>
+<version number='2.42' date='29 Apr 1997'>&gt; macro for code prefixes</version>
+<version number='2.41' date='25 Apr 1997'>Cond Set fixed</version>
+<version number='2.40' date='09 Apr 1997'>XBL/XSWI supports apcs</version>
+<version number='2.39' date='09 Apr 1997'>Pre support (constants)</version>
+<version number='2.38' date='08 Apr 1997'>AOF support</version>
+<version number='2.37' date='08 Apr 1997'>;'s for comments in Pre/Post</version>
+<version number='2.36' date='09 Mar 1997'>FNmess improved</version>
+<version number='2.35' date='08 Mar 1997'>version$ added to code</version>
+<version number='2.34' date='06 Mar 1997'>PROCGetRegs 'r' bug fixed !</version>
+<version number='2.33' date='05 Feb 1997'>Added E REM message</version>
+<version number='2.32' date='22 Jan 1997'>^ and # in XSWI supported</version>
+<version number='2.31' date='19 Jan 1997'>fixed REM &amp;, added OS_NewLine!</version>
+<version number='2.30' date='21 Dec 1996'>Directory structure changed</version>
+<version number='2.29' date='14 Nov 1996'>Modified Conditionals for 3.1</version>
+<version number='2.28' date='30 Oct 1996'>Added export of locals</version>
+<version number='2.27' date='25 Jul 1996'>Added hourglass option</version>
+<version number='2.26' date='28 May 1996'>Added macro support</version>
+<version number='2.25' date='22 May 1996'>Fixed no DDEUtils bug</version>
+<version number='2.24' date='22 May 1996'>Fixed naff handling of TB</version>
+<version number='2.23' date='09 May 1996'>Damned tiny bug fixed !</version>
+<version number='2.22' date='15 Apr 1996'>Throwback support added</version>
+<version number='2.21' date='14 Apr 1996'>Compile_A removed to allow vague Make support</version>
+<version number='2.20' date='19 Feb 1996'>includes and Compile_A added</version>
+<version number='2.19' date='28 Jan 1996'>Tabs in source file added</version>
+<version number='2.18' date='29 Dec 1995'>SWAP instruction added</version>
+<version number='2.17' date='08 Sep 1995'>-ve LMOVs implemented</version>
+<version number='2.16' date='05 Sep 1995'>Library file reorganisation</version>
+<version number='2.15' date='05 Sep 1995'>XLDMFD added for errors</version>
+<version number='2.14' date='02 Sep 1995'>CAPTURE post assembly added</version>
+<version number='2.13' date='30 Aug 1995'>EXAMINE post assembly added</version>
+<version number='2.12' date='20 Aug 1995'>MODE instruction added</version>
+<version number='2.11' date='18 Aug 1995'>LADD instruction added</version>
+<version number='2.10' date='18 Aug 1995'>; comments remove :'s</version>
+<version number='2.09' date='10 Aug 1995'>NOP instructiXon added</version>
+<version number='2.08' date='09 Aug 1995'>Flag setting added</version>
+<version number='2.07' date='20 Jul 1995'>XSWI and XBL added</version>
+<version number='2.06' date='22 Jun 1995'>VDUStream forcing</version>
+<version number='2.05' date='11 Jun 1995'>Workspace added; Long MOV; Local labels</version>
+<version number='2.04' date='06 May 1995'>bug fix for stamping</version>
+<version number='2.03' date='03 May 1995'>internal version numbering</version>
+<version number='2.02' date='18 Mar 1995'>application making added</version>
+<version number='2.00' date='25 Feb 1995'>no application making</version>
 </version-table>
 
-<h3>Module generation</h3>
+</section>
+
+<section>
+<h2 id='mkmodule'>Module generation</h2>
 <version-table>
-<version number='2.00' date='11 Jun 1995'></version>
-<version number='2.01' date='20 Jun 1995'></version>
-<version number='2.02' date='22 Jun 1995'></version>
-<version number='2.03' date='08 Aug 1995'></version>
-<version number='2.04' date='26 Aug 1995'></version>
-<version number='2.05' date='05 Nov 1996'>Services added</version>
-<version number='2.06' date='21 Dec 1996'>Services moved into Resources</version>
-<version number='2.07' date='05 Feb 1997'>Events and Vectors added</version>
-<version number='2.08' date='09 Mar 1997'>Extra info added</version>
-<version number='2.09' date='08 Apr 1997'>AOF compliant code added</version>
-<version number='2.10' date='26 Apr 1997'>Event code was completely buggered</version>
-<version number='2.11' date='28 May 1997'>AOF imports for header added</version>
-<version number='2.12' date='09 Sep 1997'>WimpSWIve post trap code fixed</version>
-<version number='2.13' date='22 Oct 1997'>Messages files</version>
-<version number='2.14' date='15 Nov 1997'>SWI Pre/Post, bug fixes for WimpSWI/Filter</version>
-<version number='2.15' date='15 Nov 1997'>Dictionary tokenisation added</version>
-<version number='2.16' date='14 Dec 1997'>Messages file fix, resource file blocks</version>
-<version number='2.17' date='15 Dec 1997'>Filter 'Code' now allows reasons</version>
-<version number='2.18' date='16 Dec 1997'>ImageFS support added</version>
-<version number='2.19' date='30 Mar 1998'>Service handler code improved</version>
-<version number='2.20' date='31 Mar 1998'>Ursula style service table</version>
-<version number='2.21' date='01 Apr 1998'>Module initialisation error handling improved</version>
-<version number='2.22' date='23 Apr 1998'>Wimp poll reason codes moved to file, new filter system, aof startcode, init, final, service and swihandler entries fixed.</version>
-<version number='2.23' date='27 Apr 1998'>WimpSWIve AOF code fixed, new filter system AOF code fixed</version>
-<version number='2.24' date='14 Jul 1998'>Rect, PostRect and PostIcon filters added.</version>
-<version number='2.25' date='05 Sep 1998'>Some ADRs changed to LADRs in initialisation code (JB)</version>
-<version number='2.26' date='09 Jun 2000'>Removed the dictionary encoding as this changed between OS versions.</version>
-<version number='2.27' date='13 Feb 2001'>Added fast service reject code</version>
-<version number='2.28' date='13 Feb 2001'>Added 'lightning fast service' code</version>
-<version number='2.29' date='27 Feb 2001'>Can explicitly set version with module_version$ (and date with module_date$)</version>
-<version number='2.30' date='16 Mar 2001'>WimpSWIve registration now uses multiple instructions (BASIC problem ?)</version>
-<version number='2.31' date='24 May 2001'>Service handler code completely re-written to cope correctly with high-service numbers. Totally removed code for encoding using dictionary</version>
 <version number='2.32' date='24 May 2001'>Added support for 'duplicate service handlers' which may help when using auto-added handlers</version>
+<version number='2.31' date='24 May 2001'>Service handler code completely re-written to cope correctly with high-service numbers. Totally removed code for encoding using dictionary</version>
+<version number='2.30' date='16 Mar 2001'>WimpSWIve registration now uses multiple instructions (BASIC problem ?)</version>
+<version number='2.29' date='27 Feb 2001'>Can explicitly set version with module_version$ (and date with module_date$)</version>
+<version number='2.28' date='13 Feb 2001'>Added 'lightning fast service' code</version>
+<version number='2.27' date='13 Feb 2001'>Added fast service reject code</version>
+<version number='2.26' date='09 Jun 2000'>Removed the dictionary encoding as this changed between OS versions.</version>
+<version number='2.25' date='05 Sep 1998'>Some ADRs changed to LADRs in initialisation code (JB)</version>
+<version number='2.24' date='14 Jul 1998'>Rect, PostRect and PostIcon filters added.</version>
+<version number='2.23' date='27 Apr 1998'>WimpSWIve AOF code fixed, new filter system AOF code fixed</version>
+<version number='2.22' date='23 Apr 1998'>Wimp poll reason codes moved to file, new filter system, aof startcode, init, final, service and swihandler entries fixed.</version>
+<version number='2.21' date='01 Apr 1998'>Module initialisation error handling improved</version>
+<version number='2.20' date='31 Mar 1998'>Ursula style service table</version>
+<version number='2.19' date='30 Mar 1998'>Service handler code improved</version>
+<version number='2.18' date='16 Dec 1997'>ImageFS support added</version>
+<version number='2.17' date='15 Dec 1997'>Filter 'Code' now allows reasons</version>
+<version number='2.16' date='14 Dec 1997'>Messages file fix, resource file blocks</version>
+<version number='2.15' date='15 Nov 1997'>Dictionary tokenisation added</version>
+<version number='2.14' date='15 Nov 1997'>SWI Pre/Post, bug fixes for WimpSWI/Filter</version>
+<version number='2.13' date='22 Oct 1997'>Messages files</version>
+<version number='2.12' date='09 Sep 1997'>WimpSWIve post trap code fixed</version>
+<version number='2.11' date='28 May 1997'>AOF imports for header added</version>
+<version number='2.10' date='26 Apr 1997'>Event code was completely buggered</version>
+<version number='2.09' date='08 Apr 1997'>AOF compliant code added</version>
+<version number='2.08' date='09 Mar 1997'>Extra info added</version>
+<version number='2.07' date='05 Feb 1997'>Events and Vectors added</version>
+<version number='2.06' date='21 Dec 1996'>Services moved into Resources</version>
+<version number='2.05' date='05 Nov 1996'>Services added</version>
+<version number='2.04' date='26 Aug 1995'></version>
+<version number='2.03' date='08 Aug 1995'></version>
+<version number='2.02' date='22 Jun 1995'></version>
+<version number='2.01' date='20 Jun 1995'></version>
+<version number='2.00' date='11 Jun 1995'></version>
 </version-table>
 
-<h3>Workspace</h3>
+</section>
+
+<section>
+<h2 id='mkws'>Workspace</h2>
 <version-table>
-<version number='1.01' date='18 Aug 1995'></version>
-<version number='1.02' date='13 Jan 1996'>| Union loop id added</version>
-<version number='1.03' date='30 Oct 1996'>Fix for MapWS returning default</version>
 <version number='1.04' date='14 Dec 1997'>`len_<i>name</i> in ADRW works</version>
+<version number='1.03' date='30 Oct 1996'>Fix for MapWS returning default</version>
+<version number='1.02' date='13 Jan 1996'>| Union loop id added</version>
+<version number='1.01' date='18 Aug 1995'></version>
 </version-table>
 
 
-<h3>AOF generation</h3>
+</section>
+
+<section>
+<h2 id='mkaof'>AOF generation</h2>
 <version-table>
-<version number='1.00' date='08 Apr 1996'>started, simple aof support</version>
-<version number='1.01' date='09 Apr 1997'>fixed module code and swstk</version>
-<version number='1.02' date='09 Apr 1997'>EQUD works, Pre added</version>
-<version number='1.03' date='16 May 1997'>multiple areas work</version>
-<version number='1.04' date='28 May 1997'>functions to do jumps/offsets</version>
-<version number='1.05' date='26 Sep 1997'>entry points</version>
-<version number='1.06' date='26 Sep 1997'>debug data</version>
-<version number='1.07' date='22 Jul 1998'>area data now works</version>
-<version number='1.07' date='15 Apr 1998'>ADR (JB)</version>
-<version number='1.08' date='06 Nov 1998'>LDR, conditional ADR (JB)</version>
 <version number='1.09' date='02 Feb 2003'>Added specifier for 32Bit areas</version>
+<version number='1.08' date='06 Nov 1998'>LDR, conditional ADR (JB)</version>
+<version number='1.07' date='15 Apr 1998'>ADR (JB)</version>
+<version number='1.07' date='22 Jul 1998'>area data now works</version>
+<version number='1.06' date='26 Sep 1997'>debug data</version>
+<version number='1.05' date='26 Sep 1997'>entry points</version>
+<version number='1.04' date='28 May 1997'>functions to do jumps/offsets</version>
+<version number='1.03' date='16 May 1997'>multiple areas work</version>
+<version number='1.02' date='09 Apr 1997'>EQUD works, Pre added</version>
+<version number='1.01' date='09 Apr 1997'>fixed module code and swstk</version>
+<version number='1.00' date='08 Apr 1996'>started, simple aof support</version>
 </version-table>
 
-<h3>Macros</h3>
+</section>
+
+<section>
+<h2 id='mkmacros'>Macros</h2>
 <version-table>
-<version number='1.00' date='28 May 1996'>Base macros</version>
-<version number='1.01' date='28 May 1996'>Embedded macros (ie one calls another)</version>
 <version number='1.02' date='08 Jan 1998'>Constants (JB)</version>
+<version number='1.01' date='28 May 1996'>Embedded macros (ie one calls another)</version>
+<version number='1.00' date='28 May 1996'>Base macros</version>
 </version-table>
 
 

@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 23-Mar-2020 13:26:47
+# updated: 23-Mar-2020 19:38:45
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -60,4 +60,12 @@ DOCUMENT ../dest/history.html
 SOURCE history.hsc
 TITLE 
 ID header-menu
+ID jfpaas
+ID jfpapp
+ID jfpatch
+ID mkmodule
+ID mkws
+ID mkaof
+ID mkmacros
 INCLUDE ../macros.hsc
+INCLUDE versions.hsc

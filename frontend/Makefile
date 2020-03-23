@@ -89,6 +89,8 @@ ${DESTDIR}/codemirror/%: codemirror/%
 ${DESTDIR}/.htaccess: htaccess
 	cp $? $@
 
+versions.hsc: make-version-info.pl versions.munge
+	./make-version-info.pl > versions.hsc
 
 ../dest/%: %
 	cp $? $@
@@ -101,7 +103,7 @@ ${DESTDIR}/.htaccess: htaccess
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Monday 23-Mar-2020 00:17:48
+# dependencies updated: Monday 23-Mar-2020 13:45:43
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/index.html ../dest/about.html \
@@ -119,7 +121,7 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 
 ../dest/notfound.html : notfound.hsc ../macros.hsc
 
-../dest/history.html : history.hsc ../macros.hsc
+../dest/history.html : history.hsc ../macros.hsc versions.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 
@@ -135,4 +137,4 @@ delete :
 	hscdepp file=../Makefile prjfile=$(PRJFILE) verbose
 
 clean :
-	-rm -rf "${DESTDIR}"
+	-rm -rf "${DESTDIR}" versions.hsc

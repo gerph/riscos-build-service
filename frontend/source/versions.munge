@@ -1,0 +1,12 @@
+5 s/support for BASTXT files;//
+5 s/Basic Text .*?\.//
+6
+8
+9
+10
+11
+16 s/longer the values/longer gives the arguments/
+34
+35 s/It does not talk about Pyromaniac.//
+46
+47
