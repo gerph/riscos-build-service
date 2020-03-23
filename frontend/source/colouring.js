@@ -17,7 +17,7 @@ function setup_colouring(opts) {
         var options = {
                 lineNumbers: want_linenumbers,
                 mode: 'text/x-jfpatch',
-                theme: 'liquibyte' + (want_autosize ? ' autosize' : ''),
+                theme: 'liquibyte' + extra_style,
                 lineWrapping: true,
                 viewportMargin: (want_autosize ? Infinity : 10),
             };

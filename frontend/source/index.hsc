@@ -8,6 +8,9 @@
     var ws;
     var ws_timeout;
     var ansi_up = new AnsiUp;
+    var cm;
+    var source_data;
+    var unsent_changes = false;
 
     // Clipboard information
     var clipboard_data = null;
@@ -177,26 +180,109 @@
     }
 
     function onSourceLoad(data) {
-        action = 'source';
-
-        var message =[action, btoa(data)];
-        ws.send(JSON.stringify(message));
-        debug("send: " + message);
-
-        show_clear();
-        show_message('Source selected, size is ' + data.length + ' bytes');
-
-        var bbutton = document.getElementById("build-button");
-        bbutton.removeAttribute('disabled');
+        source_code = data;
+        send_source();
+        show_source();
     }
+
     function onSourceError(data) {
         debug("error loading source");
-        alert("Could not lost source");
-        // FIXME: Report this to the user?
+        alert("Could not load source");
+        // FIXME: Report this to the user better?
     }
 
     function onCloseClick() {
         ws.close();
+    }
+
+    function onSave() {
+        source_code = cm.getValue();
+        send_source();
+        mark_unsent(false);
+    }
+
+    // Send the source we've got to the server.
+    function send_source() {
+        var action = 'source';
+        var message =[action, btoa(source_code)];
+        ws.send(JSON.stringify(message));
+        debug("send: " + message);
+
+        show_clear();
+        show_message('Source sent to server, size is ' + source_code.length + ' bytes');
+
+        var bbutton = document.getElementById("build-button");
+        bbutton.removeAttribute('disabled');
+    }
+
+    // Show the source in our editor box.
+    function show_source() {
+        var source_box = document.getElementById('source-box');
+        if (cm)
+        {
+            // Convert it back to a text area, so that we end up with the same state
+            // each time.
+            cm.setValue('');
+            cm.toTextArea();
+            cm = undefined;
+        }
+        if (source_code.startsWith('PK'))
+        {
+            // It's a Zip archive; don't even try to process it.
+            source_box.style.display = 'none';
+            return;
+        }
+
+        // Unhide the source box.
+        source_box.style.display = 'block';
+
+        var textarea = document.getElementById('source-content');
+
+        // FIXME: Harmonise this with colouring.js?
+        var want_linenumbers = true;
+        var want_autosize = false;
+        var want_scroll = true;
+
+        var extra_style = '';
+        if (want_autosize)
+            extra_style = ' autosize';
+        else if (want_scroll)
+            extra_style = ' scrolly';
+
+        var options = {
+                lineNumbers: want_linenumbers,
+                mode: 'text/x-jfpatch',
+                theme: 'liquibyte' + (want_autosize ? ' autosize' : ''),
+                lineWrapping: true,
+                viewportMargin: (want_autosize ? Infinity : 10),
+            };
+
+        if (textarea.readOnly)
+        {
+            // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
+            //options.readOnly = 'nocursor';
+
+            // true => cursor visible (but not blinking, with rate change), can use keyboard to
+            //         scroll, cannot exit, can select
+            options.readOnly = true;
+            options.cursorBlinkRate = 0;
+        }
+
+
+        cm = CodeMirror.fromTextArea(textarea, options);
+        cm.setValue(source_code);
+
+        mark_unsent(false);
+
+        cm.on('changes', function(cm, changes) {
+            if (! unsent_changes)
+            {
+                // This is the first time we've received changes to the code that was uploaded,
+                // so take away the 'build' button, and put a '*' on the title
+                mark_unsent(true);
+                show_message('Source changed; use the save button to send to the server');
+            }
+        });
     }
 
     // Clears all the state when we start a fresh build
@@ -314,6 +400,10 @@
         var cdiv = document.getElementById("output");
         html = escapeHTML(str);
         cdiv.innerHTML += "<span class='message'>" + html + "</span>";
+
+        // Unhide the build box when the first message appears
+        var sdiv = document.getElementById("output-box");
+        sdiv.style.display = 'block';
     }
 
     function show_rc(rc) {
@@ -372,6 +462,29 @@
             bdiv.removeAttribute('disabled');
             sdiv.removeAttribute('disabled');
         }
+    }
+
+    function mark_unsent(unsent) {
+        var bdiv = document.getElementById("build-button");
+        unsent_changes = unsent;
+        if (unsent) {
+            bdiv.setAttribute('disabled', 'disabled');
+        }
+        else
+        {
+            bdiv.removeAttribute('disabled');
+        }
+
+        var sbutton = document.getElementById('source-save-button');
+        sbutton.style.display = unsent ? 'inline' : 'none';
+
+        var heading = document.getElementById('source-heading');
+        html = heading.innerHTML.replace(' *', '')
+        if (unsent)
+        {
+            html += ' *';
+        }
+        heading.innerHTML = html;
     }
 
     function escapeHTML(unsafe) {
@@ -448,13 +561,21 @@
           </label>
       </div>
 
-      <div id='output-box'>
-        <div id='output-heading'>Build output</div>
-        <div id='output'></div>
+      <div class='box source-box' id='source-box' style='display:none'>
+        <div class='box-heading' id='source-heading'>
+            <label id='source-save-button' style='display: none'>
+                <button id='source-save' onclick="onSave(); return false;">[Save]</button>
+            </label>
+            Source code</div>
+        <textarea class='box-content' id='source-content'></textarea>
       </div>
-      <div id='throwback-box' style='display: none'>
-          <div id='throwback-heading'>Throwback</div>
-          <div id='throwback'></div>
+      <div class='box output-box' id='output-box' style='display: none'>
+        <div class='box-heading'>Build output</div>
+        <div class='box-content' id='output'></div>
+      </div>
+      <div class='box throwback-box' id='throwback-box' style='display: none'>
+          <div class='box-heading'>Throwback</div>
+          <div class='box-content' id='throwback'></div>
       </div>
       <div id="log"></div>
     </page>
