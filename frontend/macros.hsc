@@ -33,6 +33,7 @@ function toggle_header_menu() {
         <li><a href=':fileformat.html'>File Format</a></li>
         <li><a href=':api.html'>API documentation</a></li>
         <li><a href=':about.html'>About</a></li>
+        <li><a href=':history.html'>History</a></li>
     </ul>
 </nav>
 <div class='section'><(section)></div>

@@ -101,23 +101,25 @@ ${DESTDIR}/.htaccess: htaccess
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Saturday 21-Mar-2020 22:17:21
+# dependencies updated: Monday 23-Mar-2020 00:17:48
 
-all_hsc : ../dest/about.html ../dest/api.html ../dest/notfound.html \
-    ../dest/index.html ../dest/fileformat.html \
-    ../dest/codemirror-examples.html
-
-../dest/about.html : about.hsc ../macros.hsc
+all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
+    ../dest/fileformat.html ../dest/index.html ../dest/about.html \
+    ../dest/notfound.html ../dest/history.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
-../dest/notfound.html : notfound.hsc ../macros.hsc
-
-../dest/index.html : index.hsc ../macros.hsc
+../dest/codemirror-examples.html : codemirror-examples.hsc ../macros.hsc
 
 ../dest/fileformat.html : fileformat.hsc ../macros.hsc
 
-../dest/codemirror-examples.html : codemirror-examples.hsc ../macros.hsc
+../dest/index.html : index.hsc ../macros.hsc
+
+../dest/about.html : about.hsc ../macros.hsc
+
+../dest/notfound.html : notfound.hsc ../macros.hsc
+
+../dest/history.html : history.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

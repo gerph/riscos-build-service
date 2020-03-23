@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 <html-header title='Not Found'></html-header>
 <body>
-    <page section='API documentation'>
+    <page section='404'>
 
 <section>
 <h2>Not found</h2>

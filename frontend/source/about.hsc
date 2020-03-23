@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <html-header title='About'></html-header>
 <body>

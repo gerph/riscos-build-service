@@ -2,19 +2,9 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 22-Mar-2020 23:59:37
-DOCUMENT ../dest/about.html
-SOURCE about.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
+# updated: 23-Mar-2020 00:54:38
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/notfound.html
-SOURCE notfound.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc
@@ -55,4 +45,19 @@ ID output
 ID throwback-box
 ID throwback
 ID log
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/about.html
+SOURCE about.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/notfound.html
+SOURCE notfound.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/history.html
+SOURCE history.hsc
+TITLE 
+ID header-menu
 INCLUDE ../macros.hsc

@@ -455,6 +455,33 @@ table.msg-table div.msg-annotation {
     font-style: italic;
 }
 
+/* Versions */
+table.versions {
+    border-spacing: 0.5em;
+    border-collapse: separate;
+}
+table.versions tr.heading > th {
+    text-align: left;
+    vertical-align: bottom;
+}
+
+table.versions tr.row > th {
+    text-align: left;
+    font-weight: normal;
+    vertical-align: top;
+}
+
+table.versions tr.row > td {
+    text-align: left;
+    vertical-align: top;
+}
+
+table.versions tr.row > td.date {
+    white-space: nowrap;
+}
+
+
+
 li {
     margin-top: 0.75em;
 }
