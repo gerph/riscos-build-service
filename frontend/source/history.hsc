@@ -7,21 +7,25 @@
 <section>
 <h2>History</h2>
 
-<$macro version-table /CLOSE>
+<$macro version-table /CLOSE nodate:bool>
 <table class='versions'>
-    <tr class='heading'>
-        <th>Version</th>
-        <th>Date</th>
-        <th>Changes</th>
-    </tr>
+    <thead>
+        <tr class='heading'>
+            <th>Version</th>
+            <$if COND=(nodate)><$else><th>Date</th></$if>
+            <th>Changes</th>
+        </tr>
+    </thead>
+    <tbody>
 <$content>
+    </tbody>
 </table>
 </$macro>
 
 <$macro version /CLOSE number:string/REQUIRED date:string=''>
     <tr class='row'>
         <td class='number'><(number)></td>
-        <td class='date'><(date)></td>
+        <$if COND=(date='')><$else><td class='date'><(date)></td></$if>
         <td class='changes'><$content></td>
     </tr>
 </$macro>
@@ -32,7 +36,7 @@ FIXME: Put stuff in here.
 </version-table>
 
 <h3>!JFPatch RISC OS application and back end</h3>
-<version-table>
+<version-table nodate>
     <version number='2.55ß' date=''>Note: (partial releases were 2.54ß)
         <ul>
 <li> Multiple entries in 'Events' blocks now work - previously they did
@@ -99,9 +103,11 @@ FIXME: Put stuff in here.
   it complete cack or am I just imagining the code I saw ? :-)</li>
 <li> Added Resources block (Johnathan Brady) :
 <jfpatch>
-    Resources
-      local-file  resource-file
-    End Resources
+Define Module
+  Resources
+    local-file  resource-file
+  End Resources
+End Module
 </jfpatch>
   Note: 2nd parameter is the filename of the resource file, if you give this
   a different leaf name to the local file then it'll use that leaf name.<br/>
@@ -132,11 +138,19 @@ FIXME: Put stuff in here.
 <li> 'Flags Token' now added to definition of commands.</li>
 <li> In Post-Filter code, the 'Code' entry may now be of two forms :
 <jfpatch>
+Define Module
+  PostFilter
      Code    label
+  End PostFilter
+End Module
 </jfpatch>
   The standard form, with usage as before, and also
 <jfpatch>
+Define Module
+  PostFilter
      Code    reason    label
+  End PostFilter
+End Module
 </jfpatch>
   The extended form with all the checking of the conditions done for you.
   Mask/Accept need not be specified, but if it is /must/ preceed the Code
@@ -149,6 +163,7 @@ FIXME: Put stuff in here.
   will only include one instance of the name.</li>
 <li> ImageFS handling blocks added :
 <jfpatch>
+Define Module
    ImageFS
     Type     filetype
     Open     label
@@ -160,6 +175,7 @@ FIXME: Put stuff in here.
     File     label
     Flags    flags
    End ImageFS
+End Module
 </jfpatch>
   Only 'Type' is required, but without the rest it won't do much.
   'Flags' may be given many times, and may be preceeded by - to negate.<br/>
@@ -168,6 +184,7 @@ FIXME: Put stuff in here.
   This has not been tested hardly; use at your own risk :-)</li>
 <li> Normal filing system block added :
 <jfpatch>
+Define Module
    FS
     Name     fs name
     Startup  fs startup text | -
@@ -183,6 +200,7 @@ FIXME: Put stuff in here.
     GBPB     label
     Flags    flags
    End FS
+End Module
 </jfpatch>
   'Name', 'Number' and 'Files' are required. Startup text of - will use Func
   17 to display FS name.<br/>
