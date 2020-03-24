@@ -4,7 +4,7 @@
 .box-content {
     margin: 0 0 0.25em 0;
     padding: 0em 0.25em 0.5em 0.25em;
-    font-family: monaco, "Courier New", Courier, monospace;
+    font-family: monospace;
     line-height: 1.3;
     background: black;
     color: white;

@@ -6,7 +6,22 @@
   <$if COND=(codecolouring)>
     <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
     <script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
-    <script src="codemirror/mode/assembler/jfpatch.js" type='text/javascript'></script>
+    <script src="codemirror/mode/jfpatch.js" type='text/javascript'></script>
+    <$if COND=(set SUPPORT_C)>
+    <script src="codemirror/mode/clike.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_OBJASM)>
+    <script src="codemirror/mode/objasm.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_PASCAL)>
+    <script src="codemirror/mode/pascal.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_PERL)>
+    <script src="codemirror/mode/perl.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_BASTXT)>
+    <script src="codemirror/mode/bbcbasic.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css"/>
     <link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
     <script src="colouring.js" type='text/javascript'></script>

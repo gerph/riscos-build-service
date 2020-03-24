@@ -34,3 +34,47 @@ function setup_colouring(opts) {
         var cm = CodeMirror.fromTextArea(textarea, options);
     }
 }
+
+function detect_mode(code) {
+
+    if (code.toUpperCase().startsWith('IN '))
+        return 'text/x-jfpatch';
+
+#@if $SUPPORT_C eq 'true'
+    if (code.includes('void *') ||
+        code.includes("\nint main") ||
+        code.includes("\n#include <"))
+        return 'text/x-csrc';
+#@endif
+
+#@if $SUPPORT_OBJASM eq 'true'
+    if (code.includes(' AREA ') ||
+        code.includes("\n MOV ") ||
+        code.includes("\n BL "))
+        return 'text/x-objasm';
+#@endif
+
+#@if $SUPPORT_PASCAL eq 'true'
+    if (code.startsWith('program') ||
+        code.includes("\nEND.") ||
+        code.includes("\nend."))
+        return 'text/x-pascal';
+#@endif
+
+#@if $SUPPORT_PERL eq 'true'
+    if ((code.startsWith('#!') && code.includes('perl')) ||
+        code.includes('\nBEGIN {') ||
+        code.includes(' =~ /') ||
+        code.includes(' =~ s/'))
+        return 'text/x-perl';
+#@endif
+
+#@if $SUPPORT_BASTXT eq 'true'
+    if (code.startsWith('REM') ||
+        code.includes("\nPRINT") ||
+        code.includes("\nDEF"))
+        return 'text/x-basic-bbcbasic';
+#@endif
+
+    return 'text/x-jfpatch';
+}

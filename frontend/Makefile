@@ -1,5 +1,19 @@
 # Makefile to build the front end
 
+# Configurables:
+ICON_SIZE = 128
+FILETYPE_SIZE = ${ICON_SIZE}
+COG_SIZE = ${ICON_SIZE}
+BUTTON_SIZE = ${ICON_SIZE}
+
+SUPPORT_C = true
+SUPPORT_OBJASM = false
+SUPPORT_PERL = true
+SUPPORT_PASCAL = true
+SUPPORT_BASTXT = false
+
+
+# Main code
 DESTDIR = ../dest
 PRJFILE = ../hsc.project
 PREFS = ../hsc.prefs
@@ -13,18 +27,37 @@ HSCFLAGS = ignore=49 msgbrowser=throwback \
 		   xhtml \
 		   prjfile=$(PRJFILE) to=$(DESTDIR)/ $(STDINC) serverdir=$(DESTDIR)
 # ena=notes
+FLAGS = SUPPORT_C=${SUPPORT_C} \
+        SUPPORT_OBJASM=${SUPPORT_OBJASM} \
+        SUPPORT_PERL=${SUPPORT_PERL} \
+        SUPPORT_PASCAL=${SUPPORT_PASCAL} \
+        SUPPORT_BASTXT=${SUPPORT_BASTXT}
 
-ICON_SIZE = 128
-FILETYPE_SIZE = ${ICON_SIZE}
-COG_SIZE = ${ICON_SIZE}
-BUTTON_SIZE = ${ICON_SIZE}
+HSCFLAGS += $(subst =,:BOOL=,$(subst false,, ${FLAGS:SUPPORT_%=define "SUPPORT_%"}))
+CPPFLAGS = ${FLAGS:SUPPORT_%=-DSUPPORT_%}
 
 CODEMIRROR = ${DESTDIR}/codemirror/lib/codemirror.js \
              ${DESTDIR}/codemirror/lib/codemirror.css \
              ${DESTDIR}/codemirror/theme/liquibyte.css \
              ${DESTDIR}/codemirror/addon/mode/simple.js \
-             ${DESTDIR}/codemirror/mode/assembler/jfpatch.js \
+             ${DESTDIR}/codemirror/mode/jfpatch.js \
              ${DESTDIR}/colouring.js \
+
+ifeq (${SUPPORT_C}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/clike.js
+endif
+ifeq (${SUPPORT_OBJASM}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/objasm.js
+endif
+ifeq (${SUPPORT_PERL}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/perl.js
+endif
+ifeq (${SUPPORT_PASCAL}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/pascal.js
+endif
+ifeq (${SUPPORT_BASTXT}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/bbcbasic.js
+endif
 
 #.PHONY: all static all_hsc
 
@@ -34,7 +67,7 @@ dirs:
 	mkdir -p ${DESTDIR}/icons
 	mkdir -p ${DESTDIR}/codemirror/lib
 	mkdir -p ${DESTDIR}/codemirror/theme
-	mkdir -p ${DESTDIR}/codemirror/mode/assembler
+	mkdir -p ${DESTDIR}/codemirror/mode
 	mkdir -p ${DESTDIR}/codemirror/addon/mode
 
 static: \
@@ -88,6 +121,9 @@ ${DESTDIR}/codemirror/%: codemirror/%
 
 ${DESTDIR}/.htaccess: htaccess
 	cp $? $@
+
+${DESTDIR}/colouring.js: colouring.js.in
+	./preprocess.pl $(CPPFLAGS) $? $@
 
 versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc

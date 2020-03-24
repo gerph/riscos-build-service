@@ -222,6 +222,7 @@
         {
             // Convert it back to a text area, so that we end up with the same state
             // each time.
+            cm.off('changes', onEditorChange);  // disable the change trigger.
             cm.setValue('');
             cm.toTextArea();
             cm = undefined;
@@ -243,6 +244,8 @@
         var want_autosize = false;
         var want_scroll = true;
 
+        var mediatype = detect_mode(source_code);
+
         var extra_style = '';
         if (want_autosize)
             extra_style = ' autosize';
@@ -251,7 +254,7 @@
 
         var options = {
                 lineNumbers: want_linenumbers,
-                mode: 'text/x-jfpatch',
+                mode: mediatype,
                 theme: 'liquibyte' + (want_autosize ? ' autosize' : ''),
                 lineWrapping: true,
                 viewportMargin: (want_autosize ? Infinity : 10),
@@ -274,15 +277,26 @@
 
         mark_unsent(false);
 
-        cm.on('changes', function(cm, changes) {
-            if (! unsent_changes)
-            {
-                // This is the first time we've received changes to the code that was uploaded,
-                // so take away the 'build' button, and put a '*' on the title
-                mark_unsent(true);
-                show_message('Source changed; use the save button to send to the server');
-            }
+        cm.on('changes', onEditorChange);
+
+        // Make tabs insert spaces
+        cm.setOption("extraKeys", {
+          Tab: function(cm) {
+            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+            cm.replaceSelection(spaces);
+          }
         });
+    }
+
+    function onEditorChange(cm, changes) {
+        if (! unsent_changes)
+        {
+            // This is the first time we've received changes to the code that was uploaded,
+            // so take away the 'build' button, and put a '*' on the title
+            debug('changes in ' + cm);
+            mark_unsent(true);
+            show_message('Source changed; use the save button to send to the server');
+        }
     }
 
     // Clears all the state when we start a fresh build
