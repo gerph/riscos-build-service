@@ -67,7 +67,11 @@ function detect_mode(code) {
 
 #@if $SUPPORT_PERL eq 'true'
     if ((code.startsWith('#!') && code.includes('perl')) ||
+        code.startsWith('print ') ||
         code.includes('\nBEGIN {') ||
+        code.includes('\nmy $') ||
+        code.includes('\nlocal $') ||
+        code.includes('\nprint ') ||
         code.includes(' =~ /') ||
         code.includes(' =~ s/'))
         return 'text/x-perl';

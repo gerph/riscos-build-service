@@ -169,34 +169,32 @@ label {
     padding: 0.2em;
 }
 
-label#source-button {
+label.workflow-button {
     border: grey 3px solid;
     border-style: outset;
     background-color: #eeeeee;
     border-radius: 8px;
 }
+label.workflow-button input {
+    display: none;
+}
+label.workflow-button button {
+    display: none;
+}
+
+label#source-button {
+}
 label#source-button input {
-    display: none
 }
 
 label#build-button {
-    border: grey 3px solid;
-    border-style: outset;
-    background-color: #eeeeee;
-    border-radius: 8px;
 }
 label#build-button button {
-    display: none
 }
 
 label#download-button {
-    border: #808080 3px solid;
-    border-style: outset;
-    background-color: #eeeeee;
-    border-radius: 8px;
 }
 label#download-button button {
-    display: none;
 }
 
 label.disabled, label[disabled] {
@@ -215,6 +213,7 @@ label#source-save-button button {
 }*/
 
 div.workflow {
+    margin-bottom: 1em;
 }
 div.workflow span.divider {
     padding-left: 0.5em;

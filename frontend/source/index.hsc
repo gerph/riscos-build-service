@@ -10,6 +10,7 @@
     var ansi_up = new AnsiUp;
     var cm;
     var source_data;
+    var source_type;
     var unsent_changes = false;
 
     // Clipboard information
@@ -179,6 +180,20 @@
         }
     }
 
+    function onCreate() {
+        // User clicked the 'Create Document' button.
+        if (unsent_changes || source_data)
+        {
+            ok = confirm("Creating a new source file will clear your current document. Are you sure you want to create a new source file?")
+            if (!ok)
+                return;
+        }
+        source_code = '';
+        show_source();
+        focus_source();
+        mark_unsent(true);
+    }
+
     function onSourceLoad(data) {
         source_code = data;
         send_source();
@@ -197,6 +212,14 @@
 
     function onSave() {
         source_code = cm.getValue();
+
+        // Check if the media type has changed
+        var mediatype = detect_mode(source_code);
+        if (mediatype != source_type)
+        {
+            show_source();
+        }
+
         send_source();
         mark_unsent(false);
     }
@@ -245,6 +268,7 @@
         var want_scroll = true;
 
         var mediatype = detect_mode(source_code);
+        source_type = mediatype;
 
         var extra_style = '';
         if (want_autosize)
@@ -286,6 +310,12 @@
             cm.replaceSelection(spaces);
           }
         });
+    }
+
+    // Give our source code focus
+    function focus_source() {
+        if (cm)
+            cm.focus();
     }
 
     function onEditorChange(cm, changes) {
@@ -551,23 +581,29 @@
       </div>
 
       <div class='workflow'>
+          <!-- New document -->
+          <label class='workflow-button' id='create-button' title="Create a new file">
+              <button id='create' onclick="onCreate(); return false;"></button>
+              <img src="icons/create.png" alt="[Create]"/>
+          </label>
+
           <!-- File selection -->
           <form onsubmit="onSubmit(); return false;">
-            <label id="source-button" title="Upload source file">
+            <label class='workflow-button' id="source-button" title="Upload source file">
                 <input type="file" id="source" onchange="onSourceChange(this.files)"/>
                 <img src="icons/upload.png" alt="[Upload]"/>
             </label>
           </form>
           <span class='divider'></span>
 
-          <label id='build-button' disabled='disabled' title="Build the sources in the cloud">
+          <label class='workflow-button' id='build-button' disabled='disabled' title="Build the sources in the cloud">
               <button id='build' onclick="onBuild(); return false;"></button>
               <img src="icons/build.png" alt="[Build]"/>
           </label>
 
           <span class='divider'></span>
 
-          <label id='download-button' disabled='disabled' title="Download the built RISC OS binary">
+          <label class='workflow-button' id='download-button' disabled='disabled' title="Download the built RISC OS binary">
               <button id='download' onclick="onDownload(); return false;"></button>
               <img src="icons/download.png" alt="[Download]"/>
               <span id='download-label'>
