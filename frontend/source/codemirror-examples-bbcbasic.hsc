@@ -2648,7 +2648,427 @@
 
 
 <textarea class='source-code'>
-
+10REM &gt; Patch for memory compilation
+20REM Created by JFPatch v2.50DRAW (15 Nov 1997) LEN Justin Fletcher
+30REM Intermediate code file created 05 Dec 1997
+40ON ERROR PROCError:END
+50PROCpatch_loadfile
+60version$="1.00f"
+70sp=13:link=14:pc=15
+80vbit=1&lt;&lt;28:cbit=1&lt;&lt;29:zbit=1&lt;&lt;30:nbit=1&lt;&lt;31
+90P%=&amp;0:O%=MC%
+100FOR pass%=4 TO 6 STEP2
+110thisfile$="ADFS::Gerph.$.Apps.Utils.MCode.!JFPatch.Code.test.source"
+120REM **** Start of main code ****
+130PROCpatch_setpc(0)
+140[OPT pass%
+150          ; **** Add module header ****
+160   EQUD 0                  ; Start offset
+170   EQUD test               ; Initialisation offset
+180   EQUD 0                  ; Finalisation offset
+190   EQUD module_service     ; Service request offset
+200   EQUD module_title       ; Title string offset
+210   EQUD module_help        ; Help string offset
+220   EQUD 0                  ; Help and command keyword table offset
+230:
+240.module_title
+250   EQUS "test"+CHR$0
+260   ALIGN
+270:
+280.module_help
+290   EQUS "test"+CHR$9+"1.00 ("+MID$(TIME$,5,11)+") © Justin Fletcher"+CHR$0
+300   ALIGN
+310:
+320.module_service
+330   LDR     r12,[r12]
+340   TEQ     r1,#&amp;6
+350   BEQ     null
+360   STR     r0,[sp,#-4]!
+370   SUB     r0,r1,#&amp;90000
+380   SUB     r0,r0,#&amp;2C0
+390   TEQ     r0,#&amp;1
+400   LDREQ   r0,[sp],#4
+410   BEQ     null
+420   TEQ     r0,#&amp;0
+430   LDREQ   r0,[sp],#4
+440   BEQ     null
+450   TEQ     r0,#&amp;FF
+460   LDR     r0,[sp],#4
+470   BEQ     null
+480   MOVS    pc,link
+490:
+500          ; **** End of module header ****
+510:
+520.null
+530   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+540   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+550:
+560:
+570.test
+580   STMFD   (sp)!,{r0-r5,link}            ; Stack registers
+590   ADR     r0,__z0_`error
+600 FNmess("%E0",TRUE)
+610   LDMFD   (sp)!,{r0-r5,pc}              ; Return from call
+620:
+630.__z0_`error
+640   EQUD    &amp;657
+650   EQUS    "Test message"+CHR$0
+660   ALIGN
+670:
+680   EQUS    "TEST CODE (RAS)"+CHR$0
+690   ALIGN
+700          ; Find r2 from array at [r1,##4]
+710   CMP     r1,#0           ; are we at the end
+720   BEQ     P%+20           ; if so, we're done
+730   LDR     r14,[r1,#4]  ; read the value
+740   CMP     r14,r2          ; are they the same ?
+750   LDRNE   r1,[r1]         ; read the next pointer
+760   BNE     P%-20           ; jump back to the top
+770   EQUS    "TEST CODE (CAS)"+CHR$0
+780   ALIGN
+790   STMFD   (sp)!,{r0}         ; Stack registers
+800   MOV     r0,#16             ; space to claim
+810   BL      claim             ; claim the space (to r0)
+820   STR     r2,[r0,#4]        ; store the associater
+830   STR     r1,[r0]            ; store the 'next' entry
+840   MOV     r1,r0              ; r1-&gt; this block
+850   LDMFD   (sp)!,{r0}         ; Restore registers
+860          ; specifying length (no r0's)
+870   EQUS    "TEST CODE (CAS2)"+CHR$0
+880   ALIGN
+890   STMFD   (sp)!,{r0,r2}      ; Stack registers
+900   MOV     r0,#16             ; space to claim
+910   BL      claim             ; claim the space (to r0)
+920   STR     r2,[r0,#4]        ; store the associater
+930   LDR     r2,[sp],#4         ; re-read r0, and inc after
+940   STR     r2,[r0]            ; store the 'next' entry
+950   LDMFD   (sp)!,{r2}         ; Restore registers
+960          ; specifying length (r0 as rx)
+970   EQUS    "TEST CODE (CAS3)"+CHR$0
+980   ALIGN
+990   STMFD   (sp)!,{r0,r1}      ; Stack registers
+1000   MOV     r1,r0           ; hang on to r0
+1010   MOV     r0,#16             ; space to claim
+1020   BL      claim             ; claim the space (to r0)
+1030   STR     r1,[r0,#4]        ; store the associater
+1040   LDR     r1,[sp,#4*1]                  ; re-read rx
+1050   STR     r1,[r0]                       ; store the 'next' entry
+1060   STR     r0,[sp,#4*1]                  ; store back on the stack
+1070   LDMFD   (sp)!,{r0,r1}         ; Restore registers
+1080          ; specifying length (r0 as ry)
+1090   EQUS    "TEST CODE (CAS4)"+CHR$0
+1100   ALIGN
+1110   STMFD   (sp)!,{r0,r1}      ; Stack registers
+1120   MOV     r1,r0           ; hang on to r0
+1130   MOV     r0,#16             ; space to claim
+1140   BL      claim             ; claim the space (to r0)
+1150   STR     r1,[r0,#4]        ; store the associater
+1160   LDR     r1,[sp,#4*1]                  ; re-read rx
+1170   STR     r1,[r0]                       ; store the 'next' entry
+1180   STR     r0,[sp,#4*1]                  ; store back on the stack
+1190   LDMFD   (sp)!,{r0,r1}         ; Restore registers
+1200          ; length and claimer
+1210:
+1220 FNcodename("er")
+1230.er
+1240   EQUD    99
+1250   EQUS    "error"+CHR$0
+1260   ALIGN
+1270:
+1280:
+1290          ; Library routine Memory.claim
+1300 FNcodename("claim")
+1310.claim
+1320; *******************************************************************
+1330; Subroutine;   claim
+1340; Description;  claim some RMA to r0 (size=r0)
+1350; Parameters;   r0 = size
+1360; Returns;      r0 = address, or 0 if failed
+1370; *******************************************************************
+1380   STMFD   (sp)!,{r1-r3,link}            ; Stack registers
+1390   MOV     r3,r0                         ; right register
+1400   MOV     r0,#6
+1410   SWI     "XOS_Module"
+1420          ; claim space
+1430   MOVVS   r0,#0                         ; if error, return 0
+1440   MOVVC   r0,r2                         ; return address
+1450   LDMFD   (sp)!,{r1-r3,pc}^             ; Return from call
+1460:
+1470          ; Library 'Memory' ends
+1480]
+1490REM **** End of main code ****
+1500REM Set final pointer to find the length of the code
+1510PROCpatch_setpc(0)
+1520NEXT pass%
+1530PROCpatch_savefile
+1560END
+1570:
+1580REM **** Filing procedures ****
+1590:
+1600DEF PROCpatch_loadfile
+1610codelen=0
+1620DIM MC% &amp;1400
+1630endofcode=(codelen+&amp;0+3) AND -4:max=codelen
+1640L%=endofcode:__cap%=FALSE
+1770ENDPROC
+1780:
+1790DEF PROCpatch_savefile
+1800outfile$="&lt;test$Dir&gt;.test"
+1810SYS "OS_File",10,outfile$,,,MC%,max+MC%
+1820OSCLI("Settype "+outfile$+" Module")
+1830patchdir$="&lt;test$Dir&gt;"
+1880ENDPROC
+1890:
+1900REM **** Error Handler ****
+1910:
+1920DEFPROCError
+1930LOCAL ERROR
+1940ON ERROR LOCAL:RESTORE ERROR:ERROR EXT ERR,REPORT$+" whilst in error handler at line "+STR$ERL
+2050ERROR EXT ERR,REPORT$+" at line "+STR$ERL
+2060ENDPROC
+2070:
+2180REM **** Utility procedures ****
+2190:
+2200DEFPROCpatch_setpc(n)
+2210IF P%-&amp;0&gt;max THENmax=P%-&amp;0
+2220P%=n:O%=MC%+n-&amp;0
+2230ENDPROC
+2240:
+2250DEFFNfindfreereg(a,b,c,d):LOCAL n:n=0
+2260WHILE n=a OR n=b OR n=c OR n=d
+2270 n+=1
+2280ENDWHILE
+2290=n
+2300:
+2310REM **** REM macro procedures ****
+2320:
+2330REM FNmess2 : Generate a textual message on the screen
+2340REM Don't, however expand code 13 (allows control codes!)
+2350REM Include % Codes
+2360REM %%  Translate to %
+2370REM %I  Ignore code (So that control string can be embedded)
+2380REM %r# Display register number (followed by space)
+2390REM %R  Display all registers (r## : ## &lt;CR&gt;&lt;LF&gt;)
+2400DEFFNmess2(n$,f%):LOCAL l$,o,i
+2410IF INSTR(n$,"%")=0 THEN
+2420 [OPT pass%
+2430 SWI "OS_WriteS"
+2440 EQUS n$+CHR$0
+2450 ALIGN
+2460 ]
+2470ELSE
+2480 IF f% THEN[OPT pass%:STMFD (sp)!,{r0-r4,link,pc}:] ELSE[OPT pass%:STMFD (sp)!,{r0-r4}:]
+2490 FORo=1TOLEN(n$)
+2500  IF INSTR(n$+"%","%",o)-o &gt; 2 THEN
+2510   [OPT pass%
+2520   SWI "OS_WriteS"
+2530   EQUS MID$(n$,o,INSTR(n$+"%","%",o)-o)+CHR$0
+2540   ALIGN
+2550   ]
+2560   o=INSTR(n$+"%","%",o)-1
+2570  ELSE
+2580   l$=MID$(n$,o,1)
+2590   IF l$=CHR$13 THEN
+2600    IF MID$(n$,o+1,1)=CHR$10 THEN
+2610    o+=1:[OPT pass%:SWI "OS_NewLine":]
+2620    ELSE
+2630     [OPT pass%:SWI &amp;100+13:]
+2640    ENDIF
+2650    l$=""
+2660   ENDIF
+2670   IF l$="%" THEN
+2680    o+=1:l$=MID$(n$,o,1)
+2690    CASE l$ OF
+2700     WHEN "%":[OPT pass%:SWI &amp;100+ASC("%"):]
+2710     WHEN "I":REM Ignore
+2720     WHEN "a":REM Ascii of register
+2730      o+=1:[OPT pass%
+2740      MOV r0,EVAL("&amp;"+MID$(n$,o,1))
+2750      SWI "OS_WriteC":LDMFD (sp),{r0}:]
+2760     WHEN "c":REM Constant - ie embedded control
+2770      o+=1:[OPT pass%:SWI &amp;100+VAL(MID$(n$,o,2)):]:o+=1
+2780     WHEN "r":REM Print a register
+2790      o+=1:dummy=FNshowreg(EVAL("&amp;"+MID$(n$,o,1)))
+2800     WHEN "&amp;":REM Print a register
+2810      o+=1:dummy=FNshowhex(EVAL("&amp;"+MID$(n$,o,1)))
+2820     WHEN "$":REM Print a string
+2830      o+=1:dummy=FNshowstrctrl(EVAL("&amp;"+MID$(n$,o,1)))
+2840     WHEN "$":REM Print a string
+2850      o+=1:dummy=FNshowstrctrl(EVAL("&amp;"+MID$(n$,o,1)))
+2860     WHEN "E":REM Print an error message
+2870      o+=1:[OPT pass%
+2880      SWI "OS_WriteS"
+2890      EQUS "Error ("+CHR$0
+2900      ALIGN
+2910      LDR r0,[EVAL("&amp;"+MID$(n$,o,1))]:]
+2920      dummy=FNshowhex(EVAL("&amp;"+MID$(n$,o,1)))
+2930      [OPT pass%
+2940      SWI "OS_WriteS"
+2950      EQUS ") "+CHR$0
+2960      ALIGN
+2970      LDMFD (sp),{r0}
+2980      ADD EVAL("&amp;"+MID$(n$,o,1)),EVAL("&amp;"+MID$(n$,o,1)),#4:]
+2990      dummy=FNshowstrctrl(EVAL("&amp;"+MID$(n$,o,1)))
+3000      [OPT pass%:LDMFD (sp),{r0}:]
+3010     WHEN "R":REM Print all registers
+3020      FORi=0TO15
+3030       dummy=FNmess2("r"+STR$i+" : "):dummy=FNshowhex(i)
+3040       dummy=FNmess("%I")
+3050      NEXT
+3060    ENDCASE
+3070   ELSE
+3080    IF l$&lt;&gt;"" THEN
+3090     [OPT pass%
+3100     SWI &amp;100+ASC(l$)
+3110     ]
+3120    ENDIF
+3130   ENDIF
+3140  ENDIF
+3150 NEXT
+3160 IF f% THEN
+3170  [OPT pass%:LDMFD (sp)!,{r0-r4}:LDR r14,[sp,#4]
+3180  TEQP r14,#0
+3190  LDR r14,[sp],#8
+3200  ]
+3210 ELSE
+3220  [OPT pass%:LDMFD (sp)!,{r0-r4}:]
+3230ENDIF
+3240=pass%
+3250:
+3260REM FNmess : Print a message as above, but expand returns and add
+3270REM a return to end
+3280DEFFNmess(a$,f%)
+3290IF INSTR(a$,"%C")=0 THENa$+=CHR$13
+3300WHILE INSTR(a$,CHR$13)&gt;0
+3310 a$=LEFT$(a$,INSTR(a$,CHR$13)-1)+CHR$0+CHR$10+MID$(a$,INSTR(a$,CHR$13)+1)
+3320ENDWHILE
+3330WHILE INSTR(a$,CHR$0)&gt;0
+3340 MID$(a$,INSTR(a$,CHR$0),1)=CHR$13
+3350ENDWHILE
+3360=FNmess2(a$,f%)
+3370:
+3380REM FNshowreg : Print the contents of reg n to screen (signed)
+3390DEFFNshowreg(n)
+3400[OPT pass%
+3410   STMFD   (sp)!,{r0-r2}
+3420   MOV     r0,n
+3430   CMP     r0,#0
+3440   RSBMI   r0,r0,#0
+3450   SWIMI   &amp;100+ASC("-")
+3460   SUB     sp,sp,#16
+3470   MOV     r1,sp
+3480   MOV     r2,#16
+3490   SWI     "OS_ConvertCardinal4"
+3500   SWI     "OS_Write0"
+3510   ADD     sp,sp,#16
+3520   LDMFD   (sp)!,{r0-r2}
+3530]:=0
+3540:
+3550REM FNshowhex : Print the contents of reg
+3560DEFFNshowhex(n)
+3570[OPT pass%
+3580   STMFD   (sp)!,{r0-r2}
+3590   MOV     r0,n
+3600   SWI     &amp;100+ASC("&amp;")
+3610   SUB     sp,sp,#12
+3620   MOV     r1,sp
+3630   MOV     r2,#12
+3640   SWI     "OS_ConvertHex8"
+3650   SWI     "OS_Write0"
+3660   ADD     sp,sp,#12
+3670   LDMFD   (sp)!,{r0-r2}
+3680]:=0
+3690:
+3700REM FNshowstr0 : Show the string pointed to, end =0
+3710DEFFNshowstr0(n)
+3720[OPT pass%
+3730   STMFD   (sp)!,{r0}
+3740   MOV     r0,n
+3750   SWI     "OS_Write0"
+3760   LDMFD   (sp)!,{r0}
+3770]:=0
+3780:
+3790REM FNshowstrctrl : Show the ctrl ended string
+3800DEFFNshowstrctrl(n)
+3810[OPT pass%
+3820   STMFD   (sp)!,{r0,r1}
+3830   MOV     r1,n
+3840   LDRB    r0,[r1],#1
+3850   CMP     r0,#32
+3860   SWIGE   "OS_WriteC"
+3870   BGE     P%-12
+3880   LDMFD   (sp)!,{r0,r1}
+3890]:=0
+3900:
+3910REM **** Code prefix macro routine ****
+3920:
+3930DEFFNcodename(n$)
+3940[OPT pass%
+3950   EQUS    n$+CHR$0:ALIGN
+3960   EQUD    &amp;FF000000+((LEN(n$)+4) AND NOT 3)
+3970]:=pass%
+3980:
+3990DEFFNencodedict(a$,c$)
+4000LOCAL ch%,n%,b$
+4010REPEAT
+4020 ch%=FALSE:RESTORE +1
+4030 REPEAT
+4040  READ n%,b$
+4050  IF n%&lt;&gt;-1 THEN
+4060   IF INSTR(b$,"¤")&lt;&gt;0 THENb$=LEFT$(b$,INSTR(b$,"¤")-1)+c$+MID$(b$,INSTR(b$,"¤")+1)
+4070   IF INSTR(b$,"£")&lt;&gt;0 THENb$=LEFT$(b$,INSTR(b$,"£")-1)+CHR$10+MID$(b$,INSTR(b$,"£")+1)
+4080   IF INSTR(a$,b$)&lt;&gt;0 THEN
+4090    a$=LEFT$(a$,INSTR(a$,b$)-1)+CHR$27+CHR$n%+MID$(a$,INSTR(a$,b$)+LEN(b$))
+4100    ch%=TRUE
+4110   ENDIF
+4120  ENDIF
+4130 UNTILn%=-1
+4140UNTILch%=FALSE
+4150=a$
+4160DATA 1, "Syntax: *¤"
+4170DATA 2, " the "
+4180DATA 3, "director"
+4190DATA 4, "filing system"
+4200DATA 5, "current"
+4210DATA 6, "to a variable. Other types of value can be assigned with *"
+4220DATA 7, "file"
+4230DATA 8, "default"
+4240DATA 9, "tion"
+4250DATA 10, "*Configure"
+4260DATA 11, "name"
+4270DATA 12, " server"
+4280DATA 13, "number"
+4290DATA 14, "Syntax: *¤ &lt;"
+4300DATA 15, " one or more files that match the given wildcard"
+4310DATA 16, " and "
+4320DATA 17, "relocatable module"
+4330DATA 18, "£C(onfirm)    Prompt for confirmation of each "
+4340DATA 19, "sets the "
+4350DATA 20, "Syntax: *¤ [&lt;disc spec.&gt;]"
+4360DATA 21, ")£V(erbose)   Print information on each file "
+4370DATA 23, "spriteLandscape [&lt;XScale&gt; [&lt;YScale&gt; [&lt;Margin&gt; [&lt;Threshold&gt;]]]]]"
+4380DATA 24, " is used to print a hard copy of the screen on EPSON-"
+4390DATA 25, ".£Options: (use ~ to force off, eg. ~"
+4400DATA 26, "printe"
+4410DATA 27, "Syntax: *¤ &lt;filename&gt;"
+4420DATA 28, "select"
+4430DATA 29, "xpression"
+4440DATA 30, "Syntax: *¤ ["
+4450DATA 31, "sprite"
+4460DATA 32, " displays"
+4470DATA 33, "free space"
+4480DATA 34, " {off}"
+4490DATA 35, "library"
+4500DATA 36, "parameter"
+4510DATA 37, "object"
+4520DATA 38, " all "
+4530DATA 39, "disc"
+4540DATA 40, " to "
+4550DATA 41, " is "
+4560DATA 0, "¤"
+4570DATA -1, ""
+4580:
+32639REM JFPatch
 </textarea>
 <hr/>
 
