@@ -7,7 +7,7 @@ COG_SIZE = ${ICON_SIZE}
 BUTTON_SIZE = ${ICON_SIZE}
 
 SUPPORT_C = true
-SUPPORT_OBJASM = false
+SUPPORT_OBJASM = true
 SUPPORT_PERL = true
 SUPPORT_PASCAL = true
 SUPPORT_BASTXT = false
@@ -139,11 +139,12 @@ versions.hsc: make-version-info.pl versions.munge
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Monday 23-Mar-2020 13:45:43
+# dependencies updated: Wednesday 25-Mar-2020 21:28:32
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/index.html ../dest/about.html \
-    ../dest/notfound.html ../dest/history.html
+    ../dest/notfound.html ../dest/history.html \
+    ../dest/codemirror-examples-objasm.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
@@ -158,6 +159,9 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 ../dest/notfound.html : notfound.hsc ../macros.hsc
 
 ../dest/history.html : history.hsc ../macros.hsc versions.hsc
+
+../dest/codemirror-examples-objasm.html : codemirror-examples-objasm.hsc \
+    ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

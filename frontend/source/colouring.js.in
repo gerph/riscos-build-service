@@ -4,6 +4,7 @@ function setup_colouring(opts) {
     var want_linenumbers = opts['linenumbers'] ? true : false;
     var want_autosize = opts['autosize'] ? true : false;
     var want_scroll = opts['scroll'] ? true : false;
+    var want_mode = opts['mode'] ? opts['mode'] : 'text/x-jfpatch';
 
     var extra_style = '';
     if (want_autosize)
@@ -16,7 +17,7 @@ function setup_colouring(opts) {
         var textarea = areas[i];
         var options = {
                 lineNumbers: want_linenumbers,
-                mode: 'text/x-jfpatch',
+                mode: want_mode,
                 theme: 'liquibyte' + extra_style,
                 lineWrapping: true,
                 viewportMargin: (want_autosize ? Infinity : 10),
@@ -48,10 +49,13 @@ function detect_mode(code) {
 #@endif
 
 #@if $SUPPORT_OBJASM eq 'true'
-    if (code.includes(' AREA ') ||
+    if (code.startsWith(';') ||
+        code.includes(' SUBT ') ||
+        code.includes(' AREA ') ||
+        code.includes("\n; ") ||
         code.includes("\n MOV ") ||
         code.includes("\n BL "))
-        return 'text/x-objasm';
+        return 'text/x-arm-objasm';
 #@endif
 
 #@if $SUPPORT_PASCAL eq 'true'
