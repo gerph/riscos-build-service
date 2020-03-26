@@ -75,6 +75,7 @@ function detect_mode(code) {
 
 #@if $SUPPORT_BASTXT eq 'true'
     if (code.startsWith('REM') ||
+        code.startsWith('10') ||
         code.includes("\nPRINT") ||
         code.includes("\nDEF"))
         return 'text/x-basic-bbcbasic';

@@ -10,7 +10,7 @@ SUPPORT_C = true
 SUPPORT_OBJASM = true
 SUPPORT_PERL = true
 SUPPORT_PASCAL = true
-SUPPORT_BASTXT = false
+SUPPORT_BASTXT = true
 
 
 # Main code
@@ -139,12 +139,13 @@ versions.hsc: make-version-info.pl versions.munge
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Wednesday 25-Mar-2020 21:28:32
+# dependencies updated: Thursday 26-Mar-2020 13:09:39
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/index.html ../dest/about.html \
     ../dest/notfound.html ../dest/history.html \
-    ../dest/codemirror-examples-objasm.html
+    ../dest/codemirror-examples-objasm.html \
+    ../dest/codemirror-examples-bbcbasic.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
@@ -162,6 +163,9 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 
 ../dest/codemirror-examples-objasm.html : codemirror-examples-objasm.hsc \
     ../macros.hsc
+
+../dest/codemirror-examples-bbcbasic.html : \
+    codemirror-examples-bbcbasic.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

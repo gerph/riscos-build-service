@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 26-Mar-2020 00:07:11
+# updated: 26-Mar-2020 20:07:35
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -56,6 +56,18 @@ SOURCE notfound.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc
+DOCUMENT ../dest/codemirror-examples-objasm.html
+SOURCE codemirror-examples-objasm.hsc
+TITLE 
+ID header-menu
+ID HELLO
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/codemirror-examples-bbcbasic.html
+SOURCE codemirror-examples-bbcbasic.hsc
+TITLE 
+ID header-menu
+ID HELLO
+INCLUDE ../macros.hsc
 DOCUMENT ../dest/history.html
 SOURCE history.hsc
 TITLE 
@@ -69,9 +81,3 @@ ID mkaof
 ID mkmacros
 INCLUDE ../macros.hsc
 INCLUDE versions.hsc
-DOCUMENT ../dest/codemirror-examples-objasm.html
-SOURCE codemirror-examples-objasm.hsc
-TITLE 
-ID header-menu
-ID HELLO
-INCLUDE ../macros.hsc
