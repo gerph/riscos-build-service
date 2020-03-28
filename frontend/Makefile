@@ -81,6 +81,7 @@ static: \
  	 	${DESTDIR}/icons/file_xxx.png \
  	 	${DESTDIR}/icons/cog.png \
  	 	${DESTDIR}/icons/patched.png \
+ 	 	${DESTDIR}/icons/information.png \
  	 	${DESTDIR}/icons/create.png \
  	 	${DESTDIR}/icons/upload.png \
  	 	${DESTDIR}/icons/download.png \
@@ -94,6 +95,9 @@ ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 
 ${DESTDIR}/icons/%.png: icons/%.svg
 	./make-icon.sh --trim --inset 1 $? $@ ${ICON_SIZE}
+
+${DESTDIR}/icons/information.png: icons/2119897.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
 ${DESTDIR}/icons/create.png: icons/140268.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}

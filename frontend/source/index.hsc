@@ -102,7 +102,7 @@
 
       ws.onclose = function() {
         debug("onclose");
-        ws_show_status('Closed');
+        ws_show_status('Disconnected');
         console.log('Connection closed')
 
         // Retry connection
@@ -188,13 +188,23 @@
             if (!ok)
                 return;
         }
+        // Hide the help now that they clicked a button
+        show_help(false);
+
         source_code = '';
         show_source();
         focus_source();
         mark_unsent(true);
     }
 
+    function onHelp() {
+        toggle_help();
+    }
+
     function onSourceLoad(data) {
+        // Hide the help now that they clicked a button
+        show_help(false);
+
         source_code = data;
         send_source();
         show_source();
@@ -325,7 +335,25 @@
             // so take away the 'build' button, and put a '*' on the title
             debug('changes in ' + cm);
             mark_unsent(true);
-            show_message('Source changed; use the save button to send to the server');
+            show_message('Source changed; use the Send button to send to the server');
+        }
+    }
+
+    function toggle_help() {
+        show_help(-1);
+    }
+    function show_help(state) {
+        // state should be -1 to toggle, truthy to enable, falsey to disable
+        var hdiv = document.getElementById("help");
+        if (state == -1)
+            state = (hdiv.style.display == 'none');
+        if (state)
+        {
+            hdiv.style.display = 'block';
+        }
+        else
+        {
+            hdiv.style.display = 'none'
         }
     }
 
@@ -589,7 +617,7 @@
 
           <!-- File selection -->
           <form onsubmit="onSubmit(); return false;">
-            <label class='workflow-button' id="source-button" title="Upload source file">
+            <label class='workflow-button' id="source-button" title="Upload source file or zip archive">
                 <input type="file" id="source" onchange="onSourceChange(this.files)"/>
                 <img src="icons/upload.png" alt="[Upload]"/>
             </label>
@@ -609,12 +637,48 @@
               <span id='download-label'>
               </span>
           </label>
+
+          <span class='other-icons'>
+              <label class='other-button' id='info-button' title="Information on what these things do">
+                  <button id='info' onclick="onHelp(); return false;"></button>
+                  <img src="icons/information.png" alt="[Information]"/>
+              </label>
+          </span>
+      </div>
+
+      <div id='help' style='display: block;'>
+
+        <h2>1. Load some source code</h2>
+        <p>Either:
+        </p>
+        <ul>
+            <li><img src='icons/create.png' alt='[Create]'/> Starts a new source file.<br/>
+                Once you've finished editing, press the Send button to send the source to the server.</li>
+            <li><img src='icons/upload.png' alt='[Upload]'/> Uploads a source file or zip archive
+                from your computer.<br/>
+                Zip archives may contain source files and any resources needed (for example, a JFPatch source
+                and the binary that it is patching).
+            </li>
+        </ul>
+
+        <h2>2. Build the source</h2>
+        <p><img src='icons/build.png' alt='[Build]'/> Starts the build on the server.<br/>
+           A 'Build output' window will appear to show what the build is doing. If there is throwback output,
+           this will appear in a separate window.<br/>
+           If the build fails, the source editor can be used to edit the code and fix bugs.<br>
+           If the build was successful, the download icon will appear.
+        </p>
+
+        <h2>3. Download the binary</h2>
+        <p><img src='icons/download.png' alt='[Download]'/> Downloads the built binary.<br/>
+           Binaries are only returned when the build tool copies them to the clipboard on a successful build.
+        </p>
       </div>
 
       <div class='box source-box' id='source-box' style='display:none'>
         <div class='box-heading' id='source-heading'>
             <label id='source-save-button' style='display: none'>
-                <button id='source-save' onclick="onSave(); return false;">[Save]</button>
+                <button id='source-save' onclick="onSave(); return false;">[Send]</button>
             </label>
             Source code</div>
         <textarea class='box-content' id='source-content'></textarea>

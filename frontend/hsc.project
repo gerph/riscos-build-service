@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 26-Mar-2020 23:56:18
+# updated: 28-Mar-2020 09:59:16
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -72,6 +72,9 @@ ID build
 ID download-button
 ID download
 ID download-label
+ID info-button
+ID info
+ID help
 ID source-box
 ID source-heading
 ID source-save-button

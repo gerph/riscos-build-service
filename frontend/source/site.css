@@ -169,16 +169,22 @@ label {
     padding: 0.2em;
 }
 
-label.workflow-button {
+label.workflow-button, label.other-button {
     border: grey 3px solid;
     border-style: outset;
     background-color: #eeeeee;
     border-radius: 8px;
 }
+label.other-button {
+    float: right;
+}
 label.workflow-button input {
     display: none;
 }
 label.workflow-button button {
+    display: none;
+}
+label.other-button button {
     display: none;
 }
 
@@ -211,6 +217,36 @@ label#source-save-button {
 label#source-save-button button {
     display: none;
 }*/
+
+/* Information (Help) */
+div#help {
+}
+div#help {
+    margin: 2em;
+    border: 4px solid black;
+    border-radius: 0.75em;
+    padding: 1em;
+}
+div#help h2 {
+    margin: 0em;
+}
+div#help img {
+    height: 2em;
+    margin-right: 0.5em;
+    float: left;
+}
+div#help ul {
+    margin: 0em 0em 1em 0em;
+    padding: 0em;
+}
+div#help li {
+    margin: 0em;
+    padding: 0em;
+    list-style-type: none;
+}
+div#help li + li {
+    margin-top: 1em;
+}
 
 div.workflow {
     margin-bottom: 1em;
@@ -511,6 +547,7 @@ div#log { display: none }
 /* Status of the WebSocket connection */
 .status {
     display: none;
+    margin-left: 0.5em;
     margin-right: -0.5em;
     border-top-left-radius: 1em;
     border-bottom-left-radius: 1em;
