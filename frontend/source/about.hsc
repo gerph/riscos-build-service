@@ -37,6 +37,7 @@
 <section>
 <h2>How does it work?</h2>
 
+<h3>JFPatch</h3>
 <p>
     JFPatch is a preprocessor for the BASIC assembler. It's written in BASIC itself. It's not very
     good BASIC, but that's what it is. It takes your input file and parses the sections and
@@ -54,6 +55,12 @@
     special variables to indicate the status of the build, which the front end would use to display
     a pop-up message.
 </p>
+
+<h3>Service</h3>
+
+<div class='howitworks'>
+<a href='images/howitworks.png'><img src="images/howitworks.svg" alt="[Structure diagram]"/></a>
+</div>
 
 <p>
     In this online version, the throwback is actually a HTTP POST to an internal web server to
@@ -77,6 +84,24 @@
     RISC OS service we're talking about, and even if both users hit it at once, the system can
     cope.
 </p>
+
+<h3>Technologies involved</h3>
+<p>
+    The front end uses <a href='https://codemirror.net/'>CodeMirror</a> to display source code, with a custom stylesheet for JFPatch, which includes ARM assembly instructions, BBC BASIC keywords, and the JFPatch structure colouring. The ANSI colouring output from the build is converted to HTML by the <a href="http://github.com/drudru/ansi_up">ansi_up</a> library.
+</p>
+
+<p>
+    Communication with the back end is through CloudFront, which routes WebSocket and JSON requests to an EC2 instance. It could be autoscaled. I didn't see much point as this is JFPatch we're talking about and it's really not going to get used that much.
+</p>
+
+<p>
+    The WebSocket service is Python, and uses a <a href="https://github.com/Pithikos/python-websocket-server">Python Websocket Server</a> library for communication. The JSON server is also Python and uses <a href="https://github.com/pallets/flask">Flask</a> for its routing. Both servers use the same back end libraries to drive the build process. The throwback and clipboard server which RISC OS communicates non-output data through is a Python BaseHTTPServer.
+</p>
+
+<p>
+    The build process is invoked through Docker containers to isolate build processes. Within these containers RISC OS is invoked, running JFPatch as its startup command. JFPatch has been modified slightly from the last working version from back in 2002 to add support for copying the output binary to the clipboard (which is used to pass the result back to the user, through the Python HTTP server outside the container). As such, JFPatch doesn't actually support much that's useful - in particular it doesn't support creating 32bit modules yet. I've just not got around to it, as that's just secondary to creating JFPatch as a service.
+</p>
+
 </section>
 
     </page>

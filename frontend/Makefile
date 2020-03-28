@@ -140,9 +140,11 @@ versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc
 
 ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howitworks.png diagrams/howitworks.svg
-	cd diagrams && make
 	cp diagrams/howitworks.png ${DESTDIR}/images/howitworks.png
 	cp diagrams/howitworks.svg ${DESTDIR}/images/howitworks.svg
+
+diagrams/howitworks.png diagrams/howitworks.svg:
+	cd diagrams && make
 
 ../dest/%: %
 	cp $? $@
@@ -197,5 +199,5 @@ delete :
 	hscdepp file=../Makefile prjfile=$(PRJFILE) verbose
 
 clean :
-	cd diagrams && make
+	cd diagrams && make clean
 	-rm -rf "${DESTDIR}" versions.hsc

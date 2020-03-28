@@ -538,6 +538,12 @@ div.jfpatch {
 .CodeMirror {
 }
 
+div.howitworks {
+    text-align: center;
+}
+img.howitworks {
+}
+
 
 /* Remove the tools used for debugging */
 form#general { display: none; }
