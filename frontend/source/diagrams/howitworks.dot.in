@@ -1,0 +1,95 @@
+# How it works
+
+//#include "flowchart.dot.pp"
+
+//#define SHOW_JSON_SERVER
+
+#define TITLE JFPatch as a Service: Structural diagram
+
+#define VALUE(x) #x
+#define STRINGIFY(x) VALUE(x)
+
+
+digraph STRINGIFY(TITLE) {
+#include "chartconfig.dot.pp"
+
+    // Force the clusters to be more compact
+    newrank = true;
+
+    node [ style=filled; fillcolor=white; ];
+
+    // ---- Components of the system ----
+    User [ label="User through browser" ];
+    UserTool [ label="User through tool" ];
+    CloudFront [ label="AWS CloudFront\nCDN and routing" ];
+    WSServer [ label="Back end server\nWeb sockets server" ];
+#ifdef SHOW_JSON_SERVER
+    JSONServer [label="Back end serevr\nJSON server" ];
+#endif
+    FrontEndSite [ label="Front end site\nStatic site content" ];
+    WSInternalServer [ label="Internal server\nHTTP for callback from RISC OS" ];
+    Docker;
+    Pyromaniac [ label="RISC OS" ];
+    JFPatch;
+
+    {
+        rank=same;
+        Docker;
+        WSInternalServer;
+    }
+
+    // ---- Groupings (Things that contain things) ----
+    subgraph cluster_awsserver {
+        graph [
+            bgcolor="#FCDDB4"; // That's the AWS EC2 orange #F7981F + 75% alpha to white
+            color=black;
+
+            label = "";
+            labelloc = "b";
+        ];
+        WSServer;
+#ifdef SHOW_JSON_SERVER
+        JSONServer;
+#endif
+        WSInternalServer;
+
+        subgraph cluster_docker {
+            graph [
+                bgcolor="#B6DCF9"; // That's the docker blue #2496ed + 75% alpha to white
+                color=black;
+
+                label = "";
+                labelloc = "b";
+            ];
+
+            Docker;
+            subgraph cluster_pyromaniac {
+                bgcolor="palegreen"; // same as the JFPatch top bar
+                color=black;
+
+                Pyromaniac;
+                JFPatch;
+            }
+        }
+    }
+
+    User -> CloudFront;
+    UserTool -> CloudFront;
+    CloudFront -> FrontEndSite;
+    CloudFront -> WSServer;
+#ifdef SHOW_JSON_SERVER
+    CloudFront -> JSONServer;
+#endif
+
+    WSServer -> Docker;
+#ifdef SHOW_JSON_SERVER
+    JSONServer -> Docker;
+#endif
+    Docker -> Pyromaniac;
+    Pyromaniac -> JFPatch;
+    WSInternalServer -> WSServer [ constraint=false ];
+#ifdef SHOW_JSON_SERVER
+    WSInternalServer -> JSONServer [ constraint=false ];
+#endif
+    JFPatch -> WSInternalServer [ tailport=s, label="Clipboard data transfer\nand Throwback notifications", labeldistance=1, labelangle=-40 ];
+}
