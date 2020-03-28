@@ -65,6 +65,7 @@ all: dirs static all_hsc
 dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
+	mkdir -p ${DESTDIR}/images
 	mkdir -p ${DESTDIR}/codemirror/lib
 	mkdir -p ${DESTDIR}/codemirror/theme
 	mkdir -p ${DESTDIR}/codemirror/mode
@@ -88,6 +89,8 @@ static: \
  	 	${DESTDIR}/icons/build.png \
  	 	${DESTDIR}/icons/nextstep.png \
  	 	${DESTDIR}/icons/menu.png \
+ 	 	${DESTDIR}/images/howitworks.png \
+ 	 	${DESTDIR}/images/howitworks.svg \
  	 	${CODEMIRROR} \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
@@ -135,6 +138,11 @@ ${DESTDIR}/colouring.js: colouring.js.in
 
 versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc
+
+${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howitworks.png diagrams/howitworks.svg
+	cd diagrams && make
+	cp diagrams/howitworks.png ${DESTDIR}/images/howitworks.png
+	cp diagrams/howitworks.svg ${DESTDIR}/images/howitworks.svg
 
 ../dest/%: %
 	cp $? $@
@@ -189,4 +197,5 @@ delete :
 	hscdepp file=../Makefile prjfile=$(PRJFILE) verbose
 
 clean :
+	cd diagrams && make
 	-rm -rf "${DESTDIR}" versions.hsc

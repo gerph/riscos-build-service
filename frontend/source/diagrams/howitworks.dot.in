@@ -6,6 +6,9 @@
 
 #define TITLE JFPatch as a Service: Structural diagram
 
+#define ICON(x) icons/##x.png
+#define LABEL_ICON(icon, text) <<TABLE border="0" cellspacing="0" cellborder="0"><TR><TD width="24" height="24" fixedsize="TRUE"><IMG SCALE="BOTH" SRC=STRINGIFY(ICON(icon))/></TD><TD>text</TD><TD></TD></TR></TABLE>>
+
 #define VALUE(x) #x
 #define STRINGIFY(x) VALUE(x)
 
@@ -21,16 +24,16 @@ digraph STRINGIFY(TITLE) {
     // ---- Components of the system ----
     User [ label="User through browser" ];
     UserTool [ label="User through tool" ];
-    CloudFront [ label="AWS CloudFront\nCDN and routing" ];
-    WSServer [ label="Back end server\nWeb sockets server" ];
+    CloudFront [ label=LABEL_ICON(cloudfront, AWS CloudFront<BR/>CDN and routing) ];
+    WSServer [ label=LABEL_ICON(python, Back end server<BR/>Web sockets server) ];
 #ifdef SHOW_JSON_SERVER
-    JSONServer [label="Back end serevr\nJSON server" ];
+    JSONServer [label=LABEL_ICON(python, Back end serevr<BR/>JSON server) ];
 #endif
-    FrontEndSite [ label="Front end site\nStatic site content" ];
-    WSInternalServer [ label="Internal server\nHTTP for callback from RISC OS" ];
-    Docker;
-    Pyromaniac [ label="RISC OS" ];
-    JFPatch;
+    FrontEndSite [ label=LABEL_ICON(apache, Front end site<BR/>Static site content) ];
+    WSInternalServer [ label=LABEL_ICON(python, Internal server<BR/>HTTP for callback from RISC OS) ];
+    Docker [ label=LABEL_ICON(docker, Docker container) ];
+    Pyromaniac [ label=LABEL_ICON(cog, RISC OS) ];
+    JFPatch [ label=LABEL_ICON(plaster, Build tool<BR/>JFPatch command line tool) ];
 
     {
         rank=same;
@@ -44,8 +47,9 @@ digraph STRINGIFY(TITLE) {
             bgcolor="#FCDDB4"; // That's the AWS EC2 orange #F7981F + 75% alpha to white
             color=black;
 
-            label = "";
+            label = LABEL_ICON(ec2, EC2 server);
             labelloc = "b";
+            labeljust = "l"
         ];
         WSServer;
 #ifdef SHOW_JSON_SERVER
@@ -91,5 +95,5 @@ digraph STRINGIFY(TITLE) {
 #ifdef SHOW_JSON_SERVER
     WSInternalServer -> JSONServer [ constraint=false ];
 #endif
-    JFPatch -> WSInternalServer [ tailport=s, label="Clipboard data transfer\nand Throwback notifications", labeldistance=1, labelangle=-40 ];
+    JFPatch -> WSInternalServer [ tailport=s, label="Clipboard data transfer\nand Throwback events", labeldistance=1, labelangle=-40 ];
 }
