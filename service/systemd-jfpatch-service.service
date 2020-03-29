@@ -1,0 +1,11 @@
+
+[Unit]
+Description=JFPatch services
+Documentation=https://jfpatch.riscos.online/
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/start-service.sh
+
+[Install]
+WantedBy=multi-user.target

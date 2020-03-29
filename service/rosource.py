@@ -181,7 +181,10 @@ class RISCOSSource(object):
                 data.startswith('program ')]):
             return FILETYPE_PASCAL
 
-        (firstline, rest) = data.split('\n', 1)
+        if '\n' in data:
+            (firstline, rest) = data.split('\n', 1)
+        else:
+            firstline = data
 
         if any([data.startswith('#!') and 'perl' in firstline,
                 '\nBEGIN {' in data,]):
