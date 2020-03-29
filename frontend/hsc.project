@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 28-Mar-2020 19:04:25
+# updated: 29-Mar-2020 15:52:34
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -18,38 +18,6 @@ DOCUMENT ../dest/fileformat.html
 SOURCE fileformat.hsc
 TITLE 
 ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/index.html
-SOURCE index.hsc
-TITLE 
-ID header-menu
-ID general
-ID input
-ID data
-ID status
-ID status-value
-ID create-button
-ID create
-ID source-button
-ID source
-ID build-button
-ID build
-ID download-button
-ID download
-ID download-label
-ID info-button
-ID info
-ID help
-ID source-box
-ID source-heading
-ID source-save-button
-ID source-save
-ID source-content
-ID output-box
-ID output
-ID throwback-box
-ID throwback
-ID log
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/about.html
 SOURCE about.hsc
@@ -85,4 +53,36 @@ SOURCE codemirror-examples-bbcbasic.hsc
 TITLE 
 ID header-menu
 ID HELLO
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/index.html
+SOURCE index.hsc
+TITLE 
+ID header-menu
+ID general
+ID input
+ID data
+ID status
+ID status-value
+ID create-button
+ID create
+ID source-button
+ID source
+ID build-button
+ID build
+ID download-button
+ID download
+ID download-label
+ID info-button
+ID info
+ID help
+ID source-box
+ID source-heading
+ID source-save-button
+ID source-save
+ID source-content
+ID output-box
+ID output
+ID throwback-box
+ID throwback
+ID log
 INCLUDE ../macros.hsc

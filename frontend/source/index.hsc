@@ -66,6 +66,14 @@
       // Set event handlers.
       ws.onopen = function() {
         debug("onopen");
+        if (source_code)
+        {
+            if (!unsent_changes)
+            {
+                show_message("Reconnected to server; source will need to be resent");
+                mark_unsent(true);
+            }
+        }
       };
 
       ws.onmessage = function(e) {
@@ -106,6 +114,7 @@
         console.log('Connection closed')
 
         // Retry connection
+        ws = null;
         ws_retry();
       };
 
@@ -115,6 +124,7 @@
         console.log(e)
 
         // Retry connection
+        ws = null;
         ws_retry();
       };
     }
@@ -146,6 +156,11 @@
         var action = input.value;
         var data = null;
         var message = [action, data];
+        if (!ws)
+        {
+            show_error("Cannot send message to server; not connected");
+            return;
+        }
         ws.send(JSON.stringify(message));
         debug("send: " + input.value);
         input.value = "";
@@ -156,6 +171,12 @@
         var action = 'build'
         var data = null;
         var message = [action, data];
+        if (!ws)
+        {
+            show_error("Cannot build on server; not connected");
+            return;
+        }
+
         ws.send(JSON.stringify(message));
         debug("send: " + input.value);
         show_clear();
@@ -206,7 +227,11 @@
         show_help(false);
 
         source_code = data;
-        send_source();
+        if (!send_source())
+            // Failed to send the source
+            mark_unsent(true);
+        else
+            mark_unsent(false);
         show_source();
     }
 
@@ -230,14 +255,22 @@
             show_source();
         }
 
-        send_source();
-        mark_unsent(false);
+        if (send_source())
+            // Failed to send the source
+            mark_unsent(false);
+        else
+            mark_unsent(true);
     }
 
     // Send the source we've got to the server.
     function send_source() {
         var action = 'source';
         var message =[action, btoa(source_code)];
+        if (!ws)
+        {
+            show_error("Cannot send source to server; not connected");
+            return false;
+        }
         ws.send(JSON.stringify(message));
         debug("send: " + message);
 
@@ -246,6 +279,7 @@
 
         var bbutton = document.getElementById("build-button");
         bbutton.removeAttribute('disabled');
+        return true;
     }
 
     // Show the source in our editor box.
@@ -357,10 +391,18 @@
         }
     }
 
+    // Make the message box visible
+    // FIXME: Move all this handling into an object rather than arbitrary functions
+    function show_message_box(state) {
+        var sdiv = document.getElementById("output-box");
+        sdiv.style.display = state ? 'block' : 'none';
+    }
+
     // Clears all the state when we start a fresh build
     function show_clear(str) {
         var cdiv = document.getElementById("output");
         cdiv.innerHTML = '';
+        show_message_box(false);
 
         var dbutton = document.getElementById("download-button");
         var dlabel = document.getElementById("download-label");
@@ -380,14 +422,19 @@
         mark_running(false);
 
         var cdiv = document.getElementById("output");
-        html = "<div class='protoerror'>Protocol error: " + escapeHTML(str) + "</div>";
+        html = "<span class='protoerror'>Protocol error: " + escapeHTML(str) + "</span>";
         cdiv.innerHTML += html;
+
+        show_message_box(true);
+        console.log('WS error: ' + str);
     }
 
     function show_output(str) {
         html = ansi_up.ansi_to_html(str);
         var cdiv = document.getElementById("output");
         cdiv.innerHTML += html;
+
+        show_message_box(true);
     }
 
     function show_throwback(data) {
@@ -473,11 +520,8 @@
         html = escapeHTML(str);
         cdiv.innerHTML += "<span class='message'>" + html + "</span>";
 
-        // Unhide the build box when the first message appears
-        var sdiv = document.getElementById("output-box");
-        sdiv.style.display = 'block';
+        show_message_box(true);
     }
-
     function show_rc(rc) {
         var status;
         if (rc == 0)
@@ -492,6 +536,8 @@
         }
         var cdiv = document.getElementById("output");
         cdiv.innerHTML += "<span class='rc " + status + "'>" + message + "</span>";
+
+        show_message_box(true);
     }
 
     function show_clipboard(data) {

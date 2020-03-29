@@ -88,6 +88,20 @@ div#output span.clipboard::before {
     text-align: right;
 }
 
+div#output span.protoerror {
+    color: gold;
+    font-weight: bold;
+    display: block;
+}
+div#output span.protoerror::before {
+    content: "⚠";
+    padding-left: 0.25em;
+    padding-right: 0.5em;
+    width: 1em;
+    display: inline-block;
+    text-align: right;
+}
+
 /* Throwback window styles
  * Colours taken from: https://github.com/jaylett/zap/blob/master/sources/!ZapSource/s/Mode11%2Cfff#L509
  */
