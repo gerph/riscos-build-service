@@ -26,6 +26,13 @@ JFPatch files can contain up to 8 distinct sections, of which 2 are required and
 <p>
 The required sections - the Header and the Code sections - are described first, below..
 </p>
+
+<h3>Example JFPatch files</h3>
+
+<p>
+Example usage, together with example API code, can be found in a <a href="https://github.com/gerph/jfpatch-as-a-service-examples">supporting repository.</a>
+</p>
+
 </section>
 
 <section>

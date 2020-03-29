@@ -9,7 +9,7 @@
     var ws_timeout;
     var ansi_up = new AnsiUp;
     var cm;
-    var source_data;
+    var source_code;
     var source_type;
     var unsent_changes = false;
 
@@ -203,7 +203,7 @@
 
     function onCreate() {
         // User clicked the 'Create Document' button.
-        if (unsent_changes || source_data)
+        if (unsent_changes || source_code)
         {
             ok = confirm("Creating a new source file will clear your current document. Are you sure you want to create a new source file?")
             if (!ok)
@@ -703,7 +703,8 @@
             <li><img src='icons/upload.png' alt='[Upload]'/> Uploads a source file or zip archive
                 from your computer.<br/>
                 Zip archives may contain source files and any resources needed (for example, a JFPatch source
-                and the binary that it is patching).
+                and the binary that it is patching).<br/>
+                Example JFPatch files can be found in a <a href="https://github.com/gerph/jfpatch-as-a-service-examples">supporting repository</a>.
             </li>
         </ul>
 

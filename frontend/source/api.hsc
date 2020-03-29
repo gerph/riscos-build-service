@@ -35,6 +35,13 @@ The HTTP protocol is useful for clients that want the operation to be performed 
 <p>
     Multiple output files are not currently supported.
 </p>
+
+<h3>Examples</h3>
+
+<p>
+Example usage, together with example JFPatch code, can be found in a <a href="https://github.com/gerph/jfpatch-as-a-service-examples">supporting repository.</a>
+</p>
+
 </section>
 
 <section>
