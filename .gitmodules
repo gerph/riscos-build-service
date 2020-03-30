@@ -1,3 +1,6 @@
 [submodule "ci"]
 	path = ci
 	url = ../../../riscos/build/ci.git
+[submodule "frontend/source/jfpatch-as-a-service-examples"]
+	path = frontend/source/jfpatch-as-a-service-examples
+	url = ../jfpatch-as-a-service-examples.git

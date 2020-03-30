@@ -376,6 +376,36 @@ ul.header-menu-block {
 }
 
 
+/* Document load menu */
+nav.load-menu {
+}
+ul.load-menu-block {
+    position: absolute;
+    z-index: 5;
+    margin: -0.75em 0.25em 0.25em 0.25em;
+    left: 0.5em;
+    padding: 0em;
+    border: 4px solid grey;
+}
+.load-menu-block li {
+    margin: 0;
+    list-style: none;
+    padding: 0.25em;
+    background-color: #eeeeee;
+}
+.load-menu-block li + li {
+    /*border-top: 4px solid grey;*/
+}
+.load-name {
+    display: block;
+}
+.load-desc {
+    display: block;
+    font-size: 0.75em;
+    font-style: small-caps;
+}
+
+
 /* Documentation styles */
 section {
     padding-left: 2em;

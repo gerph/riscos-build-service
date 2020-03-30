@@ -201,6 +201,23 @@
         }
     }
 
+    function onLoad() {
+        // User clicked the 'Load existing/example document' button.
+
+        var lmenu = document.getElementById('load-menu-container');
+        if (lmenu.style.display == 'none')
+        {
+            // Show the menu of things that you can load.
+            examples_buildmenu();
+            lmenu.style.display = 'block';
+        }
+        else
+        {
+            // Hide the menu
+            lmenu.style.display = 'none';
+        }
+    }
+
     function onCreate() {
         // User clicked the 'Create Document' button.
         if (unsent_changes || source_code)
@@ -223,7 +240,7 @@
     }
 
     function onSourceLoad(data) {
-        // Hide the help now that they clicked a button
+        // Hide the help now that they clicked a button (or loaded a file)
         show_help(false);
 
         source_code = data;
@@ -260,6 +277,68 @@
             mark_unsent(false);
         else
             mark_unsent(true);
+    }
+
+    // Example documents
+    function example_fetch(example_path, callback) {
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', 'examples/' + example_path, true);
+
+        xobj.onreadystatechange = function() {
+            if (xobj.readyState === 4 && xobj.status === 200) {
+                // Required use of an anonymous callback
+                // as .open() will NOT return a value but simply returns undefined in asynchronous mode
+                data = xobj.responseText;
+                callback(data);
+            }
+        };
+        xobj.send(null);
+    }
+
+    // Load the example data and call the callback function when it arrives.
+    function examples_loaddata(callback) {
+        example_fetch('examples.json', function(data) {
+            callback(JSON.parse(data));
+        });
+    }
+
+    function examples_buildmenu() {
+        var lmenu = document.getElementById("load-menu");
+        lmenu.innerHTML = '';
+
+        examples_loaddata(function(data) {
+            // Called when the example data has loaded
+            console.log("Got JSON data: " + data.toString());
+            html = '';
+            examples = data['examples']
+            for (index=0; index < examples.length; ++index) {
+                example = examples[index];
+                click = "examples_loadfile(\"" + example['filename'] + "\"); false;";
+                html += "<li>";
+                html += "<span class='load-name'><a href='#' onClick='" + click +"'>" + example['name'] + "</a></span>";
+                html += "<span class='load-desc'>" + example['description'] + "</span>";
+                html += "</li>";
+            }
+
+            lmenu.innerHTML = html;
+        });
+    }
+
+    function examples_loadfile(filename) {
+        // Show the menu
+        if (unsent_changes || source_code)
+        {
+            ok = confirm("Loading a source file will clear your current document. Are you sure you want to load this source file?")
+            if (!ok)
+                return;
+        }
+
+        example_fetch(filename, function(data) {
+            onSourceLoad(data);
+        });
+        var lmenu = document.getElementById('load-menu-container');
+        lmenu.style.display = 'none';
     }
 
     // Send the source we've got to the server.
@@ -617,7 +696,7 @@
     function debug(str) {
         var log = document.getElementById("log");
         var escaped = escapeHTML(str);
-        log.innerHTML += "<br>" + escaped;
+        log.innerHTML += "<br/>" + escaped;
     }
 
     // https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
@@ -656,6 +735,12 @@
       </div>
 
       <div class='workflow'>
+          <!-- Load document -->
+          <label class='workflow-button' id='load-button' title="Load a file from examples">
+              <button id='load' onclick="onLoad(); return false;"></button>
+              <img src="icons/load.png" alt="[Load]"/>
+          </label>
+
           <!-- New document -->
           <label class='workflow-button' id='create-button' title="Create a new file">
               <button id='create' onclick="onCreate(); return false;"></button>
@@ -692,6 +777,10 @@
               </label>
           </span>
       </div>
+      <nav class='load-menu' id='load-menu-container' style='display: none;'>
+          <ul class='load-menu-block' id='load-menu'>
+          </ul>
+      </nav>
 
       <div id='help' style='display: block;'>
 
@@ -699,6 +788,8 @@
         <p>Either:
         </p>
         <ul>
+            <li><img src='icons/load.png' alt='[Load]'/> Loads an example file.<br/>
+                Examples, taken from the <a href="https://github.com/gerph/jfpatch-as-a-service-examples">supporting repository</a> are selectable here.</li>
             <li><img src='icons/create.png' alt='[Create]'/> Starts a new source file.<br/>
                 Once you've finished editing, press the Send button to send the source to the server.</li>
             <li><img src='icons/upload.png' alt='[Upload]'/> Uploads a source file or zip archive
@@ -713,7 +804,7 @@
         <p><img src='icons/build.png' alt='[Build]'/> Starts the build on the server.<br/>
            A 'Build output' window will appear to show what the build is doing. If there is throwback output,
            this will appear in a separate window.<br/>
-           If the build fails, the source editor can be used to edit the code and fix bugs.<br>
+           If the build fails, the source editor can be used to edit the code and fix bugs.<br/>
            If the build was successful, the download icon will appear.
         </p>
 

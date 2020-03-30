@@ -59,6 +59,12 @@ ifeq (${SUPPORT_BASTXT}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/bbcbasic.js
 endif
 
+
+EXAMPLE_SOURCES=$(wildcard jfpatch-as-a-service-examples/jfpatch-files/*)
+
+EXAMPLES = $(subst jfpatch-as-a-service-examples/jfpatch-files/,${DESTDIR}/examples/,${EXAMPLE_SOURCES})
+
+
 #.PHONY: all static all_hsc
 
 all: dirs static all_hsc
@@ -66,6 +72,7 @@ dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
 	mkdir -p ${DESTDIR}/images
+	mkdir -p ${DESTDIR}/examples
 	mkdir -p ${DESTDIR}/codemirror/lib
 	mkdir -p ${DESTDIR}/codemirror/theme
 	mkdir -p ${DESTDIR}/codemirror/mode
@@ -83,6 +90,7 @@ static: \
  	 	${DESTDIR}/icons/cog.png \
  	 	${DESTDIR}/icons/patched.png \
  	 	${DESTDIR}/icons/information.png \
+ 	 	${DESTDIR}/icons/load.png \
  	 	${DESTDIR}/icons/create.png \
  	 	${DESTDIR}/icons/upload.png \
  	 	${DESTDIR}/icons/download.png \
@@ -92,6 +100,7 @@ static: \
  	 	${DESTDIR}/images/howitworks.png \
  	 	${DESTDIR}/images/howitworks.svg \
  	 	${CODEMIRROR} \
+ 	 	${EXAMPLES} \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 	./make-icon.sh --inset 1 $? $@ ${FILETYPE_SIZE}
@@ -100,6 +109,9 @@ ${DESTDIR}/icons/%.png: icons/%.svg
 	./make-icon.sh --trim --inset 1 $? $@ ${ICON_SIZE}
 
 ${DESTDIR}/icons/information.png: icons/2119897.svg
+	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
+
+${DESTDIR}/icons/load.png: icons/140273.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
 ${DESTDIR}/icons/create.png: icons/140268.svg
@@ -139,6 +151,9 @@ ${DESTDIR}/colouring.js: colouring.js.in
 versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc
 
+${DESTDIR}/examples/%: jfpatch-as-a-service-examples/jfpatch-files/%
+	cp $? $@
+
 ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howitworks.png diagrams/howitworks.svg
 	cp diagrams/howitworks.png ${DESTDIR}/images/howitworks.png
 	cp diagrams/howitworks.svg ${DESTDIR}/images/howitworks.svg
@@ -146,7 +161,7 @@ ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howi
 diagrams/howitworks.png diagrams/howitworks.svg:
 	cd diagrams && make
 
-../dest/%: %
+${DESTDIR}/%: %
 	cp $? $@
 
 .SUFFIXES:
