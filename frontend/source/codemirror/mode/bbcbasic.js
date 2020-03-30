@@ -203,7 +203,7 @@ CodeMirror.defineSimpleMode("bbcbasic", {
   basic_line: [
     {regex: /\s+/, token: 'none', pop: true},
     {regex: /:/, token: 'none', pop: true},
-    {regex: /(REM)(.*)/, token: ['comment', 'comment'], pop: true},
+    {regex: /(REM.*)/, token: 'comment', pop: true},
     {regex: new RegExp(res_basic_keywords), token: 'keyword', next: 'basic_line_continuation'},
 
     // * command
@@ -218,7 +218,7 @@ CodeMirror.defineSimpleMode("bbcbasic", {
   ],
   basic_line_continuation: [
     {sol: true, pop: true},
-    {regex: /(REM)(.*)/, token: ["comment", 'comment'], pop: true},
+    {regex: /(REM.*)/, token: 'comment', pop: true},
     {regex: new RegExp(res_basic_keywords), token: 'keyword'},
     {regex: /\&[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?|%[01]+/i,
      token: "number"},
