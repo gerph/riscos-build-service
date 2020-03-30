@@ -622,7 +622,8 @@
 
     // https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
     function save(filename, data, mediatype) {
-        var blob = new Blob([data], {'type': mediatype});
+        array_data = [Uint8Array.from(data, c => c.charCodeAt(0))]
+        var blob = new Blob(array_data, {'type': mediatype});
         if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveBlob(blob, filename);
         }
