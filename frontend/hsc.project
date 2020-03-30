@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 30-Mar-2020 19:43:51
+# updated: 30-Mar-2020 20:08:20
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -18,41 +18,6 @@ DOCUMENT ../dest/fileformat.html
 SOURCE fileformat.hsc
 TITLE 
 ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/about.html
-SOURCE about.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/notfound.html
-SOURCE notfound.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/history.html
-SOURCE history.hsc
-TITLE 
-ID header-menu
-ID jfpaas
-ID jfpapp
-ID jfpatch
-ID mkmodule
-ID mkws
-ID mkaof
-ID mkmacros
-INCLUDE ../macros.hsc
-INCLUDE versions.hsc
-DOCUMENT ../dest/codemirror-examples-objasm.html
-SOURCE codemirror-examples-objasm.hsc
-TITLE 
-ID header-menu
-ID HELLO
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/codemirror-examples-bbcbasic.html
-SOURCE codemirror-examples-bbcbasic.hsc
-TITLE 
-ID header-menu
-ID HELLO
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
@@ -89,4 +54,39 @@ ID output
 ID throwback-box
 ID throwback
 ID log
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/about.html
+SOURCE about.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/notfound.html
+SOURCE notfound.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/history.html
+SOURCE history.hsc
+TITLE 
+ID header-menu
+ID jfpaas
+ID jfpapp
+ID jfpatch
+ID mkmodule
+ID mkws
+ID mkaof
+ID mkmacros
+INCLUDE ../macros.hsc
+INCLUDE versions.hsc
+DOCUMENT ../dest/codemirror-examples-objasm.html
+SOURCE codemirror-examples-objasm.hsc
+TITLE 
+ID header-menu
+ID HELLO
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/codemirror-examples-bbcbasic.html
+SOURCE codemirror-examples-bbcbasic.hsc
+TITLE 
+ID header-menu
+ID HELLO
 INCLUDE ../macros.hsc

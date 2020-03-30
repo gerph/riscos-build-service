@@ -462,10 +462,10 @@ CodeMirror.defineSimpleMode("jfpatch", {
   // The start state contains the rules that are intially used
   start: [
     // Header for the file
-    {regex: /(App|In|Out|Ver)(\s+)(.*)/i, sol: true, token: ['def', 'none', 'variable']},
-    {regex: /(Max)(\s+)([0-9]+K?)/i, sol: true, token: ['def', 'none', 'variable']},
-    {regex: /(Type)(\s+)(Module|Utility|Util|Absolute|Code|Memory|AOF|AOF Debug|AOFModule|AOFModule Debug)/i, sol: true, token: ['def', 'none', 'variable']},
-    {regex: /(PC)(\s+)([0-9]+|&[a-f0-9]+)/i, token: ['def', 'none', 'number']},
+    {regex: /(App|In|Out|Ver)(\s*:\s*|\s+)(.*)/i, sol: true, token: ['def', 'none', 'variable']},
+    {regex: /(Max)(\s*:\s*|\s+)([0-9]+K?)/i, sol: true, token: ['def', 'none', 'variable']},
+    {regex: /(Type)(\s*:\s*|\s+)(Module|Utility|Util|Absolute|Code|Memory|AOF|AOF Debug|AOFModule|AOFModule Debug)/i, sol: true, token: ['def', 'none', 'variable']},
+    {regex: /(PC)(\s*:\s*|\s+)([0-9]+|&[a-f0-9]+)/i, token: ['def', 'none', 'number']},
     {regex: /Pre/i, sol: true, token: 'def', next: 'pre'},
     {regex: /Define Module/i, sol: true, token: 'def', next: 'define_module'},
     {regex: /Define Workspace/i, sol: true, token: 'def', next: 'define_workspace'},
@@ -502,7 +502,7 @@ CodeMirror.defineSimpleMode("jfpatch", {
     {regex: /(\s*#\s*(?:Wimp)?Run)(\s*)(<THISDIR>)(\..*)/i, sol: true, token: ['def', 'none', 'builtin', 'string']},
     {regex: /(\s*#\s*(?:Wimp)?Run)(\s*)(.*)/i, sol: true, token: ['def', 'none', 'string']},
     {regex: /(\s*#\s*Examine)(\s*)(.*)/i, sol: true, token: ['def', 'none', 'string']},
-    {regex: /(\s*#\s*Captrue)(\s*)/i, sol: true, token: ['def', 'none'], push: 'boolean'},
+    {regex: /(\s*#\s*Capture)(\s*)/i, sol: true, token: ['def', 'none'], push: 'boolean'},
     {regex: /\s*#\s*End/i, sol: true, token: 'def', next: 'end'},
 
     // Basic lines
@@ -582,10 +582,10 @@ CodeMirror.defineSimpleMode("jfpatch", {
   define_module: [
     {regex: /\s*End Module/i, token: 'def', next: 'start'},
 
-    {regex: /(\s*)(Name|Version|Author|Help|Extra|MessageFile)(\s+)(.*)/, token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Init|Final|Start|Service|SWIHandler)(\s+)([`a-zA-Z][a-zA-Z0-9_]+)/, token: ['none', 'def', 'none', 'variable']},
-    {regex: /(\s*)(Workspace)(\s+)(\*?)([0-9]+|&[a-fA-F0-9]+)/i, token: ['none', 'def', 'none', 'qualifier', 'number']},
-    {regex: /(\s*)(Workspace)(\s+)(\*?)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'qualifier', 'variable']},
+    {regex: /(\s*)(Name|Version|Author|Help|Extra|MessageFile)(\s*:\s*|\s+)(.*)/, token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Init|Final|Start|Service|SWIHandler)(\s*:\s*|\s+)([`a-zA-Z][a-zA-Z0-9_]+)/, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Workspace)(\s*:\s*|\s+)(\*?)([0-9]+|&[a-fA-F0-9]+)/i, token: ['none', 'def', 'none', 'qualifier', 'number']},
+    {regex: /(\s*)(Workspace)(\s*:\s*|\s+)(\*?)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'qualifier', 'variable']},
     {regex: /(\s*)(Commands)/, token: ['none', 'def'], push: 'define_module_commands'},
     {regex: /(\s*)((?:Pre|Post|Copy|Rect|PostRect|PostIcon)Filter)/, token: ['none', 'def'], push: 'define_module_filters'},
     {regex: /(\s*)(SWIs)/, token: ['none', 'def'], push: 'define_module_swis'},
@@ -603,10 +603,10 @@ CodeMirror.defineSimpleMode("jfpatch", {
 
   define_module_commands: [
     {regex: /\s*End commands/i, token: 'def', pop: true},
-    {regex: /(\s*)(Name|Type)(\s+)(.+)/i, token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Code)(\s+)(.+)/i, token: ['none', 'def', 'none', 'variable']},
-    {regex: /(\s*)(Min|Max|Flags)(\s+)([0-9]+|&[a-fA-F0-9]+)/i, token: ['none', 'def', 'none', 'number']},
-    {regex: /(\s+)(Help|Syntax)(\s+)/i, token: ['none', 'def', 'none'], push: 'maybe_long_string'},
+    {regex: /(\s*)(Name|Type)(\s*:\s*|\s+)(.+)/i, token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Code)(\s*:\s*|\s+)(.+)/i, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Min|Max|Flags)(\s*:\s*|\s+)([0-9]+|&[a-fA-F0-9]+)/i, token: ['none', 'def', 'none', 'number']},
+    {regex: /(\s+)(Help|Syntax)(\s*:\s*|\s+)/i, token: ['none', 'def', 'none'], push: 'maybe_long_string'},
     // Not recognised, so show as an error
     {regex: /.*/, token: 'error'},
   ],
@@ -618,16 +618,16 @@ CodeMirror.defineSimpleMode("jfpatch", {
   ],
 
   long_string: [
-    {regex: /(\s{6}\s*)(.*)/, token: 'string'},
+    {regex: /(\s{5}\s*)(.*)/, token: 'string'},
     {pop: true},
   ],
 
   define_module_swis: [
     {regex: /\s*End SWIs/i, token: 'def', pop: true},
 
-    {regex: /(\s*)(Prefix)(\s+)([A-WYZa-wyz][A-Za-z0-9]*)/, token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Base)(\s+)([0-9]+|&[a-fA-F0-9]+|%[01]+)/i, token: ['none', 'def', 'none', 'number']},
-    {regex: /(\s*)(Base)(\s+)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Prefix)(\s*:\s*|\s+)([A-WYZa-wyz][A-Za-z0-9]*)/, token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Base)(\s*:\s*|\s+)([0-9]+|&[a-fA-F0-9]+|%[01]+)/i, token: ['none', 'def', 'none', 'number']},
+    {regex: /(\s*)(Base)(\s*:\s*|\s+)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'def', 'none', 'variable']},
 
     {regex: /(\s+)([0-9]+|&[a-f0-9]+)(\s+)([A-Za-z][A-Za-z_0-9]*)(\s+)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'number', 'none', 'string', 'none', 'variable']},
 
@@ -670,8 +670,8 @@ CodeMirror.defineSimpleMode("jfpatch", {
   define_module_wimpswis: [
     {regex: /\s*End WimpSWIs/i, token: 'def', pop: true},
 
-    {regex: /(\s*)(SWI)(\s+)(Wimp_[A-Za-z][A-Za-z0-9]*)/, token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Pre|Post)(\s+)(\^?)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'def', 'none', 'qualifier', 'variable']},
+    {regex: /(\s*)(SWI)(\s*:\s*|\s+)(Wimp_[A-Za-z][A-Za-z0-9]*)/, token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Pre|Post)(\s*:\s*|\s+)(\^?)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'def', 'none', 'qualifier', 'variable']},
 
     {regex: /(\s+)([0-9]+|&[a-f0-9]+)(\s+)([A-Za-z][A-Za-z_0-9]*)(\s+)([`a-zA-Z][a-zA-Z0-9_]*)/i, token: ['none', 'number', 'none', 'string', 'none', 'variable']},
 
@@ -691,11 +691,11 @@ CodeMirror.defineSimpleMode("jfpatch", {
   define_module_imagefs: [
     {regex: /\s*End (?:Image)?FS/i, token: 'def', pop: true},
 
-    {regex: new RegExp('(\\s+)(Flags)(\\s+)(' + res_jfpatch_imagefs_flags + ')', 'i'), token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Type|Filetype)(\s+)(&?[a-fA-F0-9]{3})/i, token: ['none', 'def', 'none', 'number']},
-    {regex: /(\s*)(Type|Filetype)(\s+)([A-Za-z_\-0-9]{1,8})/i, token: ['none', 'def', 'none', 'string']},
+    {regex: new RegExp('(\\s+)(Flags)(\\s*:\\s*|\\s+)(' + res_jfpatch_imagefs_flags + ')', 'i'), token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Type|Filetype)(\s*:\s*|\s+)(&?[a-fA-F0-9]{3})/i, token: ['none', 'def', 'none', 'number']},
+    {regex: /(\s*)(Type|Filetype)(\s*:\s*|\s+)([A-Za-z_\-0-9]{1,8})/i, token: ['none', 'def', 'none', 'string']},
 
-    {regex: /(\s*)(Open|Close|GetBytes|Get|PutBytes|Put|Args|File|Func)(\s+)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Open|Close|GetBytes|Get|PutBytes|Put|Args|File|Func)(\s*:\s*|\s+)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'variable']},
 
     // Not recognised, so show as an error
     {regex: /.*/, token: 'error'},
@@ -704,12 +704,12 @@ CodeMirror.defineSimpleMode("jfpatch", {
   define_module_fs: [
     {regex: /\s*End FS/i, token: 'def', pop: true},
 
-    {regex: new RegExp('(\\s+)(Flags)(\\s+)(' + res_jfpatch_fs_flags + ')', 'i'), token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Files)(\s+)(INFINITE|-|&?[a-fA-F0-9]{1,2}|[0-9]{1,3})/i, token: ['none', 'def', 'none', 'number']},
-    {regex: /(\s*)(Number)(\s+)(&?[a-fA-F0-9]{1,2}|[0-9]{1,3})/i, token: ['none', 'def', 'none', 'number']},
-    {regex: /(\s*)(Name|Startup)(\s+)(.*)/i, token: ['none', 'def', 'none', 'string']},
+    {regex: new RegExp('(\\s+)(Flags)(\\s*:\\s*|\\s+)(' + res_jfpatch_fs_flags + ')', 'i'), token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Files)(\s*:\s*|\s+)(INFINITE|-|&?[a-fA-F0-9]{1,2}|[0-9]{1,3})/i, token: ['none', 'def', 'none', 'number']},
+    {regex: /(\s*)(Number)(\s*:\s*|\s+)(&?[a-fA-F0-9]{1,2}|[0-9]{1,3})/i, token: ['none', 'def', 'none', 'number']},
+    {regex: /(\s*)(Name|Startup)(\s*:\s*|\s+)(.*)/i, token: ['none', 'def', 'none', 'string']},
 
-    {regex: /(\s*)(Open|Close|GetBytes|Get|PutBytes|Put|Args|File|Func|GBPB)(\s+)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Open|Close|GetBytes|Get|PutBytes|Put|Args|File|Func|GBPB)(\s*:\s*|\s+)([`a-zA-Z][a-zA-Z0-9_]+)/i, token: ['none', 'def', 'none', 'variable']},
 
     // Not recognised, so show as an error
     {regex: /.*/, token: 'error'},
@@ -717,10 +717,10 @@ CodeMirror.defineSimpleMode("jfpatch", {
 
   define_module_filters: [
     {regex: /\s*End (?:Pre|Post|Copy|Rect|PostRect|PostIcon|)filter/i, token: 'def', pop: true},
-    {regex: /(\s*)(Name|Task)(\s+)(.+)/i, token: ['none', 'def', 'none', 'string']},
-    {regex: /(\s*)(Code)(\s+)(.+)/i, token: ['none', 'def', 'none', 'variable']},
-    {regex: /(\s*)(Mask)(\s+)([0-9]+|&[a-fA-F0-9]+|%[01]+)/i, token: ['none', 'def', 'none', 'number']},
-    {regex: new RegExp('(\\s+)(Accept)(\\s+)(' + res_jfpatch_filters + ')', 'i'), token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Name|Task)(\s*:\s*|\s+)(.+)/i, token: ['none', 'def', 'none', 'string']},
+    {regex: /(\s*)(Code)(\s*:\s*|\s+)(.+)/i, token: ['none', 'def', 'none', 'variable']},
+    {regex: /(\s*)(Mask)(\s*:\s*|\s+)([0-9]+|&[a-fA-F0-9]+|%[01]+)/i, token: ['none', 'def', 'none', 'number']},
+    {regex: new RegExp('(\\s+)(Accept)(\\s*:\\s*|\\s+)(' + res_jfpatch_filters + ')', 'i'), token: ['none', 'def', 'none', 'string']},
 
     // Not recognised, so show as an error
     {regex: /.*/, token: 'error'},
