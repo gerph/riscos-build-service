@@ -152,7 +152,7 @@ versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc
 
 ${DESTDIR}/examples/%: jfpatch-as-a-service-examples/jfpatch-files/%
-	cp $? $@
+	cp -R $? $@
 
 ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howitworks.png diagrams/howitworks.svg
 	cp diagrams/howitworks.png ${DESTDIR}/images/howitworks.png
@@ -172,13 +172,12 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Thursday 26-Mar-2020 13:09:39
+# dependencies updated: Monday 30-Mar-2020 20:48:21
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/index.html ../dest/about.html \
-    ../dest/notfound.html ../dest/history.html \
-    ../dest/codemirror-examples-objasm.html \
-    ../dest/codemirror-examples-bbcbasic.html
+    ../dest/notfound.html ../dest/codemirror-examples-objasm.html \
+    ../dest/codemirror-examples-bbcbasic.html ../dest/history.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
@@ -192,13 +191,13 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 
 ../dest/notfound.html : notfound.hsc ../macros.hsc
 
-../dest/history.html : history.hsc ../macros.hsc versions.hsc
-
 ../dest/codemirror-examples-objasm.html : codemirror-examples-objasm.hsc \
     ../macros.hsc
 
 ../dest/codemirror-examples-bbcbasic.html : \
     codemirror-examples-bbcbasic.hsc ../macros.hsc
+
+../dest/history.html : history.hsc ../macros.hsc versions.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

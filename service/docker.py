@@ -102,6 +102,7 @@ class DockerStreamed(Docker):
 
     def run(self):
         args = self.get_command()
+        #print("Running command: %s" % (' '.join('"{}"'.format(arg) for arg in args),))
         self.stream = streamedinput.ThreadedStreamedInput(args, shell=False, keep_stderr=True,
                                                           data_function=self.data_function,
                                                           complete_function=self.complete_function)

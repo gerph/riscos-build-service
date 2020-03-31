@@ -288,9 +288,9 @@ class RISCOSSource(object):
                         makefile = name
                     else:
                         if filetype in BUILDABLE_FILETYPES:
-                            buildables.append((name, filetype))
+                            buildables.append(name)
                         elif name.filetype in BUILDABLE_FILETYPES:
-                            buildables.append((name, filetype))
+                            buildables.append(name)
 
                     files.append(name)
                     touch(absfile, (epoch_time, epoch_time))
@@ -305,7 +305,7 @@ class RISCOSSource(object):
 
         # Touch all the buildable files so that they have a later timestamp than
         # any of the other files - then they should be built by amu.
-        for name, filetype in buildables:
+        for name in buildables:
             filename = os.path.join(self.dir, name.unix_filename)
             if os.path.exists(filename):
                 touch(filename)
