@@ -47,6 +47,7 @@
 
       // Connect to Web Socket
       debug("connect websocket");
+      //server = "ws://" + window.location.hostname + ":13254/ws";
       server = "ws://jfpatch.riscos.online/ws";
       if (window.location.protocol == "https:")
         server = server.replace('ws:', 'wss:')
@@ -280,16 +281,19 @@
     }
 
     // Example documents
-    function example_fetch(example_path, callback) {
+    function example_fetch(example_path, type, callback) {
         var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
+        xobj.responseType = type;
         xobj.open('GET', 'examples/' + example_path, true);
 
         xobj.onreadystatechange = function() {
             if (xobj.readyState === 4 && xobj.status === 200) {
                 // Required use of an anonymous callback
                 // as .open() will NOT return a value but simply returns undefined in asynchronous mode
-                data = xobj.responseText;
+                if (xobj.responseType == 'text')
+                    data = xobj.responseText;
+                else
+                    data = xobj.response;
                 callback(data);
             }
         };
@@ -298,7 +302,7 @@
 
     // Load the example data and call the callback function when it arrives.
     function examples_loaddata(callback) {
-        example_fetch('examples.json', function(data) {
+        example_fetch('examples.json', "text", function(data) {
             callback(JSON.parse(data));
         });
     }
@@ -309,7 +313,6 @@
 
         examples_loaddata(function(data) {
             // Called when the example data has loaded
-            console.log("Got JSON data: " + data.toString());
             html = '';
             examples = data['examples']
             for (index=0; index < examples.length; ++index) {
@@ -334,7 +337,8 @@
                 return;
         }
 
-        example_fetch(filename, function(data) {
+        example_fetch(filename, 'arraybuffer', function(data) {
+            data = String.fromCharCode.apply(null, new Uint8Array(data))
             onSourceLoad(data);
         });
         var lmenu = document.getElementById('load-menu-container');
@@ -344,7 +348,7 @@
     // Send the source we've got to the server.
     function send_source() {
         var action = 'source';
-        var message =[action, btoa(source_code)];
+        var message = [action, btoa(source_code)];
         if (!ws)
         {
             show_error("Cannot send source to server; not connected");
