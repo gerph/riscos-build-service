@@ -57,6 +57,9 @@ class Builder(object):
         for config, value in self.pyro_config:
             self.pyro.set_config(config, value)
 
+        # prevent things from running away?
+        self.pyro.timeout = 60 * 5
+
     def prepare_builder(self):
         self.robuilder = robuild.ROBuilder(self.rosource)
         self.result.message("Build tool selected: {}".format(self.robuilder.tool_name))
