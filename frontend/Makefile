@@ -5,6 +5,7 @@ ICON_SIZE = 128
 FILETYPE_SIZE = ${ICON_SIZE}
 COG_SIZE = ${ICON_SIZE}
 BUTTON_SIZE = ${ICON_SIZE}
+LARGE_SIZE = 640
 
 SUPPORT_C = true
 SUPPORT_OBJASM = true
@@ -89,6 +90,7 @@ static: \
  	 	${DESTDIR}/icons/file_xxx.png \
  	 	${DESTDIR}/icons/cog.png \
  	 	${DESTDIR}/icons/patched.png \
+ 	 	${DESTDIR}/icons/patched-large.png \
  	 	${DESTDIR}/icons/information.png \
  	 	${DESTDIR}/icons/load.png \
  	 	${DESTDIR}/icons/create.png \
@@ -107,6 +109,9 @@ ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 
 ${DESTDIR}/icons/%.png: icons/%.svg
 	./make-icon.sh --trim --inset 1 $? $@ ${ICON_SIZE}
+
+${DESTDIR}/icons/%-large.png: icons/%.svg
+	./make-icon.sh --trim --inset 1 $? $@ ${LARGE_SIZE}
 
 ${DESTDIR}/icons/information.png: icons/2119897.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
@@ -138,6 +143,9 @@ ${DESTDIR}/favicon.ico: ${DESTDIR}/icons/patched.png
 
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
 	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@
+
+${DESTDIR}/icons/patched-large.png: ${DESTDIR}/icons/cog-large.png ${DESTDIR}/icons/plaster-large.png
+	convert -size ${LARGE_SIZE}x${LARGE_SIZE} ${DESTDIR}/icons/cog-large.png -gravity center \( ${DESTDIR}/icons/plaster-large.png -resize 85% \) -composite $@
 
 ${DESTDIR}/codemirror/%: codemirror/%
 	cp $? $@

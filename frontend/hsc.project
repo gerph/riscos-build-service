@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 01-Apr-2020 00:06:10
+# updated: 01-Apr-2020 00:09:03
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
@@ -41,19 +41,6 @@ TITLE
 ID header-menu
 ID HELLO
 INCLUDE ../macros.hsc
-DOCUMENT ../dest/history.html
-SOURCE history.hsc
-TITLE 
-ID header-menu
-ID jfpaas
-ID jfpapp
-ID jfpatch
-ID mkmodule
-ID mkws
-ID mkaof
-ID mkmacros
-INCLUDE ../macros.hsc
-INCLUDE versions.hsc
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
 TITLE 
@@ -90,3 +77,16 @@ ID throwback-box
 ID throwback
 ID log
 INCLUDE ../macros.hsc
+DOCUMENT ../dest/history.html
+SOURCE history.hsc
+TITLE 
+ID header-menu
+ID jfpaas
+ID jfpapp
+ID jfpatch
+ID mkmodule
+ID mkws
+ID mkaof
+ID mkmacros
+INCLUDE ../macros.hsc
+INCLUDE versions.hsc
