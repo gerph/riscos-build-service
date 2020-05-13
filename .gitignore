@@ -4,6 +4,8 @@ ci-logs/
 
 # Downloaded resources
 riscos-build/
+crosscompile/riscos/
+crosscompile/pyromaniac/
 
 # Service temporary files
 *.pyc

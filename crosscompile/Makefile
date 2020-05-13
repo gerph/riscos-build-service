@@ -12,6 +12,6 @@ docker: prepare
 
 prepare: dirs
 clean:
-	-rm -rf "${WORKDIR}"
+	-rm -rf pyromaniac riscos
 
 dirs:
