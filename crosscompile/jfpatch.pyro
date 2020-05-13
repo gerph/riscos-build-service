@@ -21,6 +21,7 @@ modules:
     - fs/modules/BASIC,ffa
     - fs/modules/SCL,ffa
     - fs/modules/FPEmulator,ffa
+    - fs/modules/Obey,ffa
 
 variables:
   #'Alias$FX': '||'
