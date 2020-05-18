@@ -21,7 +21,7 @@ import result
 
 
 class Builder(object):
-    docker_image = 'gerph/jfpatch'
+    docker_image = 'gerph/robuild-service'
     docker_workdir = '/home/riscos'
     docker_mountdir = '{}/fs/work'.format(docker_workdir)
     pyro_configfile = 'jfpatch.pyro'
@@ -140,7 +140,7 @@ class BuilderStream(Builder):
                 if '\n' in data:
                     (before_newline, after_newline) = data.rsplit('\n', 1)
                     output_accumulator.extend([before_newline, '\n'])
-                    self.callback_function(code=code, data=''.join(output_accumulator))
+                    self.callback_function(code='output', data=''.join(output_accumulator))
                     if after_newline:
                         output_accumulator = [after_newline]
                     else:
@@ -149,8 +149,9 @@ class BuilderStream(Builder):
                     output_accumulator.append(data)
                 continue
             else:
+                # Not an output, but something else has happened, so flush the accumulator
                 if output_accumulator:
-                    self.callback_function(code=code, data=''.join(output_accumulator))
+                    self.callback_function(code='output', data=''.join(output_accumulator))
                     output_accumulator = []
             if code == 'heartbeat':
                 continue

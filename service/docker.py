@@ -5,8 +5,9 @@ Interface to a command within Docker.
 
 import os
 import subprocess
-import streamedinput
 import time
+
+import streamedinput
 
 
 try:
