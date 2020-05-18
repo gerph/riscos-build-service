@@ -13,6 +13,14 @@ import zipfile
 
 import roname
 from rofiletypes import *
+import rozipinfo
+
+
+try:
+    unicode
+except NameError:
+    # Python 3, make unicode the str type
+    unicode = str
 
 
 # Files with these extensions will be flipped to put the files into subdirectories
@@ -236,39 +244,26 @@ class RISCOSSource(object):
             infolist = zh.infolist()
             #zh.printdir()
             for zi in infolist:
+                zi = rozipinfo.ZipInfoRISCOS(zipinfo=zi)
+                # Force the use of the NFS encoded filenames
+                zi.riscos_filename = zi.riscos_filename
+
                 filename = zi.filename
 
-                # FIXME: Might be wrong - appnote says that it only applies to MSDOS
-                is_dir = (zi.external_attr & 1) or filename.endswith('/')
-                #print("%s : ext %x int %x" % (filename, zi.external_attr, zi.internal_attr))
+                is_dir = (zi.riscos_objtype == 2)
 
-                (year, month, day, hour, minute, second) = zi.date_time
-                epoch_time = calendar.timegm((year, month, day, hour, minute, second))
+                # There was no RISC OS extension, so see if we can translate the filename extension
+                # into RISC OS format.
+                (base, ext) = os.path.splitext(filename)
+                if base and ext in translate_extension:
+                    # Turns foo.c into c/foo
+                    dirname = os.path.dirname(filename)
+                    filename = os.path.join(dirname, ext[1:], base)
 
-                # Filename is always in unix format, but may be missing the filetype if a RISC OS
-                # extension is present.
-                ro_extension = False
-                if zi.extra and not is_dir:
-                    # I'm lazy and will only process a single extra field.
-                    if zi.extra.startswith('AC'):
-                        acorn_block = zi.extra[4:]
-                        if acorn_block[:4] == 'ARC0':
-                            # It's a Spark block
-                            ro_extension = True
-                            (word,) = struct.unpack('<I', acorn_block[4:8])
-                            if word & 0xFFF00000 == 0xFFF00000:
-                                filetype = (word>>8) & 0xFFF
-                                filename += ',%03x' % (filetype,)
-
-                if not ro_extension:
-                    # There was no RISC OS extension, so see if we can translate the filename extension
-                    # into RISC OS format.
-                    (base, ext) = os.path.splitext(filename)
-                    if base and ext in translate_extension:
-                        # Turns foo.c into c/foo
-                        dirname = os.path.dirname(filename)
-                        filename = os.path.join(dirname, ext[1:], base)
-
+                # In Python 2 the filename is a unicode if the UTF-8 flag was set, and a str if not.
+                # In Python 3 the filename is always a unicode.
+                if isinstance(filename, unicode):
+                    filename = filename.encode('utf-8')
                 absfile = self.absfile(filename)
                 if is_dir:
                     if absfile.endswith('/'):
@@ -277,14 +272,16 @@ class RISCOSSource(object):
                         os.makedirs(absfile)
                 else:
                     name = roname.RISCOSName(unix_filename=filename)
-                    with zh.open(zi.filename) as ifh:
+                    with zh.open(zi) as ifh:
                         with open(absfile, 'wb') as ofh:
                             data = ifh.read()
                             ofh.write(data)
 
                     filetype = self.guess_filetype(data=data, unix_filename=name.unix_filename)
                     #print("%r is %03x" % (name, filetype))
-                    if filetype == FILETYPE_AMU or name.filetype == FILETYPE_AMU or os.path.basename(name.unix_filename).upper() == 'MAKEFILE':
+                    if filetype == FILETYPE_AMU or \
+                       name.filetype == FILETYPE_AMU or \
+                       os.path.basename(name.unix_filename).upper() == 'MAKEFILE':
                         makefile = name
                     else:
                         if filetype in BUILDABLE_FILETYPES:
@@ -293,6 +290,8 @@ class RISCOSSource(object):
                             buildables.append(name)
 
                     files.append(name)
+                    dt = rozipinfo.tuple_to_datetime(zi.riscos_date_time)
+                    epoch_time = rozipinfo.datetime_to_epochtime(dt)
                     touch(absfile, (epoch_time, epoch_time))
 
         #print(makefile)

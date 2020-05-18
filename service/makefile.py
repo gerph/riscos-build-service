@@ -526,6 +526,8 @@ class Makefile(object):
         """
         commands = []
         if not goal:
+            if not self.first_target:
+                return commands
             goal = self.first_target.target
 
         rule = self.find_rule(goal)

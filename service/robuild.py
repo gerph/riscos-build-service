@@ -192,7 +192,7 @@ class ROBuilderMakefile(ROBuilderBase):
             # Simple processing, looking at what buildables we have
             need_odirectory = False
             for f in self.source.buildables:
-                if f[1] in AOF_GENERATING:
+                if f.filetype in AOF_GENERATING:
                     need_odirectory = True
 
             if need_odirectory:
