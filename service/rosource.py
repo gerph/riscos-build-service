@@ -68,8 +68,9 @@ class RISCOSSource(object):
         self.shutil = shutil
 
         # Discovered items
-        self.buildables = None
+        self.buildables = []
         self.makefile = None
+        self.files = []
 
     def __repr__(self):
         return "<{}(file={}, filetype={}, #buildables={})>" \
@@ -311,6 +312,7 @@ class RISCOSSource(object):
 
         self.buildables = buildables
         self.makefile = makefile
+        self.files = files
 
         # FIXME: If there are multiple buildables we might be able to construct a makefile for them.
 

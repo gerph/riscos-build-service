@@ -5,6 +5,8 @@ Extract files from a source package ready for building.
 
 import os
 
+import simpleyaml
+
 from rofiletypes import *
 
 import makefile
@@ -44,6 +46,69 @@ class ROBuilderBase(object):
     @property
     def ro_dirname(self):
         return self.source.primary_file.ro_dirname
+
+
+@register_builder
+class ROBuilderYAML(ROBuilderBase):
+    tool_name = 'ROBuild YAML'
+    config_ro_filename = ['/robuild/yaml',
+                          '/robuild/yml',
+                          '/robuild']
+
+    def commands(self):
+        # We can only have one file with this name
+        roname = [roname for roname in self.source.files if roname.ro_filename in self.config_ro_filename][0]
+        config_filename = os.path.join(self.source.dir, roname.unix_filename)
+
+        with open(config_filename, 'r') as fh:
+            config_yaml = simpleyaml.load(fh)
+
+        jobs = config_yaml.get('jobs', None)
+        if not jobs:
+            raise ROBuilderError("ROBuild YAML: Must have a 'jobs' dictionary")
+        if len(jobs) != 1:
+            raise ROBuilderError("ROBuild YAML: Must have a 'jobs' dictionary with only one key")
+
+        config_build_name = jobs.keys()[0]
+        config_build = jobs.values()[0]
+
+        # Environment variables
+        env = config_yaml.get('env', {})
+        if not isinstance(env, dict):
+            raise ROBuilderError("ROBuild YAML: jobs.*.env must be a dictionary")
+
+        # Working directory
+        working_directory = config_yaml.get('dir', None)
+
+        # Script to build
+        script = config_build.get('script', None)
+        if not script:
+            raise ROBuilderError("ROBuild YAML: jobs.*.script must be a list of commands to run")
+
+        if not isinstance(script, list):
+            script = [str(script)]
+
+        # Artifacts to collect
+        artifacts = config_build.get('artifacts', None)
+        if artifacts:
+            if len(artifacts) == 1:
+                raise ROBuilderError("ROBuild YAML: jobs.*.artifacts must be a single path")
+
+        # Now build the commands!
+        commands = []
+        for key, value in sorted(env.items()):
+            commands.append('Set {} {}'.format(key, str(value)))
+
+        if working_directory:
+            commands.append('Dir {}'.format(working_directory))
+
+        for cmd in script:
+            commands.append(cmd)
+
+        return commands
+
+    def recognise(self):
+        return [roname for roname in self.source.files if roname.ro_filename in self.config_ro_filename]
 
 
 class ROBuilderSingleFile(ROBuilderBase):
