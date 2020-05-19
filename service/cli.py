@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 CLI tool for building.
+
+Uses the build module to invoke the build process for either streamed or static interface.
 """
 
 import argparse

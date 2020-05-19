@@ -4,9 +4,9 @@ Storage and communication for the results of a run.
 """
 
 import base64
-import collections
 
 import roname
+
 
 class Clipboard(object):
 

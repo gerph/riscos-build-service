@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 """
 Invoke a RISC OS build on a given file.
+
+Given a source file (or data), build it.
+
+* Loads the file with RISCOSSource.
+* Extracts the content into a temporary directory.
+* Uses the ROBuilder to determine what should be run.
+* Sets up a PyroServer for the RISC OS commands and the HTTP server environment.
+* Uses the PyroServer tool command line to pass to the Docker environment.
+* Uses the docker module to start the job.
+* Returns the results through callbacks and the results object.
 """
 
 import threading
-import time
 
 try:
     # Python 2 has Queue with a capital

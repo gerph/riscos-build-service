@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 """
-Extract files from a source package ready for building.
+Decide how to build sources on RISC OS.
+
+Uses the RISCOSSource information to decide how the source should be built within RISC OS.
+
+* Each builder will determine whether it can build using the RISCOSSource supplied.
+* ROBuild YAML will be parsed through the SimpleYAML parser.
+* Makefiles will be parsed by the makefile module.
 """
 
 import os

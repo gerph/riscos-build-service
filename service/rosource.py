@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 """
-RISC OS/Unix filename convention conversions.
+Extract files from a source package ready for building.
+
+Given a file, extracts any content and determines what RISC OS buildable files are present.
+
+* Takes the file and puts it in a temporary directory.
+* If the file is a zip archive, extracts the contents
+* Using the rozipinfo to extract RISC OS data from the zip.
 """
 
-import calendar
 import os
 import shutil
-import struct
 import tempfile
-import time
 import zipfile
 
 import roname
@@ -68,7 +71,7 @@ class RISCOSSource(object):
         self.shutil = shutil
 
         # Discovered items
-        self.buildables = []
+        self.buildables = None
         self.makefile = None
         self.files = []
 
