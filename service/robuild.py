@@ -9,12 +9,16 @@ Uses the RISCOSSource information to decide how the source should be built withi
 * Makefiles will be parsed by the makefile module.
 """
 
+import io
 import os
+import zipfile
 
 from rofiletypes import *
 
 import makefile
 import robuildyaml
+from roname import RISCOSName
+import rozipinfo
 
 
 builder_classes = []
@@ -40,6 +44,14 @@ class ROBuilderBase(object):
     def commands(self):
         raise NotImplementedError("{}.commands is not implemented".format(self.__class__.__name__))
 
+    def collect_artifact(self):
+        """
+        Collect any artifacts from the output.
+
+        @return:    tuple of (data, filetype), or (None, None) if no data present
+        """
+        return (None, None)
+
     @property
     def ro_filename(self):
         return self.source.primary_file.ro_filename
@@ -59,6 +71,7 @@ class ROBuilderYAML(ROBuilderBase):
     config_ro_filename = ['/robuild/yaml',
                           '/robuild/yml',
                           '/robuild']
+    roby = None
 
     def commands(self):
         # We can only have one file with this name
@@ -66,6 +79,8 @@ class ROBuilderYAML(ROBuilderBase):
         config_filename = os.path.join(self.source.dir, roname.unix_filename)
 
         roby = robuildyaml.ROBuildYAML(config_filename)
+
+        self.roby = roby
 
         # Now build the commands!
         job = roby.jobs[0]
@@ -84,6 +99,42 @@ class ROBuilderYAML(ROBuilderBase):
 
     def recognise(self):
         return [roname for roname in self.source.files if roname.ro_filename in self.config_ro_filename]
+
+    def collect_artifact(self):
+        artifacts = self.roby.jobs[0].artifacts
+        if not artifacts:
+            return (None, None)
+
+        ro_filename = artifacts[0].path
+        roname = RISCOSName(ro_filename)
+        # FIXME: We only support zipping the contents of a directory at present
+        ofh = io.BytesIO()
+        artifact_dir = os.path.join(self.source.dir, roname.unix_filename)
+
+        with zipfile.ZipFile(ofh, 'w') as zh:
+            for path, dirname, filenames in os.walk(artifact_dir):
+                p = os.path.relpath(path, artifact_dir) + '/'
+                if p.startswith('./'):
+                    p = p[2:]
+
+                for d in dirname:
+                    fn = '{}{}/'.format(p, d)
+                    dfn = os.path.join(path, d)
+                    zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
+                    zi.nfs_encoding = False
+                    zh.writestr(zi, b'')
+                    #print("Add dir: %s%s/" % (p, d))
+
+                for f in filenames:
+                    fn = '{}{}'.format(p, f)
+                    dfn = os.path.join(path, f)
+                    zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
+                    zi.nfs_encoding = False
+                    with open(dfn) as fh:
+                        zh.writestr(zi, fh.read())
+                    #print("Add file: %s%s" % (p, f))
+
+        return (ofh.getvalue(), FILETYPE_ZIP)
 
 
 class ROBuilderSingleFile(ROBuilderBase):

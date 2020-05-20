@@ -97,6 +97,13 @@ class Builder(object):
             print("Failed to stop server? - {}".format(exc))
             # And fall through
 
+        if rc == 0:
+            # All was well; see if there's any artifact to pick up
+            (artifact_data, artifact_filetype) = self.robuilder.collect_artifact()
+            if artifact_data:
+                #print("Got artifact: %03x" % (artifact_filetype,))
+                self.result.clipboard_received(artifact_data, artifact_filetype)
+
         self.result.set_rc(rc)
         self.result.message("Return code: {}".format(rc))
         return rc

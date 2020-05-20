@@ -23,7 +23,7 @@ The `jobs` dictionary may contain the following keys:
       exist at present.
 
 The `artifacts` list items are a dictionary describing how they artifacts are to be
-handled (Not currently implemented):
+handled:
 
     * `path`: Declares the path which will be archived.
 """
@@ -90,7 +90,7 @@ class ROBYJob(object):
         # Artifacts to collect
         artifacts = job_yaml.get('artifacts', None)
         if artifacts:
-            if len(artifacts) == 1:
+            if len(artifacts) != 1:
                 raise ROBuildYAMLError("ROBuild YAML: jobs.*.artifacts must be a single path")
 
         self.artifacts = []
