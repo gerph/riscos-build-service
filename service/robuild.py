@@ -68,9 +68,11 @@ class ROBuilderBase(object):
 @register_builder
 class ROBuilderYAML(ROBuilderBase):
     tool_name = 'ROBuild YAML'
-    config_ro_filename = ['/robuild/yaml',
-                          '/robuild/yml',
-                          '/robuild']
+    config_ro_filename = [
+            '/robuild/yaml',
+            '/robuild/yml',
+            '/robuild',
+        ]
     roby = None
 
     def commands(self):

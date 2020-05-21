@@ -296,7 +296,7 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
                 if field != 'extra':
                     setattr(self, field, getattr(zipinfo, field, None))
             # Always populate the extra field last, as this modifies the existing fields
-            # based on what the RISC OS extra field contains
+            # based on what the RISC OS extra field contains.
             self.extra = zipinfo.extra
 
         self._nfs_encoding = nfs_encoding
@@ -348,12 +348,18 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
                 if riscos_type == self.header_id_riscos_spark:
                     riscos_index = index
 
-        # We either have the index we need to modify, OR we know that we need to append it.
-        new_data = struct.pack('<IIII', self.riscos_loadaddr, self.riscos_execaddr, self.riscos_attr, 0)
-        if riscos_index is None:
-            chunks.append((self.header_id_riscos, new_data))
+        if self.nfs_encoding:
+            # We don't want the RISC OS information present, so we need to strip it from the fields.
+            if riscos_index is not None:
+                del chunks[riscos_index]
+
         else:
-            chunks[riscos_index] = (self.header_id_riscos, new_data)
+            # We're using RISC OS encoding, so add or modify the existing field
+            new_data = struct.pack('<IIIII', self.header_id_riscos_spark, self.riscos_loadaddr, self.riscos_execaddr, self.riscos_attr, 0)
+            if riscos_index is None:
+                chunks.append((self.header_id_riscos, new_data))
+            else:
+                chunks[riscos_index] = (self.header_id_riscos, new_data)
 
         value = self.build_extra_fields(chunks)
 
@@ -379,8 +385,8 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
         #   0x30435241  SparkFS information (20 bytes)
         #
         # Format 0x30435241 ('ARC0') data:
-        #   4 bytes: exec address (little endian)
         #   4 bytes: load address (little endian)
+        #   4 bytes: exec address (little endian)
         #   4 bytes: attributes (little endian)
         #   4 bytes: reserved for future expansion, 0 on write (little endian)
 
@@ -391,6 +397,11 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
                 (riscos_type,) = struct.unpack('<I', data[:4])
                 if riscos_type == self.header_id_riscos_spark:
                     (loadaddr, execaddr, attr, zero) = struct.unpack('<IIII', data[4:])
+                    if self.riscos_objtype == 2:
+                        # If this is a directory, the load address is ALWAYS a timestamp; so we flag it as
+                        # such. Some archives are written with all 0s in the upper 24 bits of the word.
+                        loadaddr &= 0xFF
+                        loadaddr |= 0xFFF00000 | (self.directory_filetype_internal << 8)
                     self.riscos_loadaddr = loadaddr
                     self.riscos_execaddr = execaddr
                     self.riscos_attr = attr
@@ -727,11 +738,18 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
             (name, loadaddr, execaddr, filetype) = self.extract_nfs_encoding(self.filename)
             self._nfs_encoding = bool(value)
             if not self._nfs_encoding:
-                self.riscos_filename = name
+                # We have a unix name, so we can now explicitly clear the RISC OS filename to use that.
+                self.filename = name
+                self._riscos_filename = None
                 if loadaddr:
-                    self.riscos_loadaddr = loadaddr
-                    self.riscos_execaddr = execaddr
-                if filetype:
+                    self._riscos_loadaddr = loadaddr
+                    self._riscos_execaddr = execaddr
+                    self._riscos_filetype = None
+                    self._riscos_present = True
+                elif filetype:
+                    # Unless the extract_nfs_encoding is overridden, this should not happen.
+                    self._riscos_loadaddr = None
+                    self._riscos_execaddr = None
                     self.riscos_filetype = filetype
 
     ################ Filename
@@ -826,6 +844,8 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
                 else:
                     loadaddr = (self._riscos_loadaddr & 0xFFF000FF) | (self.riscos_filetype << 8)
                 return loadaddr
+            else:
+                return self._riscos_loadaddr
 
         if self.riscos_objtype == 1:
             # No load address given explicitly, so try to extract from NFS naming
@@ -843,11 +863,9 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
 
     @riscos_loadaddr.setter
     def riscos_loadaddr(self, value):
+        #print("Set loadaddr: %s, %08x" % (value, value))
         self._riscos_loadaddr = value
-
-        if self.riscos_objtype == 1:
-            # If this is a file, we can clear the filetype
-            self._riscos_filetype = None
+        self._riscos_filetype = None
         self._update_date_time()
 
         self._riscos_present = True
@@ -944,11 +962,11 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
     @property
     def riscos_filetype(self):
         # Convert information to RISC OS file type
-        if self._riscos_filetype is not None:
-            return self._riscos_filetype
-
         if self.riscos_objtype == 2:
             return self.directory_filetype
+
+        if self._riscos_filetype is not None:
+            return self._riscos_filetype
 
         # No filetype currently set, so we'll infer one.
         if self.nfs_encoding:
