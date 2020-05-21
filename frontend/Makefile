@@ -84,6 +84,7 @@ static: \
  	 	${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/site.css \
  	 	${DESTDIR}/favicon.ico \
+ 	 	${DESTDIR}/icons/file_a91.png \
  	 	${DESTDIR}/icons/file_ff8.png \
  	 	${DESTDIR}/icons/file_ffa.png \
  	 	${DESTDIR}/icons/file_ffc.png \
@@ -180,20 +181,19 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Monday 30-Mar-2020 20:48:21
+# dependencies updated: Thursday 21-May-2020 14:07:20
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
-    ../dest/fileformat.html ../dest/index.html ../dest/about.html \
-    ../dest/notfound.html ../dest/codemirror-examples-objasm.html \
-    ../dest/codemirror-examples-bbcbasic.html ../dest/history.html
+    ../dest/fileformat.html ../dest/about.html ../dest/notfound.html \
+    ../dest/codemirror-examples-objasm.html \
+    ../dest/codemirror-examples-bbcbasic.html ../dest/history.html \
+    ../dest/index.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
 ../dest/codemirror-examples.html : codemirror-examples.hsc ../macros.hsc
 
 ../dest/fileformat.html : fileformat.hsc ../macros.hsc
-
-../dest/index.html : index.hsc ../macros.hsc
 
 ../dest/about.html : about.hsc ../macros.hsc
 
@@ -206,6 +206,8 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     codemirror-examples-bbcbasic.hsc ../macros.hsc
 
 ../dest/history.html : history.hsc ../macros.hsc versions.hsc
+
+../dest/index.html : index.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

@@ -26,11 +26,17 @@
             0xFFC: 'Utility',
             0xFFA: 'Module',
             0xFF8: 'Absolute',
+            0xA91: 'Zip',
+        };
+    // Extensions and media types to override certain types
+    var filetype_extensions = {
+            0xA91: ['zip', 'application/zip'],
         };
     var filetype_icons = {
             0xFFC: 'icons/file_ffc.png',
             0xFFA: 'icons/file_ffa.png',
             0xFF8: 'icons/file_ff8.png',
+            0xA91: 'icons/file_a91.png',
         };
     var filetype_unknown = 'icons/file_xxx.png';
 
@@ -47,8 +53,8 @@
 
       // Connect to Web Socket
       debug("connect websocket");
-      //server = "ws://" + window.location.hostname + ":13254/ws";
-      server = "ws://jfpatch.riscos.online/ws";
+      server = "ws://" + window.location.hostname + ":13254/ws";
+      //server = "ws://jfpatch.riscos.online/ws";
       if (window.location.protocol == "https:")
         server = server.replace('ws:', 'wss:')
 
@@ -185,9 +191,17 @@
     }
 
     function onDownload() {
-        save('built,' + clipboard_filetype.toString(16),
+        var name = 'built,' + clipboard_filetype.toString(16)
+        var mediatype = 'application/riscos'
+        // If there's an override extension for this filetype, use it.
+        if (filetype_extensions.hasOwnProperty(clipboard_filetype))
+        {
+            name = 'built.' + filetype_extensions[clipboard_filetype][0]
+            mediatype = filetype_extensions[clipboard_filetype][1]
+        }
+        save(name,
              clipboard_data,
-             'application/riscos')
+             mediatype)
     }
 
     function onSourceChange() {
