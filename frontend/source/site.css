@@ -567,7 +567,7 @@ li {
     margin-top: 0.75em;
 }
 
-div.jfpatch {
+div.jfpatch, div.yaml {
     margin: 0.25em 1em 0.25em 1em;
     padding: 0.25em 0.25em 0.25em 0.25em;
     background-color: black;

@@ -53,8 +53,8 @@
 
       // Connect to Web Socket
       debug("connect websocket");
-      server = "ws://" + window.location.hostname + ":13254/ws";
-      //server = "ws://jfpatch.riscos.online/ws";
+      //server = "ws://" + window.location.hostname + ":13254/ws";
+      server = "ws://jfpatch.riscos.online/ws";
       if (window.location.protocol == "https:")
         server = server.replace('ws:', 'wss:')
 

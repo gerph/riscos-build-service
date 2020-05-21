@@ -7,6 +7,7 @@
     <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
     <script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
     <script src="codemirror/mode/jfpatch.js" type='text/javascript'></script>
+    <script src="codemirror/mode/yaml.js" type='text/javascript'></script>
     <$if COND=(set SUPPORT_C)>
     <script src="codemirror/mode/clike.js" type='text/javascript'></script>
     <$stripws type="prev"></$if>
@@ -45,8 +46,9 @@ function toggle_header_menu() {
     <a href="#" onclick="toggle_header_menu()"><img src='icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>
         <li><a href=':index.html'>Home</a></li>
-        <li><a href=':fileformat.html'>File Format</a></li>
+        <li><a href=':fileformat.html'>JFPatch File Format</a></li>
         <li><a href=':api.html'>API documentation</a></li>
+        <li><a href=':robuildyaml.html'>Build configuration</a></li>
         <li><a href=':about.html'>About</a></li>
         <li><a href=':history.html'>History</a></li>
     </ul>
@@ -114,6 +116,12 @@ function toggle_header_menu() {
 <$macro jfpatch /CLOSE>
 <div class='jfpatch'>
     <textarea class='source-code jfpatch' readonly><$content><$stripws type=both></textarea>
+</div>
+</$macro>
+
+<$macro yaml /CLOSE>
+<div class='yaml'>
+    <textarea class='source-code yaml' readonly><$content><$stripws type=both></textarea>
 </div>
 </$macro>
 

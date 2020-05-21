@@ -54,7 +54,7 @@ If <code>-</code>, no input file will be used.<br/>
 If preceeded by <code>*</code>, the module whose name is given will be
 extracted from memory and processed.</param>
 
-<param name='OUT' required>Output file (ignored if output is AOF and file is in j directory)</param>
+<param name='OUT' required>Output file (ignored if TYPE is AOF and file is in j directory)</param>
 
 <param name='TYPE' required>Type of file to generated. Values which may be supplied:
     <param-list label="Type name">

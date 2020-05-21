@@ -42,6 +42,7 @@ CODEMIRROR = ${DESTDIR}/codemirror/lib/codemirror.js \
              ${DESTDIR}/codemirror/theme/liquibyte.css \
              ${DESTDIR}/codemirror/addon/mode/simple.js \
              ${DESTDIR}/codemirror/mode/jfpatch.js \
+             ${DESTDIR}/codemirror/mode/yaml.js \
              ${DESTDIR}/colouring.js \
 
 ifeq (${SUPPORT_C}, true)
@@ -181,13 +182,13 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Thursday 21-May-2020 14:07:20
+# dependencies updated: Thursday 21-May-2020 20:42:49
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/about.html ../dest/notfound.html \
     ../dest/codemirror-examples-objasm.html \
     ../dest/codemirror-examples-bbcbasic.html ../dest/history.html \
-    ../dest/index.html
+    ../dest/index.html ../dest/robuildyaml.html
 
 ../dest/api.html : api.hsc ../macros.hsc
 
@@ -208,6 +209,8 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 ../dest/history.html : history.hsc ../macros.hsc versions.hsc
 
 ../dest/index.html : index.hsc ../macros.hsc
+
+../dest/robuildyaml.html : robuildyaml.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 
