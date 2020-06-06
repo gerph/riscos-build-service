@@ -14,7 +14,11 @@ import build
 import json_funcs
 
 VERSION = '1.04'
-NAME = 'Linking over Internet with RISCOS Pyromaniac Agent'
+NAME = 'RISC OS Build system'
+
+
+# How long we'll allow things to run
+MAX_RUNTIME = 600
 
 
 class HarnessStream(object):
@@ -49,7 +53,7 @@ class HarnessStream(object):
             self.builder.load()
             self.builder.prepare_builder()
             self.builder.prepare_pyro()
-
+            self.builder.pyro.timeout = MAX_RUNTIME
             if self.debug:
                 for debug in self.debug.split(','):
                     self.builder.pyro.add_debug(debug)

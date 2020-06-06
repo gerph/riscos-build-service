@@ -11,6 +11,7 @@ Uses the RISCOSSource information to decide how the source should be built withi
 
 import io
 import os
+import traceback
 import zipfile
 
 from rofiletypes import *
@@ -280,6 +281,7 @@ class ROBuilderMakefile(ROBuilderBase):
                     needed_directories |= set([target_dir])
 
         except Exception as exc:
+            #traceback.print_exc()
             print("Failed to read Makefile: {}".format(exc))
 
             # Simple processing, looking at what buildables we have

@@ -41,7 +41,12 @@ import json_funcs
 
 
 # How long we'll allow things to run
-MAX_RUNTIME = 60
+MAX_RUNTIME = 600
+
+
+@app.route('/ping')
+def url_ping():
+    return 'OK'
 
 
 @app.route('/build/<format>', methods=['POST'])
@@ -139,4 +144,4 @@ if __name__ == "__main__":
     debug = True
     host = '0.0.0.0'
     port = 13255
-    app.run(debug=True, host=host, port=port)
+    app.run(debug=True, host=host, port=port, threaded=True)
