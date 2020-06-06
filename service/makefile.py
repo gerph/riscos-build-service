@@ -142,7 +142,7 @@ class Target(CommandAccumulator):
 
     def merge(self, other):
         self.dependencies.extend(other.dependencies)
-        self.commands.append(other.commands)
+        self.commands.extend(other.commands)
         return self
 
 
@@ -536,7 +536,8 @@ class Makefile(object):
 
         dependencies = rule.dependencies
         for dependency in dependencies:
-            commands.extend(self.target_commands(goal=dependency))
+            dependency_commands = self.target_commands(goal=dependency)
+            commands.extend(dependency_commands)
 
         for command in rule.commands:
             expansion = self.expand(command, rule.variables)
