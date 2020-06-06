@@ -150,5 +150,5 @@ class RISCOSName(object):
             # These should not happen with the extracted zip files
             leafname = self.ro_filename
         else:
-            leafname = '@'
+            leafname = self.ro_filename
         return leafname
