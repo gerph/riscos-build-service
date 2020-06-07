@@ -275,6 +275,9 @@ class RISCOSSource(object):
                     if not os.path.isdir(absfile):
                         os.makedirs(absfile)
                 else:
+                    parent = os.path.dirname(absfile)
+                    if not os.path.isdir(parent):
+                        os.makedirs(parent)
                     name = roname.RISCOSName(unix_filename=filename)
                     with zh.open(zi) as ifh:
                         with open(absfile, 'wb') as ofh:
