@@ -14,6 +14,7 @@ config:
   filesystem.native_directory: fs
   input.eof_effect: exit
   vdu.implementation: ansitext
+  VDUANSIText.support_primarybold: no
 
 modules:
   internal: true
