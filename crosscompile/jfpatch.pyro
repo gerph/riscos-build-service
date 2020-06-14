@@ -25,19 +25,19 @@ modules:
     - fs/modules/Obey,ffa
 
 variables:
-  #'Alias$FX': '||'
-  #'Alias$If': '||'
-  #'Alias$Cdir': '||'
-  #'Alias$Unset': '||echo *Unset '
-  #'Alias$Set': '||echo *Set '
   'Alias$WimpSlot': '||'
   'JFPatch$ScrapDir': '$.tmp'
   'JFPatch$Dir': '$.!JFPatch'
-  'C$Path': $.dev.
-
-#debug:
-#  - envcalls
-#  - exceptions
+  'Lib$Dir': '$.Libs.C'
+  'C$Path': '|<Lib$Dir>.CLib.,|<Lib$Dir>.Interface.,|<Lib$Dir>.'
+  'Hdr$Path': '$.Libs.Hdr.Global.,$.Libs.Hdr.Interface.'
+  'RISCOSLib$Path': '|<Lib$Dir>.RISCOSLib.'
+  'RISC_OSLib$Path': '|<Lib$Dir>.RISCOSLib.'
+  'OSLib$Dir': '|<Lib$Dir>.OSLib'
+  'OS$Path': '|<OSLib$Dir>.,|<OSLib$Dir>.Core.,|<OSLib$Dir>.Computer.,|<OSLib$Dir>.User.,|<OSLib$Dir>.Toolbox.'
+  'TCPIPLibs$Path': '|<Lib$Dir>.TCPIPLibs.'
+  'TBox$Path': '|<Lib$Dir>.TBoxLibs.'
+  'Makefiles$Path': '$.Libs.Makefiles.'
 
 execute:
   - command: lib Library

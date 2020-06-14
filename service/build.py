@@ -38,7 +38,7 @@ class Builder(object):
             ('trace.watch_lowvectors', False),
         ]
 
-    def __init__(self, sourcefile=None, data=None):
+    def __init__(self, sourcefile=None, data=None, timeout=(60 * 10)):
         self.sourcefile = sourcefile
         self.data = data
         self.result = result.BuildResultLines()
@@ -46,6 +46,7 @@ class Builder(object):
         self.robuilder = None
         self.pyro = None
         self.docker = None
+        self.timeout = timeout
 
     def load(self, sourcefile=None, data=None):
         if sourcefile:
@@ -67,7 +68,7 @@ class Builder(object):
             self.pyro.set_config(config, value)
 
         # prevent things from running away?
-        self.pyro.timeout = 60 * 5
+        self.pyro.timeout = self.timeout
 
     def prepare_builder(self):
         self.robuilder = robuild.ROBuilder(self.rosource)

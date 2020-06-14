@@ -22,6 +22,8 @@ def setup_parser():
                         help="Use the streaming interface")
     parser.add_argument('--output', type=str, default=None,
                         help="File to write the clipboard output to")
+    parser.add_argument('--timeout', type=int, default=(60 * 10),
+                        help="Number of seconds to timeout")
 
     return parser
 
@@ -55,9 +57,9 @@ options = parser.parse_args()
 builder = None
 try:
     if options.stream:
-        builder = build.BuilderStream(options.source, callback_function=stream_callback)
+        builder = build.BuilderStream(options.source, callback_function=stream_callback, timeout=options.timeout)
     else:
-        builder = build.Builder(options.source)
+        builder = build.Builder(options.source, timeout=options.timeout)
 
     builder.load()
     builder.prepare_builder()

@@ -29,16 +29,26 @@ RUN /pyromaniac/pyro --version
 
 # Add user we're going to run under (without a password)
 RUN adduser riscos
-RUN mkdir -p /home/riscos/fs /home/riscos/fs/tmp /home/riscos/fs/sources/o /home/riscos/fs/sources/h && \
+RUN mkdir -p /home/riscos/fs /home/riscos/fs/tmp && \
     chown -R riscos:riscos /home/riscos/fs
 
 
 #### Add RISC OS build environment
-# FIXME: We only import the C libs right now - no assembler headers, etc.
-ADD --chown=riscos:riscos riscos/build/Lib/CLib /home/riscos/fs/dev
-# FIXME: Makefiles aren't being used just yet
+# C headers
+ADD --chown=riscos:riscos riscos/build/C /home/riscos/fs/Libs/C/Interface
+ADD --chown=riscos:riscos riscos/build/Lib/CLib /home/riscos/fs/Libs/C/CLib
+ADD --chown=riscos:riscos riscos/build/Lib/Fortify /home/riscos/fs/Libs/C/Fortify
+ADD --chown=riscos:riscos riscos/build/Lib/Asm /home/riscos/fs/Libs/C/Asm
+ADD --chown=riscos:riscos riscos/build/Lib/GetOpt /home/riscos/fs/Libs/C/GetOpt
+ADD --chown=riscos:riscos riscos/build/Lib/tboxlibs /home/riscos/fs/Libs/C/TBoxLibs
+ADD --chown=riscos:riscos riscos/build/Lib/RISC_OSLib /home/riscos/fs/Libs/C/RISC_OSLib
+ADD --chown=riscos:riscos riscos/build/Lib/OSLib /home/riscos/fs/Libs/C/OSLib
+ADD --chown=riscos:riscos riscos/build/Lib/TCPIPLibs /home/riscos/fs/Libs/C/TCPIPLibs
+ADD --chown=riscos:riscos riscos/build/Hdr/Global /home/riscos/fs/Libs/Hdr/Global
+ADD --chown=riscos:riscos riscos/build/Hdr/Interface /home/riscos/fs/Libs/Hdr/Interface
+# Makefiles
+ADD --chown=riscos:riscos riscos/build/Makefiles /home/riscos/fs/Libs/Makefiles
 
-# FIXME: We haven't actually got the RISC OS build tools in Artifactory yet, it seems.
 #ADD --chown=riscos:riscos riscos-tools /home/riscos/fs/Library
 
 ADD --chown=riscos:riscos riscos/tools/CMunge,ff8 \
@@ -77,7 +87,7 @@ ADD --chown=riscos:riscos riscos/tools/CMunge,ff8 \
 
 #### P2C libraries
 # FIXME: Get these from artifactory.
-ADD --chown=riscos:riscos p2c/libs /home/riscos/fs/dev/p2c
+ADD --chown=riscos:riscos p2c/libs /home/riscos/fs/Libs/p2c
 ADD --chown=riscos:riscos p2c/tools /home/riscos/fs/Library
 
 
