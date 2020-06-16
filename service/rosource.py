@@ -12,6 +12,7 @@ Given a file, extracts any content and determines what RISC OS buildable files a
 import os
 import shutil
 import tempfile
+import time
 import zipfile
 
 import roname
@@ -53,14 +54,13 @@ if not os.path.isdir(tempdir):
 
 
 def touch(fname, times=None):
-    with open(fname, 'a'):
-        os.utime(fname, times)
+    os.utime(fname, times)
 
 
 class RISCOSSource(object):
     dir = None
 
-    def __init__(self, source):
+    def __init__(self, source, touch_buildables=True):
         self.source = source
         self.dir = tempfile.mkdtemp(prefix='robuild', dir=tempdir)
         self.source_file = os.path.join(self.dir, '_source_')
@@ -69,6 +69,7 @@ class RISCOSSource(object):
         self.primary_file = roname.RISCOSName()
         self.content = None
         self.shutil = shutil
+        self.touch_buildables = touch_buildables
 
         # Discovered items
         self.buildables = None
@@ -311,10 +312,11 @@ class RISCOSSource(object):
 
         # Touch all the buildable files so that they have a later timestamp than
         # any of the other files - then they should be built by amu.
-        for name in buildables:
-            filename = os.path.join(self.dir, name.unix_filename)
-            if os.path.exists(filename):
-                touch(filename)
+        if self.touch_buildables:
+            for name in buildables:
+                filename = os.path.join(self.dir, name.unix_filename)
+                if os.path.exists(filename):
+                    touch(filename)
 
         self.buildables = buildables
         self.makefile = makefile
