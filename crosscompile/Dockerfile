@@ -2,18 +2,19 @@ FROM ubuntu:18.04
 
 ENV LANG en_US.UTF-8
 
-RUN echo "Last update: 2020-05-13" && \
-    apt-get update && apt-get install -y bash nano
-
 ##### Set up the tools we need
-RUN apt-get install -y \
+RUN echo "Last update: 2020-06-16" && \
+    apt-get update && apt-get install -y bash nano && \
+    apt-get install -y \
             python \
             python-pip \
-            virtualenv
-RUN pip install --upgrade pip
-RUN pip install capstone \
+            python-virtualenv && \
+    pip install --upgrade pip && \
+    pip install capstone \
                 netifaces && \
-    rm -rf .cache/pip
+    apt-get remove -y build-essential libc6-dev && apt-get autoremove -y && \
+    rm -rf ~/.cache/pip /var/lib/apt/lists
+
 
 
 ##### Install Pyromaniac
@@ -23,13 +24,14 @@ ADD pyromaniac/pyro /pyromaniac/pyro
 ENV PATH="/pyromaniac:$PATH"
 
 # Install all the components into a virtualenv, and ensure that pyromaniac is working
-RUN /pyromaniac/pyro --version
+RUN /pyromaniac/pyro --version && \
+    rm -rf ~/.cache/pip
 
 
 
 # Add user we're going to run under (without a password)
-RUN adduser riscos
-RUN mkdir -p /home/riscos/fs /home/riscos/fs/tmp && \
+RUN adduser riscos && \
+    mkdir -p /home/riscos/fs /home/riscos/fs/tmp && \
     chown -R riscos:riscos /home/riscos/fs
 
 
@@ -98,9 +100,11 @@ ADD --chown=riscos:riscos riscos/modules/*,ffa /home/riscos/fs/modules/
 
 # Create the application and workspace
 RUN mkdir -p /home/riscos/fs/tmp && \
-    chown riscos:riscos /home/riscos/fs/tmp
-RUN mkdir /home/riscos/fs/work && \
+    chown riscos:riscos /home/riscos/fs/tmp && \
+    chmod -R a+rw /home/riscos/fs/tmp && \
+    mkdir /home/riscos/fs/work && \
     chown riscos:riscos /home/riscos/fs/work
+
 ADD --chown=riscos:riscos fs/!JFPatch /home/riscos/fs/!JFPatch
 ADD --chown=riscos:riscos fs/jfpatch,fd1 /home/riscos/fs/Library/jfpatch,fd1
 ADD --chown=riscos:riscos *.pyro /home/riscos/
@@ -111,6 +115,3 @@ ADD --chown=riscos:riscos *.pyro /home/riscos/
 #ADD update/pyro.py /pyromaniac/pyromaniac-resources/pyro.py
 
 ENV PYTHONUNBUFFERED=1
-
-RUN chmod -R a+rw /home/riscos/fs/tmp && \
-    chmod -R a+r /home/riscos/fs
