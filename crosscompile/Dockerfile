@@ -31,7 +31,9 @@ RUN /pyromaniac/pyro --version && \
 
 # Add user we're going to run under (without a password)
 RUN adduser riscos && \
-    mkdir -p /home/riscos/fs /home/riscos/fs/tmp && \
+    mkdir -p /home/riscos/fs/tmp \
+             /home/riscos/fs/Libs/C \
+             /home/riscos/fs/Libs/Hdr && \
     chown -R riscos:riscos /home/riscos/fs
 
 
@@ -89,7 +91,7 @@ ADD --chown=riscos:riscos riscos/tools/CMunge,ff8 \
 
 #### P2C libraries
 # FIXME: Get these from artifactory.
-ADD --chown=riscos:riscos p2c/libs /home/riscos/fs/Libs/p2c
+ADD --chown=riscos:riscos p2c/libs /home/riscos/fs/Libs/C/p2c
 ADD --chown=riscos:riscos p2c/tools /home/riscos/fs/Library
 
 

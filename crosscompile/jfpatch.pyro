@@ -38,6 +38,7 @@ variables:
   'TCPIPLibs$Path': '|<Lib$Dir>.TCPIPLibs.'
   'TBox$Path': '|<Lib$Dir>.TBoxLibs.'
   'Makefiles$Path': '$.Libs.Makefiles.'
+  'Alias$Alias': 'Set Alias$%0 %*1'
 
 execute:
   - command: lib Library
