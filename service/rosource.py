@@ -259,7 +259,7 @@ class RISCOSSource(object):
 
                 # There was no RISC OS extension, so see if we can translate the filename extension
                 # into RISC OS format.
-                (base, ext) = os.path.splitext(filename)
+                (base, ext) = os.path.splitext(os.path.basename(filename))
                 if base and ext in translate_extension:
                     # Turns foo.c into c/foo
                     dirname = os.path.dirname(filename)
