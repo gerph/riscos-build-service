@@ -37,6 +37,7 @@ class HarnessStream(object):
         self.thread = None
         self.server_running = False
         self.timeout = DEFAULT_RUNTIME
+        self.ansitext = True
 
     def set_source(self, source_data):
         self.source_data = source_data
@@ -47,6 +48,7 @@ class HarnessStream(object):
     def get_options(self):
         return {
                 'timeout': self.timeout,
+                'ansitext': self.ansitext,
             }
 
     def set_option(self, option, value):
@@ -57,7 +59,14 @@ class HarnessStream(object):
                value > MAX_RUNTIME or \
                value <= 0:
                 raise OptionError("Option 'timeout' must be a positive number, less than {}".format(MAX_RUNTIME))
+            print("Configured 'timeout' to {}".format(value))
             self.timeout = value
+            return
+
+        if option == 'ansitext':
+            value = bool(value)
+            print("Configured 'ansitext' to {}".format(value))
+            self.ansitext = value
             return
 
         raise OptionError("Option '{}' is not known".format(option))
@@ -78,8 +87,13 @@ class HarnessStream(object):
             self.builder = build.BuilderStream(data=self.source_data, callback_function=self.stream_callback)
             self.builder.load()
             self.builder.prepare_builder()
+            self.builder.timeout = self.timeout
+            if self.ansitext:
+                self.builder.pyro_config.append(('vdu.implementation', 'ansitext'))
+            else:
+                self.builder.pyro_config.append(('vdu.implementation', 'plain'))
+
             self.builder.prepare_pyro()
-            self.builder.pyro.timeout = self.timeout
             if self.debug:
                 for debug in self.debug.split(','):
                     self.builder.pyro.add_debug(debug)
@@ -201,7 +215,7 @@ def received(client, server, message):
 
             try:
                 options = harness.get_options()
-                response("OK", options)
+                response("Options returned", options)
             except OptionError as exc:
                 error("Options failed: {}".format(str(exc)))
 
@@ -213,7 +227,7 @@ def received(client, server, message):
                 try:
                     (option, value) = data
                     harness.set_option(option, value)
-                    response("OK")
+                    response("Option '{}' set".format(option))
 
                 except OptionError as exc:
                     error("Option set failed: {}".format(str(exc)))

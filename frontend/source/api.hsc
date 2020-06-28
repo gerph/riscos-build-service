@@ -199,6 +199,7 @@ The server may send other messages to the client at any time to explain its prog
     The currently supported options are:
     <param-list label="Option">
      <param name='timeout'>Specifies the timeout for the build process in seconds.</param>
+     <param name='ansitext'>Controls whether the ANSI text translation is performed (converts the RISC OS VDU sequences into ANSI terminal control codes). True enables the ANSI text mode (the default), whilst False disables it.</param>
     </param-list>
 </param>
 </param-list>

@@ -34,9 +34,6 @@ class Builder(object):
     docker_workdir = '/home/riscos'
     docker_mountdir = '{}/fs/work'.format(docker_workdir)
     pyro_configfile = 'jfpatch.pyro'
-    pyro_config = [
-            ('trace.watch_lowvectors', False),
-        ]
 
     def __init__(self, sourcefile=None, data=None, timeout=(60 * 10)):
         self.sourcefile = sourcefile
@@ -47,6 +44,9 @@ class Builder(object):
         self.pyro = None
         self.docker = None
         self.timeout = timeout
+        self.pyro_config = [
+                ('trace.watch_lowvectors', False),
+            ]
 
     def load(self, sourcefile=None, data=None):
         if sourcefile:
