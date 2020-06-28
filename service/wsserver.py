@@ -17,8 +17,15 @@ VERSION = '1.04'
 NAME = 'RISC OS Build system'
 
 
-# How long we'll allow things to run
-MAX_RUNTIME = 600
+# Maximum timeout we'll allow things to run for (in seconds)
+MAX_RUNTIME = 30 * 60
+
+# The default timeout (in seconds)
+DEFAULT_RUNTIME = 10 * 60
+
+
+class OptionError(Exception):
+    pass
 
 
 class HarnessStream(object):
@@ -29,12 +36,31 @@ class HarnessStream(object):
         self.debug = None
         self.thread = None
         self.server_running = False
+        self.timeout = DEFAULT_RUNTIME
 
     def set_source(self, source_data):
         self.source_data = source_data
 
     def set_debug(self, debug):
         self.debug = debug
+
+    def get_options(self):
+        return {
+                'timeout': self.timeout,
+            }
+
+    def set_option(self, option, value):
+        # For safety, the 'debug' option isn't externally configurable - it may expose
+        # more about the system than necessary.
+        if option == 'timeout':
+            if not isinstance(value, (int, float)) or \
+               value > MAX_RUNTIME or \
+               value <= 0:
+                raise OptionError("Option 'timeout' must be a positive number, less than {}".format(MAX_RUNTIME))
+            self.timeout = value
+            return
+
+        raise OptionError("Option '{}' is not known".format(option))
 
     def start(self):
         if not self.source_data:
@@ -53,7 +79,7 @@ class HarnessStream(object):
             self.builder.load()
             self.builder.prepare_builder()
             self.builder.prepare_pyro()
-            self.builder.pyro.timeout = MAX_RUNTIME
+            self.builder.pyro.timeout = self.timeout
             if self.debug:
                 for debug in self.debug.split(','):
                     self.builder.pyro.add_debug(debug)
@@ -142,11 +168,13 @@ def received(client, server, message):
             harness.send_message('response', msg)
 
     print("Received message")
+    # For every action that is received, a 'response', or an 'error' must be sent back.
     try:
         action, data = json.loads(message)
         print("  Action: {}".format(action))
 
         if action == 'source':
+            # format: ['source', <base64-data>]
             if harness.server_running:
                 error("Cannot set source. Build is already running")
                 return
@@ -158,11 +186,37 @@ def received(client, server, message):
             response('Source loaded')
 
         elif action == 'build':
+            # format: ['build', <any>]
             if harness.server_running:
                 error("Cannot start build. Build is already running")
                 return
             harness.start()
             response('Started build')
+
+        elif action == 'options':
+            # format: ['options', <any>]
+            if harness.server_running:
+                error("Cannot examine options; build is running")
+                return
+
+            try:
+                options = harness.get_options()
+                response("OK", options)
+            except OptionError as exc:
+                error("Options failed: {}".format(str(exc)))
+
+        elif action == 'option':
+            # format: ['option', [<variable>, <value>]]
+            if not isinstance(data, list) or len(data) != 2:
+                error("Option must be passed a list of two items, a variable and a value")
+            else:
+                try:
+                    (option, value) = data
+                    harness.set_option(option, value)
+                    response("OK")
+
+                except OptionError as exc:
+                    error("Option set failed: {}".format(str(exc)))
 
         else:
             error("Unrecognised action '{}'".format(action))

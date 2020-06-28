@@ -52,6 +52,8 @@ Example usage, together with example JFPatch code, can be found in a <a href="ht
 The HTTP build service allows building of RISC OS binaries through a POST request,
 with the response format selectable through the URI.</p>
 
+<p>The HTTP protocol can be found at <code>https://json.build.riscos.online/</code> and <code>http://json.build.riscos.online/</code>.</p>
+
 <p>
 POST requests are <media-type>application/x-www-form-urlencoded</media-type> with the following parameters:</p>
 
@@ -96,6 +98,8 @@ output from the clipboard.
 
 <h3>Protocol</h3>
 
+<p>The WebSocket protocol can be found at <code>https://build.riscos.online/build/ws</code> and <code>http://build.riscos.online/build/ws</code>.</p>
+
 <p>The server and client communicate through messages. Each message is a JSON encoded list of two
 items.</p>
 
@@ -119,7 +123,7 @@ The server may send other messages to the client at any time to explain its prog
 </param>
 
 <param name='response'>Sent as a successful response to an action from the client.<br/>
-    Data is a string giving an indication of how the action was processed.
+    Data is a string giving an indication of how the action was processed, or a list of a string indicating the action followed by associated data.
 </param>
 
 <param name='error'>Sent as an unsuccessful response to an action from the client.<br/>
@@ -185,6 +189,18 @@ The server may send other messages to the client at any time to explain its prog
 <param name='build'>Requests that the build starts.<br/>
     Data is ignored.
 </param>
+
+<param name='options'>Requests information about the server options.<br/>
+    Data is ignored. The response will include a map of the options supported by the server and their current values (for this session). See the 'option' action, below, for details of the options which are currently supported.
+</param>
+
+<param name='option'>Change the value of an option.<br/>
+    Data is a list containing two items - the option name, and the new value. If the option cannot be changed or its value is invalid an error will be returned.
+    The currently supported options are:
+    <param-list label="Option">
+     <param name='timeout'>Specifies the timeout for the build process in seconds.</param>
+    </param-list>
+</param>
 </param-list>
 </section>
 
@@ -194,7 +210,7 @@ The server may send other messages to the client at any time to explain its prog
 The following examples show the interaction between the client and the WebSocket server.
 
 <$macro message-table /CLOSE title:string/REQUIRED>
-<h3>Exchange for a successful build</h3>
+<h3><(title)></h3>
 <table class='msg-table'>
     <!-- <caption><(title)></caption> -->
     <thead>
