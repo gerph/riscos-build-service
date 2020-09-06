@@ -1,6 +1,0 @@
-Bound checking :
-   if ( r>=x OR r<=y) then something
-
-CMP    r#,#x
-RSBGES rt,r#,#y    ; rt is a temporary
-BGE    something

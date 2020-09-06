@@ -1,8 +1,0 @@
-BCD->Decimal
-r0 = value
-r14 = temporary register
-
-MOV r14,r0,LSR #4 ; temp = high nibble
-SUB r0,r14,LSL #2 ; original -= high * 4
-SUB r0,r14,LSL #1 ; original -= high * 2 (leaving original -= high * 6)
-

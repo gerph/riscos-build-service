@@ -1,7 +1,7 @@
 ---
 
 resources:
-  build/cross-pyromaniac:
+  build/cross/pyromaniac:
     phases: native:install
     version: latest
     path: crosscompile/pyromaniac
@@ -49,3 +49,8 @@ resources:
     phases: native:install
     version: latest
     path: crosscompile/riscos/tools
+
+  app/jfpatch-tool:
+    phases: native:install
+    version: latest
+    path: crosscompile/riscos/jfpatch

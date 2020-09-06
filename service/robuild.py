@@ -170,6 +170,8 @@ class ROBuilderJFPatch(ROBuilderSingleFile):
             args.append('-warnings')
         args.append('-clipboard')
 
+        # Always build in 32bit mode
+        args.extend(['-apcs', '3/32'])
         args.extend(['-in', self.ro_filename])
 
         return [' '.join(args)]

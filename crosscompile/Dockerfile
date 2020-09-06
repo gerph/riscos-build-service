@@ -34,7 +34,8 @@ RUN adduser riscos && \
     mkdir -p /home/riscos/fs/tmp \
              /home/riscos/fs/Libs/C \
              /home/riscos/fs/Libs/Hdr && \
-    chown -R riscos:riscos /home/riscos/fs
+    chown -R riscos:riscos /home/riscos/fs && \
+    chmod 777 /home/riscos
 
 
 #### Add RISC OS build environment
@@ -52,8 +53,6 @@ ADD --chown=riscos:riscos riscos/build/Hdr/Global /home/riscos/fs/Libs/Hdr/Globa
 ADD --chown=riscos:riscos riscos/build/Hdr/Interface /home/riscos/fs/Libs/Hdr/Interface
 # Makefiles
 ADD --chown=riscos:riscos riscos/build/Makefiles /home/riscos/fs/Libs/Makefiles
-
-#ADD --chown=riscos:riscos riscos-tools /home/riscos/fs/Library
 
 ADD --chown=riscos:riscos riscos/tools/CMunge,ff8 \
                           riscos/tools/Do,ffc \
@@ -88,6 +87,11 @@ ADD --chown=riscos:riscos riscos/tools/CMunge,ff8 \
                           riscos/tools/squeeze,ff8 \
                           /home/riscos/fs/Library/
 
+### JFPatch
+ADD --chown=riscos:riscos riscos/jfpatch/ \
+                          /home/riscos/fs/Library/JFPatchResources/
+ADD --chown=riscos:riscos fs/jfpatch,feb /home/riscos/fs/Library/JFPatch,feb
+ADD --chown=riscos:riscos *.pyro /home/riscos/
 
 #### P2C libraries
 # FIXME: Get these from artifactory.
@@ -107,9 +111,7 @@ RUN mkdir -p /home/riscos/fs/tmp && \
     mkdir /home/riscos/fs/work && \
     chown riscos:riscos /home/riscos/fs/work
 
-ADD --chown=riscos:riscos fs/!JFPatch /home/riscos/fs/!JFPatch
-ADD --chown=riscos:riscos fs/jfpatch,fd1 /home/riscos/fs/Library/jfpatch,fd1
-ADD --chown=riscos:riscos *.pyro /home/riscos/
+#ADD --chown=riscos:riscos riscos/jfpatch /home/riscos/fs/!JFPatch
 
 # Update Pyromaniac with our version
 #ADD update/pyromaniac /pyromaniac/pyromaniac-resources/pyromaniac
@@ -117,3 +119,6 @@ ADD --chown=riscos:riscos *.pyro /home/riscos/
 #ADD update/pyro.py /pyromaniac/pyromaniac-resources/pyro.py
 
 ENV PYTHONUNBUFFERED=1
+
+ENV HOME="/home/riscos"
+USER riscos
