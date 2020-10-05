@@ -2,12 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 21-May-2020 22:21:24
-DOCUMENT ../dest/api.html
-SOURCE api.hsc
-TITLE 
-ID header-menu
-INCLUDE ../macros.hsc
+# updated: 04-Oct-2020 21:00:31
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -92,6 +87,11 @@ ID log
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/robuildyaml.html
 SOURCE robuildyaml.hsc
+TITLE 
+ID header-menu
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/api.html
+SOURCE api.hsc
 TITLE 
 ID header-menu
 INCLUDE ../macros.hsc

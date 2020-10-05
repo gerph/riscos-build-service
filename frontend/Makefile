@@ -168,7 +168,15 @@ ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howi
 	cp diagrams/howitworks.png ${DESTDIR}/images/howitworks.png
 	cp diagrams/howitworks.svg ${DESTDIR}/images/howitworks.svg
 
-diagrams/howitworks.png diagrams/howitworks.svg:
+${DESTDIR}/images/builder.png ${DESTDIR}/images/builder.svg: diagrams/builder.png diagrams/builder.svg
+	cp diagrams/builder.png ${DESTDIR}/images/builder.png
+	cp diagrams/builder.svg ${DESTDIR}/images/builder.svg
+
+${DESTDIR}/images/interfaces.png ${DESTDIR}/images/interfaces.svg: diagrams/interfaces.png diagrams/interfaces.svg
+	cp diagrams/interfaces.png ${DESTDIR}/images/interfaces.png
+	cp diagrams/interfaces.svg ${DESTDIR}/images/interfaces.svg
+
+diagrams/howitworks.png diagrams/howitworks.svg diagrams/builder.png diagrams/builder.svg diagrams/interfaces.png diagrams/interfaces.svg:
 	cd diagrams && make
 
 ${DESTDIR}/%: %

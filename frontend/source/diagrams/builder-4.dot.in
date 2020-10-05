@@ -1,0 +1,3 @@
+#define STAGE 4
+
+#include "builder.dot.in"

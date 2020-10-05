@@ -1,0 +1,104 @@
+#define TITLE JFPatch as a Service: Builder control flow
+
+#define ICON(x) icons/##x.png
+#define LABEL_ICON(icon, text) <<TABLE border="0" cellspacing="0" cellborder="0"><TR><TD width="24" height="24" fixedsize="TRUE"><IMG SCALE="BOTH" SRC=STRINGIFY(ICON(icon))/></TD><TD>text</TD><TD></TD></TR></TABLE>>
+
+#define VALUE(x) #x
+#define STRINGIFY(x) VALUE(x)
+
+#define SUBPROCESS dir=both, color=grey50
+
+#ifndef STAGE
+#define STAGE 5
+#endif
+
+#define HIDE color=none, fontcolor=none
+#define SHOW color=black, fontcolor=black
+#define HIDE_EDGE color=none
+#define SHOW_EDGE dummy=1
+
+#define NODE_STAGE1 HIDE
+#define EDGE_STAGE1 HIDE_EDGE
+#define NODE_STAGE2 HIDE
+#define EDGE_STAGE2 HIDE_EDGE
+#define NODE_STAGE3 HIDE
+#define EDGE_STAGE3 HIDE_EDGE
+#define NODE_STAGE4 HIDE
+#define EDGE_STAGE4 HIDE_EDGE
+#define NODE_STAGE5 HIDE
+#define EDGE_STAGE5 HIDE_EDGE
+#if STAGE >= 1
+#define NODE_STAGE1 SHOW
+#define EDGE_STAGE1 SHOW_EDGE
+#endif
+#if STAGE >= 2
+#define NODE_STAGE2 SHOW
+#define EDGE_STAGE2 SHOW_EDGE
+#endif
+#if STAGE >= 3
+#define NODE_STAGE3 SHOW
+#define EDGE_STAGE3 SHOW_EDGE
+#endif
+#if STAGE >= 4
+#define NODE_STAGE4 SHOW
+#define EDGE_STAGE4 SHOW_EDGE
+#endif
+#if STAGE >= 5
+#define NODE_STAGE5 SHOW
+#define EDGE_STAGE5 SHOW_EDGE
+#endif
+
+digraph STRINGIFY(TITLE) {
+#include "chartconfig.dot.pp"
+    newrank = true;
+
+    graph [ splines=ortho ];
+
+    # Parts of the processing.
+    Result [ label=<<B>result</B><BR/><i>Container which holds and routes information<br/>from the build process</i>> ];
+    ROSource [ NODE_STAGE2, label=<<B>rosource</B><BR/><i>Decides what RISC OS file type this is<br/>(C, BASIC, ObjAsm, JFPatch, Pascal, Perl)<BR/>Extracts Zip archives if needed<BR/>Stores in a temporary directory</i>> ];
+    ROZipInfo [ NODE_STAGE2, label=<<B>rozipinfo</B><BR/><i>Extracts RISC OS filetype information from zip archives</i>> ];
+
+    ROBuild [ NODE_STAGE3, label=<<B>robuild</B><BR/><i>Decides what type of build it is<br/>Constructs command lines for JFPatch, cc, etc</i>> ];
+    ROBuildYAML [ NODE_STAGE3, label=<<B>robuildyaml</B><BR/><i>Parses robuild.yaml files</i>> ];
+    SimpleYAML [ NODE_STAGE3, label=<<B>simpleyaml</B><BR/><i>Parses YAML without dependencies</i>> ];
+
+    PyroServer [ NODE_STAGE4, label=<<B>pyroserver</B><BR/><i>HTTP servers which will receive throwback or clipboard data<br/>Routes data to 'results'</i>> ];
+
+    Docker [ NODE_STAGE5, label=<<B>docker</B><BR/><i>Manages running docker containers<br/>Streams data to 'results'</i>> ];
+    Pyro [ NODE_STAGE5, label=<<B>pyro</B><BR/><i>Constructs command lines<br/>to run inside docker</i>> ];
+    StreamedInput [ NODE_STAGE5, label=<<B>streamedinput</B><BR/><i>Streams process output in a separate thread</i>> ];
+
+    # Flow
+    Result;
+    Result -> ROSource [ EDGE_STAGE2 ];
+
+    {
+        rank = same;
+        ROSource -> ROZipInfo [ SUBPROCESS, EDGE_STAGE2 ];
+    }
+
+    ROSource -> ROBuild [ EDGE_STAGE3 ];
+
+    {
+        rank = same;
+        ROBuild -> ROBuildYAML [ SUBPROCESS, EDGE_STAGE3 ];
+        ROBuildYAML -> SimpleYAML [ SUBPROCESS, EDGE_STAGE3 ];
+    }
+
+    ROBuild -> PyroServer [ EDGE_STAGE4 ];
+
+    PyroServer -> Docker [ EDGE_STAGE5 ];
+    {
+        rank = same;
+        Docker -> Pyro [ SUBPROCESS, EDGE_STAGE5 ];
+    }
+    Docker -> StreamedInput [ SUBPROCESS EDGE_STAGE5 ];
+
+    subgraph cluster_DockerParts {
+        graph [ label="" ];
+        style = invis;
+        Pyro;
+        StreamedInput;
+    }
+}

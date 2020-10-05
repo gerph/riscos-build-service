@@ -1,0 +1,92 @@
+#define TITLE JFPatch as a Service: Interface control flow
+
+#define ICON(x) icons/##x.png
+#define LABEL_ICON(icon, text) <<TABLE border="0" cellspacing="0" cellborder="0"><TR><TD width="24" height="24" fixedsize="TRUE"><IMG SCALE="BOTH" SRC=STRINGIFY(ICON(icon))/></TD><TD>text</TD><TD></TD></TR></TABLE>>
+
+#define VALUE(x) #x
+#define STRINGIFY(x) VALUE(x)
+
+#define SUBPROCESS dir=both, color=grey50
+
+#ifndef STAGE
+#define STAGE 5
+#endif
+
+#define HIDE color=none, fontcolor=none
+#define SHOW color=black, fontcolor=black
+#define HIDE_EDGE color=none
+#define SHOW_EDGE dummy=1
+
+#define NODE_STAGE1 HIDE
+#define EDGE_STAGE1 HIDE_EDGE
+#define NODE_STAGE2 HIDE
+#define EDGE_STAGE2 HIDE_EDGE
+#define NODE_STAGE3 HIDE
+#define EDGE_STAGE3 HIDE_EDGE
+#define NODE_STAGE4 HIDE
+#define EDGE_STAGE4 HIDE_EDGE
+#define NODE_STAGE5 HIDE
+#define EDGE_STAGE5 HIDE_EDGE
+#if STAGE >= 1
+#define NODE_STAGE1 SHOW
+#define EDGE_STAGE1 SHOW_EDGE
+#endif
+#if STAGE >= 2
+#define NODE_STAGE2 SHOW
+#define EDGE_STAGE2 SHOW_EDGE
+#endif
+#if STAGE >= 3
+#define NODE_STAGE3 SHOW
+#define EDGE_STAGE3 SHOW_EDGE
+#endif
+#if STAGE >= 4
+#define NODE_STAGE4 SHOW
+#define EDGE_STAGE4 SHOW_EDGE
+#endif
+#if STAGE >= 5
+#define NODE_STAGE5 SHOW
+#define EDGE_STAGE5 SHOW_EDGE
+#endif
+
+digraph STRINGIFY(TITLE) {
+#include "chartconfig.dot.pp"
+
+    newrank = true;
+
+    graph [ splines=ortho ];
+
+    CLI [ NODE_STAGE1, label=<<B>cli</B><BR/><i>Simple command line invocation</i>> ];
+    Server [ NODE_STAGE1, label=<<B>server</B><BR/><i>JSON HTTP API server</i>> ];
+    WSServer [ NODE_STAGE1, label=<<B>wsserver</B><BR/><i>WebSockets API server</i>> ];
+
+    CLIParse [ NODE_STAGE2, label=<<B>cli(parse)</B><BR/><i>Decides on arguments<br/>and streaming type</i>> ];
+
+    Build [ NODE_STAGE3, label=<<B>build</B><BR/><i>Building process, holding results</i>> ];
+    BuildStream [ NODE_STAGE3, label=<<B>buildstream</B><BR/><i>Streams results to caller</i>> ];
+
+    ResultStream [ NODE_STAGE3, label=<<B>result</B><BR/><i>Calls back to the caller with<br/>the output from the build</i>> ];
+
+    CLIReport [ NODE_STAGE4, label=<<B>cli(report)</B><BR/><i>Shows results to user, stores files</i>> ];
+    ServerReport [ NODE_STAGE4, label=<<B>server(report)</B><BR/><i>Returns HTTP response<br/>JSON or application/riscos</i>> ];
+
+    {
+        rank = same;
+        CLI;
+        Server;
+        WSServer;
+    }
+
+    CLI -> CLIParse [ EDGE_STAGE2 ];
+    CLIParse -> Build [ EDGE_STAGE3 ];
+    CLIParse -> BuildStream [ EDGE_STAGE3 ];
+    Server -> Build [ EDGE_STAGE3 ];
+    WSServer -> BuildStream [ EDGE_STAGE3 ];
+
+    {
+        rank = same;
+        BuildStream -> ResultStream [ SUBPROCESS, EDGE_STAGE3 ];
+    }
+
+    Build -> CLIReport [ EDGE_STAGE4 ];
+    Build -> ServerReport [ EDGE_STAGE4 ];
+}
