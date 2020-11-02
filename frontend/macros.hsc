@@ -1,13 +1,23 @@
-<$macro html-header /CLOSE title:string/REQUIRED codecolouring:bool=false>
+<$macro service-name>JFPatch-as-a-Service</$macro>
+
+<$include file="../pages.hsc">
+
+<$define Hsc.Format.Filesize:string/c="%kK">
+
+<$macro html-header /CLOSE title:string/REQUIRED codecolouring:bool=''>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>JFPatch as a Service: <(title)></title>
+  <title><service-name>: <(title)></title>
   <link rel="shortcut icon" href=":favicon.ico" />
   <$if COND=(codecolouring)>
     <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
     <script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
+    <$if COND=(set SUPPORT_JFPATCH)>
     <script src="codemirror/mode/jfpatch.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_YAML)>
     <script src="codemirror/mode/yaml.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
     <$if COND=(set SUPPORT_C)>
     <script src="codemirror/mode/clike.js" type='text/javascript'></script>
     <$stripws type="prev"></$if>
@@ -23,11 +33,15 @@
     <$if COND=(set SUPPORT_BASTXT)>
     <script src="codemirror/mode/bbcbasic.js" type='text/javascript'></script>
     <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_PYTHON)>
+    <script src="codemirror/mode/python.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css"/>
+    <link rel="stylesheet" href="codemirror/theme/elegant.css"/>
     <link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
     <script src="colouring.js" type='text/javascript'></script>
   </$if>
-  <link rel="stylesheet" type="text/css" href="site.css" />
+  <link rel="stylesheet" type="text/css" href=":site.css" />
   <$content>
 </head>
 </$macro>
@@ -40,17 +54,12 @@ function toggle_header_menu() {
     menu.style.display = menu.style.display == 'block' ? 'none' : 'block';
 }
 --></script>
-<a href=':index.html'><img class='site-logo' src='icons/patched.png' alt='[Patched Cog]' /></a>
+<a href=':index.html'><img class='site-logo' src=':icons/patched.png' alt='[Patched Cog]' /></a>
 <h1 class='title'>JFPatch <small><i>as a Service</i></small></h1>
 <nav class='header-menu'>
-    <a href="#" onclick="toggle_header_menu()"><img src='icons/menu.png' alt='[menu]'/></a>
+    <a href="#" onclick="toggle_header_menu()"><img src=':icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>
-        <li><a href=':index.html'>Home</a></li>
-        <li><a href=':fileformat.html'>JFPatch File Format</a></li>
-        <li><a href=':api.html'>API documentation</a></li>
-        <li><a href=':robuildyaml.html'>Build configuration</a></li>
-        <li><a href=':about.html'>About</a></li>
-        <li><a href=':history.html'>History</a></li>
+        <links-to-pages>
     </ul>
 </nav>
 <div class='section'><(section)></div>
@@ -60,9 +69,10 @@ function toggle_header_menu() {
 </main>
 <footer class='page-foot'>
     <span class='disclaimer'>
-        JFPatch as a service is not intended for use in safety critical applications.<br/>
+        <service-name> is not intended for use in safety critical applications.<br/>
         No warranty is given for fitness for any particular purpose.<br/>
-        Do not feed after midnight.</span>
+        Do not feed after midnight.
+    </span>
 </footer>
 </$macro>
 
@@ -127,4 +137,19 @@ function toggle_header_menu() {
 
 <$macro asm /CLOSE>
 <code class='asm'><$content></code>
+</$macro>
+
+<$macro python /CLOSE>
+<code class='python'>
+    <textarea class='source-code python' readonly><$content><$stripws type=both></textarea>
+</code>
+</$macro>
+
+
+
+<***** Common formatting macros ****>
+
+<$macro filelink filename:string/REQUIRED label:string/REQUIRED>
+<span class='filelink'><a href=(filename)><(label)></a>
+(<(GetFileSize(filename))>)</span>
 </$macro>

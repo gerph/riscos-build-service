@@ -263,6 +263,7 @@ div#help li + li {
 }
 
 div.workflow {
+    padding-top: 1em;
     margin-bottom: 1em;
 }
 div.workflow span.divider {
@@ -297,6 +298,7 @@ html, body {
 }
 body {
     margin: 0;
+    line-height: 1.4em;
     font-family: sans-serif;
     flex-direction: column;
     display: flex;
@@ -307,6 +309,11 @@ header {
     font-size: 2em;
     padding: 4px;
     margin-bottom: 0.5em;
+    /* Make the header bar stick to the top */
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 100;
 }
 header a {
     text-decoration: none;
@@ -325,9 +332,11 @@ header .section {
     float: right;
     font-variant: small-caps;
     display: inline-block;
+    line-height: 100%;
     padding-top: 0.2em;
 }
 main {
+    padding-top: 3.5em;
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
@@ -344,17 +353,19 @@ footer .disclaimer {
     font-size: small;
     display: block;
     text-align: right;
+    line-height: 120%;
 }
 
 /* Header menu */
 .header-menu {
     float: right;
     display: inline-block;
+    line-height: 0.5em;
 }
 .header-menu img {
     height: 1em;
     margin-left: 0.25em;
-    margin-top: 0.25em;
+    margin-top: 0.15em;
 }
 ul.header-menu-block {
     position: absolute;
@@ -374,6 +385,9 @@ ul.header-menu-block {
 .header-menu-block li + li {
     border-top: 4px solid green;
 }
+.header-menu-block .page-link-description {
+    display: none;
+}
 
 
 /* Document load menu */
@@ -392,6 +406,7 @@ ul.load-menu-block {
     list-style: none;
     padding: 0.25em;
     background-color: #eeeeee;
+    line-height: 100%;
 }
 .load-menu-block li + li {
     /*border-top: 4px solid grey;*/
@@ -402,7 +417,7 @@ ul.load-menu-block {
 .load-desc {
     display: block;
     font-size: 0.75em;
-    font-style: small-caps;
+    xfont-variant: small-caps;
 }
 
 
@@ -411,9 +426,10 @@ section {
     padding-left: 2em;
     padding-right: 2em;
     margin-bottom: 1em;
+    clear: right;
 }
 h2 {
-    background-color: darkgrey;
+    background-color: dimgrey;
     color: white;
     padding: 0.25em;
     margin-left: -1.25em;

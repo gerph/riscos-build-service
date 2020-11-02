@@ -7,11 +7,14 @@ COG_SIZE = ${ICON_SIZE}
 BUTTON_SIZE = ${ICON_SIZE}
 LARGE_SIZE = 640
 
+SUPPORT_JFPATCH = true
 SUPPORT_C = true
 SUPPORT_OBJASM = true
 SUPPORT_PERL = true
 SUPPORT_PASCAL = true
 SUPPORT_BASTXT = true
+SUPPORT_YAML = true
+SUPPORT_PYTHON = false
 
 
 # Main code
@@ -23,28 +26,34 @@ STDINC  = ../macros.hsc
 # ignore=21
 # smartent (used to convert to entities automatically)
 # getsize
-HSCFLAGS = ignore=49 msgbrowser=throwback \
+HSCFLAGS = ignore=49 ignore=79 ignore=87 msgbrowser=throwback \
 		   prefsfile=$(PREFS) \
 		   xhtml \
 		   prjfile=$(PRJFILE) to=$(DESTDIR)/ $(STDINC) serverdir=$(DESTDIR)
 # ena=notes
-FLAGS = SUPPORT_C=${SUPPORT_C} \
+
+FLAGS = SUPPORT_JFPATCH=${SUPPORT_JFPATCH} \
+        SUPPORT_C=${SUPPORT_C} \
         SUPPORT_OBJASM=${SUPPORT_OBJASM} \
         SUPPORT_PERL=${SUPPORT_PERL} \
         SUPPORT_PASCAL=${SUPPORT_PASCAL} \
-        SUPPORT_BASTXT=${SUPPORT_BASTXT}
+        SUPPORT_BASTXT=${SUPPORT_BASTXT} \
+        SUPPORT_YAML=${SUPPORT_YAML} \
+        SUPPORT_PYTHON=${SUPPORT_PYTHON}
 
 HSCFLAGS += $(subst =,:BOOL=,$(subst false,, ${FLAGS:SUPPORT_%=define "SUPPORT_%"}))
 CPPFLAGS = ${FLAGS:SUPPORT_%=-DSUPPORT_%}
 
 CODEMIRROR = ${DESTDIR}/codemirror/lib/codemirror.js \
              ${DESTDIR}/codemirror/lib/codemirror.css \
+             ${DESTDIR}/codemirror/theme/elegant.css \
              ${DESTDIR}/codemirror/theme/liquibyte.css \
              ${DESTDIR}/codemirror/addon/mode/simple.js \
-             ${DESTDIR}/codemirror/mode/jfpatch.js \
-             ${DESTDIR}/codemirror/mode/yaml.js \
              ${DESTDIR}/colouring.js \
 
+ifeq (${SUPPORT_JFPATCH}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/jfpatch.js
+endif
 ifeq (${SUPPORT_C}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/clike.js
 endif
@@ -59,6 +68,12 @@ CODEMIRROR += ${DESTDIR}/codemirror/mode/pascal.js
 endif
 ifeq (${SUPPORT_BASTXT}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/bbcbasic.js
+endif
+ifeq (${SUPPORT_PYTHON}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/python.js
+endif
+ifeq (${SUPPORT_YAML}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/yaml.js
 endif
 
 
@@ -85,6 +100,8 @@ static: \
  	 	${DESTDIR}/ansi_up.js \
  	 	${DESTDIR}/site.css \
  	 	${DESTDIR}/favicon.ico \
+ 	 	${DESTDIR}/favicon-patched.ico \
+ 	 	${DESTDIR}/favicon-buildsite.ico \
  	 	${DESTDIR}/icons/file_a91.png \
  	 	${DESTDIR}/icons/file_ff8.png \
  	 	${DESTDIR}/icons/file_ffa.png \
@@ -93,6 +110,8 @@ static: \
  	 	${DESTDIR}/icons/cog.png \
  	 	${DESTDIR}/icons/patched.png \
  	 	${DESTDIR}/icons/patched-large.png \
+ 	 	${DESTDIR}/icons/buildsite.png \
+ 	 	${DESTDIR}/icons/buildsite-large.png \
  	 	${DESTDIR}/icons/information.png \
  	 	${DESTDIR}/icons/load.png \
  	 	${DESTDIR}/icons/create.png \
@@ -134,20 +153,51 @@ ${DESTDIR}/icons/download.png: icons/140283.svg
 ${DESTDIR}/icons/build.png: icons/2746034.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
+# Site icon
+# 1646265 - spanner and screwdriver crossed.
+# 2081656 - screwdriver and spanner.
+${DESTDIR}/icons/overlay-build-large.png: icons/2078671-edited.svg
+	./make-icon.sh --trim $? $@ ${LARGE_SIZE}
+${DESTDIR}/icons/overlay-build.png: icons/2078671-edited.svg
+	./make-icon.sh --trim $? $@ ${COG_SIZE}
+
 ${DESTDIR}/icons/nextstep.png: icons/1920786.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
 ${DESTDIR}/icons/menu.png: icons/2328436.svg
 	./make-icon.sh --trim $? $@ ${BUTTON_SIZE}
 
-${DESTDIR}/favicon.ico: ${DESTDIR}/icons/patched.png
+${DESTDIR}/favicon-patched.ico: ${DESTDIR}/icons/patched.png
 	convert $? -define icon:auto-resize=64,48,32,16 $@
 
+${DESTDIR}/favicon-buildsite.ico: ${DESTDIR}/icons/buildsite.png
+	convert $? -define icon:auto-resize=64,48,32,16 $@
+
+${DESTDIR}/favicon.ico: ${DESTDIR}/favicon-patched.ico
+	cp $? $@
+
 ${DESTDIR}/icons/patched.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/plaster.png
-	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png -gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) -composite $@
+	convert -size ${COG_SIZE}x${COG_SIZE} ${DESTDIR}/icons/cog.png \
+			-gravity center \( ${DESTDIR}/icons/plaster.png -resize 85% \) \
+			-composite $@
 
 ${DESTDIR}/icons/patched-large.png: ${DESTDIR}/icons/cog-large.png ${DESTDIR}/icons/plaster-large.png
-	convert -size ${LARGE_SIZE}x${LARGE_SIZE} ${DESTDIR}/icons/cog-large.png -gravity center \( ${DESTDIR}/icons/plaster-large.png -resize 85% \) -composite $@
+	convert -size ${LARGE_SIZE}x${LARGE_SIZE} ${DESTDIR}/icons/cog-large.png \
+			-gravity center \( ${DESTDIR}/icons/plaster-large.png -resize 85% \) -composite $@
+
+${DESTDIR}/icons/buildsite.png: ${DESTDIR}/icons/cog.png ${DESTDIR}/icons/overlay-build.png
+	convert -size ${COG_SIZE}x${COG_SIZE} \
+			${DESTDIR}/icons/overlay-build.png \
+			\( ${DESTDIR}/icons/cog.png -resize 38% \
+			-geometry +$$((${COG_SIZE} * 310 / 640))+$$((${COG_SIZE} * 340 / 640)) \) \
+			-composite $@
+
+${DESTDIR}/icons/buildsite-large.png: ${DESTDIR}/icons/cog-large.png ${DESTDIR}/icons/overlay-build-large.png
+	convert -size ${LARGE_SIZE}x${LARGE_SIZE} \
+			${DESTDIR}/icons/overlay-build-large.png \
+			\( ${DESTDIR}/icons/cog-large.png -resize 40% \
+			-geometry +$$((${LARGE_SIZE} * 310 / 640))+$$((${LARGE_SIZE} * 340 / 640)) \) \
+			-composite $@
 
 ${DESTDIR}/codemirror/%: codemirror/%
 	cp $? $@
@@ -190,7 +240,7 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Thursday 21-May-2020 20:42:49
+# dependencies updated: Monday 02-Nov-2020 20:39:09
 
 all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/fileformat.html ../dest/about.html ../dest/notfound.html \
@@ -198,27 +248,28 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
     ../dest/codemirror-examples-bbcbasic.html ../dest/history.html \
     ../dest/index.html ../dest/robuildyaml.html
 
-../dest/api.html : api.hsc ../macros.hsc
+../dest/api.html : api.hsc ../pages.hsc ../macros.hsc
 
-../dest/codemirror-examples.html : codemirror-examples.hsc ../macros.hsc
-
-../dest/fileformat.html : fileformat.hsc ../macros.hsc
-
-../dest/about.html : about.hsc ../macros.hsc
-
-../dest/notfound.html : notfound.hsc ../macros.hsc
-
-../dest/codemirror-examples-objasm.html : codemirror-examples-objasm.hsc \
+../dest/codemirror-examples.html : codemirror-examples.hsc ../pages.hsc \
     ../macros.hsc
 
+../dest/fileformat.html : fileformat.hsc ../pages.hsc ../macros.hsc
+
+../dest/about.html : about.hsc ../pages.hsc ../macros.hsc
+
+../dest/notfound.html : notfound.hsc ../pages.hsc ../macros.hsc
+
+../dest/codemirror-examples-objasm.html : codemirror-examples-objasm.hsc \
+    ../pages.hsc ../macros.hsc
+
 ../dest/codemirror-examples-bbcbasic.html : \
-    codemirror-examples-bbcbasic.hsc ../macros.hsc
+    codemirror-examples-bbcbasic.hsc ../pages.hsc ../macros.hsc
 
-../dest/history.html : history.hsc ../macros.hsc versions.hsc
+../dest/history.html : history.hsc ../pages.hsc ../macros.hsc versions.hsc
 
-../dest/index.html : index.hsc ../macros.hsc
+../dest/index.html : index.hsc ../pages.hsc ../macros.hsc
 
-../dest/robuildyaml.html : robuildyaml.hsc ../macros.hsc
+../dest/robuildyaml.html : robuildyaml.hsc ../pages.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 
@@ -236,3 +287,6 @@ delete :
 clean :
 	cd diagrams && make clean
 	-rm -rf "${DESTDIR}" versions.hsc
+
+upload : dirs static all_hsc
+	rsync -av "${DESTDIR}"/ u36706922@home106874872.1and1-data.host:riscos/robuild/

@@ -523,6 +523,8 @@
 <$deftag FOOTER /CLOSE [__attrs]>
 <$deftag MAIN /CLOSE [__attrs]>
 <$deftag SECTION /CLOSE [__attrs]>
+<$deftag AUDIO /CLOSE [__attrs] controls:bool SRC:uri/X/Z/R>
+
 
 <* vi: set nowrap tw=0 et ts=2: *>
 <* EOF *>

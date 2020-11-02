@@ -748,11 +748,11 @@
         <button onclick="onCloseClick(); return false;">close</button>
       </form>
 
-      <div class='status' id='status'>
-        Service status: <span class='status-value status-unknown' id='status-value'>Unknown</span>
-      </div>
-
       <div class='workflow'>
+          <div class='status' id='status'>
+            Service status: <span class='status-value status-unknown' id='status-value'>Unknown</span>
+          </div>
+
           <!-- Load document -->
           <label class='workflow-button' id='load-button' title="Load a file from examples">
               <button id='load' onclick="onLoad(); return false;"></button>

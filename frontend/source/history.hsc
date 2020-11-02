@@ -16,7 +16,7 @@ about 11 months, which are not described here.
 </p>
 
 <ul>
-    <li><a href='#jfpaas'>JFPatch as a service</a></li>
+    <li><a href='#jfpaas'><service-name></a></li>
     <li><a href='#jfpapp'>JFPatch the RISC OS application</a>, incorporating general changes from the components that make it up</li>
     <li><a href='#jfpatch'>JFPatch back end build tool</a></li>
     <li><a href='#mkmodule'>Module generation</a></li>
@@ -48,7 +48,7 @@ about 11 months, which are not described here.
     </tr>
 </$macro>
 
-<h2 id='jfpaas'>JFPatch as a Service</h2>
+<h2 id='jfpaas'><service-name></h2>
 <version-table>
 <$include FILE="versions.hsc">
 </version-table>

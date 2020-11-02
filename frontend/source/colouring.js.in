@@ -1,3 +1,5 @@
+var theme_name = 'liquibyte';
+
 function setup_colouring(opts) {
     if (!opts)
         opts = {};
@@ -18,10 +20,27 @@ function setup_colouring(opts) {
         var options = {
                 lineNumbers: want_linenumbers,
                 mode: want_mode,
-                theme: 'liquibyte' + extra_style,
+                theme: theme_name + extra_style,
                 lineWrapping: true,
                 viewportMargin: (want_autosize ? Infinity : 10),
             };
+        var classes = textarea.className.split(' ');
+#@if $SUPPORT_C eq 'true'
+        if (classes.indexOf('c') != -1)
+            options.mode = 'text/x-csrc';
+#@endif
+#@if $SUPPORT_PYTHON eq 'true'
+        if (classes.indexOf('python') != -1)
+            options.mode = 'text/x-python';
+#@endif
+#@if $SUPPORT_OBJASM eq 'true'
+        if (classes.indexOf('asm') != -1)
+            options.mode = 'text/x-arm-objasm';
+#@endif
+#@if $SUPPORT_YAML eq 'true'
+        if (classes.indexOf('yaml') != -1)
+            options.mode = 'text/x-yaml';
+#@endif
         if (textarea.readOnly)
         {
             // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
@@ -85,5 +104,106 @@ function detect_mode(code) {
         return 'text/x-basic-bbcbasic';
 #@endif
 
+#@if $SUPPORT_PYTHON eq 'true'
+    if (code.startsWith('"""') ||
+        code.startsWith("'''") ||
+        code.includes("\nimport os\n"))
+        return 'text/x-python';
+#@endif
+
+#@if $SUPPORT_YAML eq 'true'
+    if (code.startsWith('---') ||
+        code.startsWith("%YAML"))
+        return 'text/x-yaml';
+#@endif
+
     return 'text/x-jfpatch';
 }
+
+
+function toggle_code(example_path, mediatype, textarea_id) {
+    textarea = document.getElementById(textarea_id);
+    if (textarea.style.display == 'none')
+    {
+        if (!textarea.cm)
+        {
+            example_loadintextarea(example_path, mediatype, textarea_id);
+        }
+        else
+        {
+            textarea.cm.toTextArea();
+            textarea.cm = undefined;
+            textarea.style.display = 'none';
+        }
+    }
+    else
+    {
+        textarea.style.display = 'none';
+    }
+    return 1;
+}
+
+
+// Load example document
+function example_loadintextarea(example_path, mediatype, textarea_id) {
+    textarea = document.getElementById(textarea_id);
+
+    example_fetch(example_path, 'arraybuffer', function(data) {
+            var want_linenumbers = true;
+            var want_autosize = false;
+            var want_scroll = true;
+
+            var extra_style = '';
+            if (want_autosize)
+                extra_style = ' autosize';
+            else if (want_scroll)
+                extra_style = ' scrolly';
+
+            data = String.fromCharCode.apply(null, new Uint8Array(data))
+            var options = {
+                    lineNumbers: want_linenumbers,
+                    mode: mediatype,
+                    theme: theme_name + extra_style,
+                    lineWrapping: true,
+                    viewportMargin: (want_autosize ? Infinity : 10),
+                };
+
+            if (textarea.readOnly)
+            {
+                // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select
+                //options.readOnly = 'nocursor';
+
+                // true => cursor visible (but not blinking, with rate change), can use keyboard to
+                //         scroll, cannot exit, can select
+                options.readOnly = true;
+                options.cursorBlinkRate = 0;
+            }
+
+            cm = CodeMirror.fromTextArea(textarea, options);
+            cm.setValue(data);
+
+            textarea.cm = cm;
+        });
+}
+
+
+function example_fetch(example_path, type, callback) {
+    var xobj = new XMLHttpRequest();
+    xobj.responseType = type;
+    xobj.open('GET', example_path, true);
+
+    xobj.onreadystatechange = function() {
+        if (xobj.readyState === 4 && xobj.status === 200) {
+            // Required use of an anonymous callback
+            // as .open() will NOT return a value but simply returns undefined in asynchronous mode
+            if (xobj.responseType == 'text')
+                data = xobj.responseText;
+            else
+                data = xobj.response;
+            callback(data);
+        }
+    };
+    xobj.send(null);
+}
+
+

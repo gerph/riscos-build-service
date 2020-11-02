@@ -2,39 +2,45 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 04-Oct-2020 21:00:31
+# updated: 02-Nov-2020 21:30:12
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
 ID header-menu
 ID HELLO
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/fileformat.html
 SOURCE fileformat.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/about.html
 SOURCE about.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/notfound.html
 SOURCE notfound.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/codemirror-examples-objasm.html
 SOURCE codemirror-examples-objasm.hsc
 TITLE 
 ID header-menu
 ID HELLO
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/codemirror-examples-bbcbasic.html
 SOURCE codemirror-examples-bbcbasic.hsc
 TITLE 
 ID header-menu
 ID HELLO
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/history.html
 SOURCE history.hsc
@@ -47,6 +53,7 @@ ID mkmodule
 ID mkws
 ID mkaof
 ID mkmacros
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 INCLUDE versions.hsc
 DOCUMENT ../dest/index.html
@@ -84,14 +91,17 @@ ID output
 ID throwback-box
 ID throwback
 ID log
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/robuildyaml.html
 SOURCE robuildyaml.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc

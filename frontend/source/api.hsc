@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <html-header title='API docs'></html-header>
 <body>

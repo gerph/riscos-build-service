@@ -8,11 +8,11 @@
 <h2>Introduction</h2>
 
 <p>
-    JFPatch as a service is actually a generic cloud based RISC OS build system.
+    <service-name> is a cloud based general RISC OS build system.
     It can also be supplied a Zip archive, as described on the home page, which contains
     the JFPatch source and patch files, and it will build these. This is only one of
     the modes in which it can function. If the Zip archive contains a configuration file,
-    the JFPatch as a service system will interpret this as build instructions and return
+    the <service-name> system will interpret this as build instructions and return
     the results.
 </p>
 </section>
