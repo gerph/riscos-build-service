@@ -46,7 +46,7 @@ class Pyro(object):
         args = []
         if self.timeout:
             args.extend(['timeout', str(self.timeout)])
-        args.append('pyro')
+        args.append('./robuild-pyro')
 
         # Configuration
         for config_file in self.config_files:

@@ -1,0 +1,13 @@
+#!/bin/bash
+##
+# Run pyro for the ROBuild system.
+#
+# Adds all the configuration files we need, and then runs with
+# whatever arguments were supplied.
+#
+
+here=$(cd "$(dirname "$0")" && pwd)
+cd "$here"
+exec pyro --config-file "riscos.pyro" \
+          --config-file "build.pyro" \
+          --config-file "jfpatch.pyro" "$@"

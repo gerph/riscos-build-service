@@ -1,56 +1,62 @@
 ---
 
 resources:
-  build/cross/pyromaniac:
-    phases: native:install
-    version: latest
-    path: crosscompile/pyromaniac
-    platform: Linux
-
-  # Build environment
-  build/root-env:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/build
-
-  build/build-headers:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/build
-
-  build/build-libs:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/build
-
-  # Modules
-  modules/ram/basic:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/modules
-
-  modules/ram/clib:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/modules
-
-  modules/ram/fpemulator:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/modules
-
-  modules/ram/obey:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/modules
-
-  # Tools
-  library/all:
-    phases: native:install
-    version: latest
-    path: crosscompile/riscos/tools
+# These tools are not needed, because the base container has already installed them
+#  build/cross/pyromaniac:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/pyromaniac
+#    platform: Linux
+#
+#  # Build environment
+#  build/root-env:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/build
+#
+#  build/build-headers:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/build
+#
+#  build/build-libs:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/build
+#
+#  # Modules
+#  modules/ram/basic:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/modules
+#
+#  modules/ram/clib:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/modules
+#
+#  modules/ram/fpemulator:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/modules
+#
+#  modules/ram/obey:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/modules
+#
+#  # Tools
+#  library/all:
+#    phases: native:install
+#    version: latest
+#    path: crosscompile/riscos/tools
 
   app/jfpatch-tool:
     phases: native:install
     version: latest
     path: crosscompile/riscos/jfpatch
+
+  app/jfpatch-libraries:
+    phases: native:install
+    version: latest
+    path: crosscompile/riscos/jfpatch-libs

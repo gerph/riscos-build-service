@@ -33,7 +33,7 @@ class Builder(object):
     docker_image = 'gerph/robuild-service'
     docker_workdir = '/home/riscos'
     docker_mountdir = '{}/fs/work'.format(docker_workdir)
-    pyro_configfile = 'jfpatch.pyro'
+    pyro_configfile = None
 
     def __init__(self, sourcefile=None, data=None, timeout=(60 * 10)):
         self.sourcefile = sourcefile
@@ -63,7 +63,8 @@ class Builder(object):
         """
         Injection point for setting up pyro before the main execution.
         """
-        self.pyro.add_config_file(self.pyro_configfile)
+        if self.pyro_configfile:
+            self.pyro.add_config_file(self.pyro_configfile)
         for config, value in self.pyro_config:
             self.pyro.set_config(config, value)
 

@@ -16,30 +16,6 @@ config:
   vdu.implementation: ansitext
   VDUANSIText.support_primarybold: no
 
-modules:
-  internal: true
-  rom:
-    - fs/modules/BASIC,ffa
-    - fs/modules/SCL,ffa
-    - fs/modules/FPEmulator,ffa
-    - fs/modules/Obey,ffa
-
 variables:
-  'Alias$WimpSlot': '||'
   'JFPatch$ScrapDir': '$.tmp'
   'JFPatch$Dir': '$.Library.JFPatchResources'
-  'Lib$Dir': '$.Libs.C'
-  'C$Path': '|<Lib$Dir>.CLib.,|<Lib$Dir>.Interface.,|<Lib$Dir>.'
-  'Hdr$Path': '$.Libs.Hdr.Global.,$.Libs.Hdr.Interface.'
-  'RISCOSLib$Path': '|<Lib$Dir>.RISCOSLib.'
-  'RISC_OSLib$Path': '|<Lib$Dir>.RISCOSLib.'
-  'OSLib$Dir': '|<Lib$Dir>.OSLib'
-  'OSLib$Path': '|<OSLib$Dir>.,|<OSLib$Dir>.Core.,|<OSLib$Dir>.Computer.,|<OSLib$Dir>.User.,|<OSLib$Dir>.Toolbox.'
-  'TCPIPLibs$Path': '|<Lib$Dir>.TCPIPLibs.'
-  'TBox$Path': '|<Lib$Dir>.TBoxLibs.'
-  'Makefiles$Path': '$.Libs.Makefiles.'
-  'Alias$Alias': 'Set Alias$%0 %*1'
-
-execute:
-  - command: lib Library
-  - command: dir work
