@@ -30,6 +30,10 @@
     File format specification for '.robuild.yaml' build configuration.
 </link-to-page>
 
+<link-to-page href=':ci-build.html' name='CI configuration'>
+    How to use <service-name> with CI systems.
+</link-to-page>
+
 <link-to-page href=':history.html' name='History'>
     History of <service-name> and related systems.
 </link-to-page>

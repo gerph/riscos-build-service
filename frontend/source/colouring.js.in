@@ -41,6 +41,10 @@ function setup_colouring(opts) {
         if (classes.indexOf('yaml') != -1)
             options.mode = 'text/x-yaml';
 #@endif
+#@if $SUPPORT_SHELL eq 'true'
+        if (classes.indexOf('shell') != -1)
+            options.mode = 'text/x-sh';
+#@endif
         if (textarea.readOnly)
         {
             // 'nocursor' => no cursor, cannot use keyboard to scroll, cannot edit, can select

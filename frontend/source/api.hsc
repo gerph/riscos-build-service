@@ -53,7 +53,7 @@ Example usage, together with example JFPatch code, can be found in a <a href="ht
 The HTTP build service allows building of RISC OS binaries through a POST request,
 with the response format selectable through the URI.</p>
 
-<p>The HTTP protocol can be found at <code>https://json.build.riscos.online/</code> and <code>http://json.build.riscos.online/</code>.</p>
+<p>The HTTP protocol can be found at <code>http://build.riscos.online/</code> and <code>http://json.build.riscos.online/</code>. The former has a timeout of 1 minute, whilst the latter should be unlimited. The services are also available on <code>https</code>.</p>
 
 <p>
 POST requests are <media-type>application/x-www-form-urlencoded</media-type> with the following parameters:</p>
@@ -99,7 +99,7 @@ output from the clipboard.
 
 <h3>Protocol</h3>
 
-<p>The WebSocket protocol can be found at <code>https://build.riscos.online/build/ws</code> and <code>http://build.riscos.online/build/ws</code>.</p>
+<p>The WebSocket protocol can be found at <code>http://build.riscos.online/build/ws</code>. The service is also available on <code>https</code>.</p>
 
 <p>The server and client communicate through messages. Each message is a JSON encoded list of two
 items.</p>

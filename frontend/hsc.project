@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 02-Nov-2020 21:30:12
+# updated: 03-Nov-2020 23:55:17
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -103,5 +103,16 @@ DOCUMENT ../dest/api.html
 SOURCE api.hsc
 TITLE 
 ID header-menu
+INCLUDE ../pages.hsc
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/ci-build.html
+SOURCE ci-build.hsc
+TITLE 
+ID header-menu
+ID assumptions
+ID curl
+ID robuild
+ID github
+ID gitlab
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc

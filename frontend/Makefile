@@ -15,6 +15,7 @@ SUPPORT_PASCAL = true
 SUPPORT_BASTXT = true
 SUPPORT_YAML = true
 SUPPORT_PYTHON = false
+SUPPORT_SHELL = true
 
 
 # Main code
@@ -39,7 +40,8 @@ FLAGS = SUPPORT_JFPATCH=${SUPPORT_JFPATCH} \
         SUPPORT_PASCAL=${SUPPORT_PASCAL} \
         SUPPORT_BASTXT=${SUPPORT_BASTXT} \
         SUPPORT_YAML=${SUPPORT_YAML} \
-        SUPPORT_PYTHON=${SUPPORT_PYTHON}
+        SUPPORT_PYTHON=${SUPPORT_PYTHON} \
+        SUPPORT_SHELL=${SUPPORT_SHELL} \
 
 HSCFLAGS += $(subst =,:BOOL=,$(subst false,, ${FLAGS:SUPPORT_%=define "SUPPORT_%"}))
 CPPFLAGS = ${FLAGS:SUPPORT_%=-DSUPPORT_%}
@@ -74,6 +76,9 @@ CODEMIRROR += ${DESTDIR}/codemirror/mode/python.js
 endif
 ifeq (${SUPPORT_YAML}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/yaml.js
+endif
+ifeq (${SUPPORT_YAML}, true)
+CODEMIRROR += ${DESTDIR}/codemirror/mode/shell.js
 endif
 
 
@@ -240,15 +245,14 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Monday 02-Nov-2020 20:39:09
+# dependencies updated: Monday 02-Nov-2020 22:43:09
 
-all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
-    ../dest/fileformat.html ../dest/about.html ../dest/notfound.html \
+all_hsc : ../dest/codemirror-examples.html ../dest/fileformat.html \
+    ../dest/about.html ../dest/notfound.html \
     ../dest/codemirror-examples-objasm.html \
     ../dest/codemirror-examples-bbcbasic.html ../dest/history.html \
-    ../dest/index.html ../dest/robuildyaml.html
-
-../dest/api.html : api.hsc ../pages.hsc ../macros.hsc
+    ../dest/index.html ../dest/robuildyaml.html ../dest/api.html \
+    ../dest/ci-build.html
 
 ../dest/codemirror-examples.html : codemirror-examples.hsc ../pages.hsc \
     ../macros.hsc
@@ -270,6 +274,10 @@ all_hsc : ../dest/api.html ../dest/codemirror-examples.html \
 ../dest/index.html : index.hsc ../pages.hsc ../macros.hsc
 
 ../dest/robuildyaml.html : robuildyaml.hsc ../pages.hsc ../macros.hsc
+
+../dest/api.html : api.hsc ../pages.hsc ../macros.hsc
+
+../dest/ci-build.html : ci-build.hsc ../pages.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

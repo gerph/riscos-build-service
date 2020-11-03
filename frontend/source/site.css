@@ -482,6 +482,7 @@ table.endpoint-list tr.row > th {
     font-family: monospace;
     font-weight: normal;
     vertical-align: top;
+    white-space: nowrap;
 }
 
 table.endpoint-list tr.row > td {
@@ -583,7 +584,7 @@ li {
     margin-top: 0.75em;
 }
 
-div.jfpatch, div.yaml {
+div.jfpatch, div.yaml, div.asm, div.python, div.shell {
     margin: 0.25em 1em 0.25em 1em;
     padding: 0.25em 0.25em 0.25em 0.25em;
     background-color: black;

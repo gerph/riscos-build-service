@@ -36,6 +36,9 @@
     <$if COND=(set SUPPORT_PYTHON)>
     <script src="codemirror/mode/python.js" type='text/javascript'></script>
     <$stripws type="prev"></$if>
+    <$if COND=(set SUPPORT_SHELL)>
+    <script src="codemirror/mode/shell.js" type='text/javascript'></script>
+    <$stripws type="prev"></$if>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css"/>
     <link rel="stylesheet" href="codemirror/theme/elegant.css"/>
     <link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
@@ -136,13 +139,19 @@ function toggle_header_menu() {
 </$macro>
 
 <$macro asm /CLOSE>
-<code class='asm'><$content></code>
+<div class='asm'><$content></div>
 </$macro>
 
 <$macro python /CLOSE>
-<code class='python'>
+<div class='python'>
     <textarea class='source-code python' readonly><$content><$stripws type=both></textarea>
-</code>
+</div>
+</$macro>
+
+<$macro shell /CLOSE>
+<div class='shell'>
+    <textarea class='source-code shell' readonly><$content><$stripws type=both></textarea>
+</div>
 </$macro>
 
 
