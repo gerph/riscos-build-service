@@ -93,7 +93,7 @@ function toggle_header_menu() {
 
 <$macro param /CLOSE name:string/REQUIRED required:bool=''>
 <tr class='row'>
-    <th><(name)><$if COND=(required)>&nbsp;&dagger;</$if></th>
+    <th><code><(name)></code><$if COND=(required)>&nbsp;&dagger;</$if></th>
     <td><$content></td>
 </tr>
 </$macro>
@@ -139,7 +139,7 @@ function toggle_header_menu() {
 </$macro>
 
 <$macro asm /CLOSE>
-<div class='asm'><$content></div>
+<span class='asm'><$content></span>
 </$macro>
 
 <$macro python /CLOSE>

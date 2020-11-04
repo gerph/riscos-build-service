@@ -584,7 +584,19 @@ li {
     margin-top: 0.75em;
 }
 
-div.jfpatch, div.yaml, div.asm, div.python, div.shell {
+
+code, span.asm {
+    background-color: #DDDDDD;
+    border: 1px #AAAAAA solid;
+    padding: 0.125em 0.25em 0.125em 0.25em;
+    border-radius: 3px;
+    margin: 0 0.125em 0 0.125em;
+}
+span.asm {
+    font-family: monospace;
+}
+
+div.jfpatch, div.yaml, div.python, div.shell {
     margin: 0.25em 1em 0.25em 1em;
     padding: 0.25em 0.25em 0.25em 0.25em;
     background-color: black;

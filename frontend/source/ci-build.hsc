@@ -258,7 +258,7 @@ fi
 set -o pipefail
 
 # Fetch the build client
-curl --silent -L -o riscos-build-online https://github.com/gerph/robuild-client/releases/download/v0.05/riscos-build-online && chmod +x riscos-build-online
+curl --silent -L -o riscos-build-online https://github.com/gerph/robuild-client/releases/download/v0.05/riscos-build-online &amp;&amp; chmod +x riscos-build-online
 
 # Send the archive file to build service
 ./riscos-build-online -i my-source-file -t 60 -o /tmp/built
@@ -288,8 +288,263 @@ curl --silent -L -o riscos-build-online https://github.com/gerph/robuild-client/
     <h2 id='github'>GitHub Workflows</h2>
 
 <p>
-FIXME
+    GitHub can trigger builds when changes are pushed to branches or tags.
+    The definition of what build is triggered is called a 'workflow', and the workflows can trigger
+    multiple actions. The workflows are described in YAML, which is described in the
+    <a href="https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions">GitHub documentation</a>.
 </p>
+
+<h3>Basic workflow</h3>
+<p>
+    The YAML file is held in the files '<code>.github/workflows/NAME.yml</code>'.
+    There can be multiple independant workflows which will be run in parallel, differentiated by the filename '<code>NAME</code>'.
+    The YAML content looks like this:
+</p>
+
+<yaml>
+name: RISC OS
+
+# Controls when the action will run. Triggers the workflow on:
+#   * push or pull request on any branch.
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-riscos:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # The scripts to run
+      - name: Build
+        run: |
+            echo Script goes here...
+</yaml>
+
+<ul>
+    <li>The top level '<code>name</code>' key allows different workflows to be distinguished from one another.</li>
+    <li>The '<code>on</code>' block defines which git server operations will cause the workflow to be run.
+        In the example, this is on all branches and all pull requests, as this is likely to be the most
+        common set of triggers that will be required.</li>
+    <li>The '<code>jobs</code>' block defines multiple jobs which can be run to perform the build or test.
+        In the example, only one job is present, for the build of a RISC OS component.
+        Some projects may wish to include other types of builds; for example the <a href="https://github.com/gerph/robuild-client/blob/master/.github/workflows/ci.yml">robuild-client</a> workflow has three distinct builds
+        present, which are serialised (build for Linux, build for RISC OS, create release).</li>
+    <li>Within each of the builds, there are other properties, which can refine how the build happens.</li>
+    <li>The '<code>runs-on</code>' key defines the environment on which the steps in this build of the workflow will
+        be run. The robuild-client is built for ubuntu, so this is used in the example.</li>
+    <li>The '<code>steps</code>' block describes the steps that will be run to make the build.</li>
+    <li>The '<code>uses</code>' key allows 'actions' - canned operations - to be performed. There are many actions
+        available to GitHub workflows. The example uses just one of the 'checkout' operations, which checks out
+        the git source into the working directory.</li>
+    <li>The '<code>runs</code>' key allows a shell script to be executed. This is used with the '<code>name</code>'
+        key, which gives the step a name. The value of the '<code>runs</code>' element is a list of lines to
+        run. In YAML, this list is indicated by the '<code>|</code>', and ends when the indentation of the line
+        returns to that of the introducing key. Consult the <a href='http://yaml.org/spec/1.1/'>YAML documentation</a>
+        for more detail (but be prepared for headaches).</li>
+</ul>
+
+<h3>Artifacts and version numbering</h3>
+<p>
+    This configuration can be combined with the scripting used in the earlier examples to give a build of the
+    RISC OS component. To be useful as a tool for building binaries that others may use, though, it is necessary
+    to archive the output into an 'artifact'. In building an distributable component, it is common to want to
+    distribute the results with a version number or other differentiating feature.
+</p>
+
+<p>
+    Version numbering can be performed in a number of ways, but it is common to have a '<code>VersionNum</code>'
+    file which contains '<code>#define</code>' statements to declare the version number. This is the way that
+    the RISC OS source manages its versions. However, if no version is handled this way, it may be more useful
+    to just use the commit identifier (aka 'Git SHA'). These operations can be performed with a YAML file that
+    looks like this:
+</p>
+
+<yaml>
+name: RISC OS
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-riscos:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      leafname: ${{ steps.version.outputs.leafname }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Build our RISC OS component
+      - name: Build through build.riscos.online
+        run: |
+          ...
+
+      - name: Give the output a versioned name
+        id: version
+        run: |
+          if [[ -f VersionNum ]] ; then
+              version=$(sed '/MajorVersion / ! d ; s/.*MajorVersion *"\(.*\)"/\1/' VersionNum)
+          else
+              version=$(git rev-parse --short HEAD)
+          fi
+          echo "This is version: $version"
+          leafname="MyProgram-$version.zip"
+          if [ -f /tmp/built,a91 ] ; then
+              cp /tmp/built,a91 "MyProgram-$version.zip"
+          else
+              echo "No archive was built?"
+              exit 1
+          fi
+          echo "::set-output name=version::$version"
+          echo "::set-output name=leafname::$leafname"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RISCOS-build
+          path: ${{ steps.version.outputs.leafname }}
+        # The artifact that is downloadable from the Actions is actually a zip of the artifacts
+        # that we supply. So it will be a regular Zip file containing a RISC OS Zip file.
+</yaml>
+
+<ul>
+    <li>The '<code>outputs</code>' block defines that there will be variables generated by an identified step.
+        These variables can be used in later steps, or in different builds. We use them here to declare what
+        we called the archive that we built, and the version number we determined.</li>
+    <li>A new step is created which will create extract the version number from the <code>VersionNum</code> file, or
+        use the commit identifier if no version file was found. Other methods might be to extract from a tag,
+        or to use a different file to read the version from.
+    </li>
+    <li>
+        The magic output '<code>::set-output ...</code>' indicates the variables that should be set and their
+        values.
+    </li>
+    <li>
+        The built output is, here, assumed to be a Zip archive. Zip archives will be created by the build service
+        if the build configuration specifies an artifact path, rather than using the clipboard to copy a file.
+        Filetype &amp;a91 is used for Zip archives.
+    </li>
+    <li>
+        The final step uses the '<code>upload-artifact</code>' action to transfer the artifact from the CI
+        server to GitHub.
+    </li>
+</ul>
+
+<h3>Releases</h3>
+<p>
+    Artifacts stored by GitHub are only available for a short period. In order to be retained so that they
+    can be used for distribution, it is necessary to create a 'Release' in GitHub. This can be achieved at
+    the end of the build process. Commonly, releases are only created when a block of work has been completed
+    and the author is happy with the results. This can be achieved by using git 'tags' to indicate that a
+    release is required. Using any tag prefixed by a 'v' is a common way to achieve this.
+</p>
+
+<yaml>
+name: RISC OS
+
+# Controls when the action will run. Triggers the workflow on:
+#   * push or pull request on any branch.
+#   * tag creation for tags beginning with a 'v'
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+  create:
+    tags:
+      - v*
+
+jobs:
+  build-riscos:
+    ... (as above examples) ...
+
+  # The release only triggers when the thing that was pushed was a tag starting with 'v'
+  release:
+    needs: build-riscos
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download built binary
+        uses: actions/download-artifact@v1
+        with:
+          name: RISCOS-build
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ needs.build-riscos.outputs.version }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`.
+          # See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: RISCOS-build/${{ needs.build-riscos.outputs.leafname }}
+          asset_name: ${{ needs.build-riscos.outputs.leafname }}
+          asset_content_type: application/zip
+</yaml>
+
+<ul>
+    <li>The '<code>on</code>' block has been extended to trigger on the creation of tags that start with a '<code>v</code>'.</li>
+    <li>The '<code>build-riscos</code>' block has been elided.</li>
+
+    <li>A new job has been created which follows on from the earlier job, due to the '<code>needs</code>' element.</li>
+    <li>The 'release' job, is conditional with the '<code>if</code>' key which restricts it to only run when the tag
+        has been pushed which starts with a '<code>v</code>'.</li>
+
+    <li>The binary we created as an artifact is downloaded with the '<code>download-artifact</code>' action.</li>
+    <li>The '<code>create-release</code>' action is used to create a new release into which we can put the artifact.
+        There is a name, based on the version number we determined earlier, generated for the release. In theory
+        this could be based on the tag name, but then the version number in the built component might not match
+        that of the release. The release is created as a 'draft' so that it must be approved before being public.
+    </li>
+
+    <li>
+        The '<code>upload-release-asset</code>' action is then used to put the content that was downloaded into
+        the release. This must use a magic token (because we don't want any old user uploading a release to your
+        project). The name of the file that will be uploaded, its content type, and where it can be found are
+        given with the '<code>asset_</code>' prefixed keys.
+    </li>
+</ul>
+
+<p>
+    Once released, it is necessary for the author to confirm the release (because it was a 'draft'). This allows
+    the author a chance to test that what was built is actually suitable for distribution. Releases do not expire
+    by default and will remain available to the public.
+</p>
+
+<p>
+    The <a href="https://github.com/gerph/cobey/blob/master/.github/workflows/ci.yml">CObey</a> component gives an
+    example of how you might build components and releases automatically. It is not required to follow the pattern
+    given here - there are other ways to achieve this automation which you can use as you wish.
+</p>
+
 </section>
 
 
@@ -297,10 +552,72 @@ FIXME
     <h2 id='gitlab'>GitLab CI</h2>
 
 <p>
-FIXME
+    GitLab CI is able to build on commits in much the same way as the GitHub actions. It is a very powerful
+    system, but doesn't have the same 'action' infrastructure as the GitHub. Consequently, a simpler example
+    is supplied here which shows how to use CI with GitLab. There is fuller documentation on the
+    <a href="https://docs.gitlab.com/ee/ci/yaml/">GitLab documentation site</a>.
 </p>
-</section>
 
+<h3>Basic structure</h3>
+<p>
+    As with the <service-name> build configuration, and GitHub workflow, the configuration for GitLab CI is
+    YAML. GitLab CI organises the builds into stages, which may contain multiple builds. The builds will happen
+    in parallel, unless a dependency is introduced. Each build may contain multiple scripted steps, which are
+    run in the shell on the target system.
+</p>
+
+<p>
+    The basic structure of the GitLab CI file is thus:
+</p>
+
+
+<yaml>
+riscos:
+    stage: build
+    script:
+      - |
+        ...
+
+    artifacts:
+        when: always
+        paths:
+            - MyProgram-*.zip
+
+    tags:
+      - linux
+
+stages:
+    - build
+</yaml>
+
+<ul>
+    <li>The '<code>stages</code>' block declares which named stages will be built, and the order in which
+        they will be built. If any of the builds within the stages fails, the stage will fail, and the
+        job will be terminated.</li>
+
+    <li>
+        The '<code>riscos</code>' block is a named build. It contains a '<code>stage</code>' key which
+        declares the stage this build will be executed within.
+    </li>
+
+    <li>
+        The '<code>script</code>' block is a list of shell commands to run. The failure of any of these
+        commands will terminate the build with a failure. As with the GitHub shell commands, these are
+        usually indicated by a '<code>|</code>' block which introduces lines of commands.
+    </li>
+
+    <li>
+        The '<code>artifacts</code>' block declares which files should be archived as artifacts.
+    </li>
+
+    <li>
+        The '<code>tags</code>' block indicates which environments (which 'runner' in GitLab terms)
+        the code should run on. This will depend on your installation as to which builder is
+        appropriate.
+    </li>
+</ul>
+
+</section>
 
     </page>
 </body>

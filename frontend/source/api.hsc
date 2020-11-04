@@ -233,7 +233,7 @@ The following examples show the interaction between the client and the WebSocket
                        content:string/REQUIRED>
 <tr class=('msg-sender-'+sender)>
     <td class='msg-sender'><(sender)></td>
-    <td class='msg-action'><(action)></td>
+    <td class='msg-action'><code><(action)></code></td>
     <td class='msg-data'><div class='msg-body'><(content)></div>
         <div class='msg-annotation'><$content></div>
     </td>
