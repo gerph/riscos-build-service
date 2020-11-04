@@ -1,0 +1,28 @@
+#define TITLE JFPatch as a Service: Docker layering
+
+#define VALUE(x) #x
+#define STRINGIFY(x) VALUE(x)
+
+#define CONTAINER_MINE   shape=rect, fillcolor="lightblue", style="rounded, filled"
+#define CONTAINER_OTHER  shape=rect, fillcolor="lightgrey", style="rounded, filled"
+
+
+digraph STRINGIFY(TITLE) {
+#include "chartconfig.dot.pp"
+
+    graph [ splines=ortho ];
+
+    # Containers
+    Ubuntu [ CONTAINER_OTHER, label=<<B>ubuntu:18.04</B><br/><i>Base OS</i>> ];
+    Pyromaniac [ CONTAINER_MINE, label=<<B>gerph/pyromaniac</B><br/><i>Pyromaniac, support packages + core RISC OS modules</i>> ];
+    Build [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-build</B><br/><i>Adds build tootls and environment</i>> ];
+    Demo [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-demo</B><br/><i>Adds P2C, example code, web shell</i>> ];
+    VNCServer [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-vncserver</B><br/><i>Adds automatic running of VNC server</i>> ];
+    ROBuild [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-robuild</B><br/><i>Adds JFPatch and P2C</i>> ];
+
+    # Layering.
+    Ubuntu -> Pyromaniac -> Build;
+    Build -> Demo;
+    Build -> VNCServer;
+    Build -> ROBuild;
+}
