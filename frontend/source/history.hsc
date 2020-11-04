@@ -12,7 +12,7 @@ JFPatch has a history that covers its many components. Each of the parts of the 
 own history log at the top of the file, and the main application had a history that wrapped
 up the descriptions of each of the parts. Now, the service itself has another history. There's
 also the technologies that the service is built upon, which have separate histories covering
-about 11 months, which are not described here.
+about 18 months, which are not described here.
 </p>
 
 <ul>

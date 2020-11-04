@@ -12,10 +12,14 @@ open(my $fh, '<', 'versions.munge');
 while (<$fh>)
 {
     chomp;
-    if (/(\d+) s\/(.*)\/(.*)\//)
+    if (/(\d+) s\/(.*)\/(.*)\// ||
+        /(\d+) s!(.*)!(.*)!/)
     {
         my $num = $1 + 0;
         my ($from, $to) = ($2, $3);
+        $to =~ s/\\n/\n/g;
+        $to =~ s/&bullet;/\x{2022}/g;
+        $to =~ s/&nbsp;/\x{a0}/g;
         if (!defined $replace_versions{$num})
         {
             $replace_versions{$num} = [];

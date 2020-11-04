@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 04-Nov-2020 22:05:18
+# updated: 04-Nov-2020 23:23:51
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -42,20 +42,6 @@ ID header-menu
 ID HELLO
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
-DOCUMENT ../dest/history.html
-SOURCE history.hsc
-TITLE 
-ID header-menu
-ID jfpaas
-ID jfpapp
-ID jfpatch
-ID mkmodule
-ID mkws
-ID mkaof
-ID mkmacros
-INCLUDE ../pages.hsc
-INCLUDE ../macros.hsc
-INCLUDE versions.hsc
 DOCUMENT ../dest/index.html
 SOURCE index.hsc
 TITLE 
@@ -116,3 +102,17 @@ ID github
 ID gitlab
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
+DOCUMENT ../dest/history.html
+SOURCE history.hsc
+TITLE 
+ID header-menu
+ID jfpaas
+ID jfpapp
+ID jfpatch
+ID mkmodule
+ID mkws
+ID mkaof
+ID mkmacros
+INCLUDE ../pages.hsc
+INCLUDE ../macros.hsc
+INCLUDE versions.hsc
