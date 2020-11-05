@@ -34,6 +34,10 @@
     How to use <service-name> with CI systems.
 </link-to-page>
 
+<link-to-page href=':statistics.html' name='Statistics'>
+    Some statistics on Pyromaniac and related projects.
+</link-to-page>
+
 <link-to-page href=':history.html' name='History'>
     History of <service-name> and related systems.
 </link-to-page>

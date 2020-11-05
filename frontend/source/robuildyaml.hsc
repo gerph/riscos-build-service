@@ -114,6 +114,7 @@
              </li>
 
         <li><code>squeeze</code> -
+            RISC OS absolute executable file compressor.
              </li>
 
         <li><code>CMunge</code> -

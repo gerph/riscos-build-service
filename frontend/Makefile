@@ -77,7 +77,7 @@ endif
 ifeq (${SUPPORT_YAML}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/yaml.js
 endif
-ifeq (${SUPPORT_YAML}, true)
+ifeq (${SUPPORT_SHELL}, true)
 CODEMIRROR += ${DESTDIR}/codemirror/mode/shell.js
 endif
 
@@ -245,14 +245,14 @@ ${DESTDIR}/%: %
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies follow ---
 
-# dependencies updated: Monday 02-Nov-2020 22:43:09
+# dependencies updated: Thursday 05-Nov-2020 10:06:32
 
 all_hsc : ../dest/codemirror-examples.html ../dest/fileformat.html \
     ../dest/about.html ../dest/notfound.html \
     ../dest/codemirror-examples-objasm.html \
-    ../dest/codemirror-examples-bbcbasic.html ../dest/history.html \
-    ../dest/index.html ../dest/robuildyaml.html ../dest/api.html \
-    ../dest/ci-build.html
+    ../dest/codemirror-examples-bbcbasic.html ../dest/index.html \
+    ../dest/robuildyaml.html ../dest/api.html ../dest/ci-build.html \
+    ../dest/history.html ../dest/statistics.html
 
 ../dest/codemirror-examples.html : codemirror-examples.hsc ../pages.hsc \
     ../macros.hsc
@@ -269,8 +269,6 @@ all_hsc : ../dest/codemirror-examples.html ../dest/fileformat.html \
 ../dest/codemirror-examples-bbcbasic.html : \
     codemirror-examples-bbcbasic.hsc ../pages.hsc ../macros.hsc
 
-../dest/history.html : history.hsc ../pages.hsc ../macros.hsc versions.hsc
-
 ../dest/index.html : index.hsc ../pages.hsc ../macros.hsc
 
 ../dest/robuildyaml.html : robuildyaml.hsc ../pages.hsc ../macros.hsc
@@ -278,6 +276,10 @@ all_hsc : ../dest/codemirror-examples.html ../dest/fileformat.html \
 ../dest/api.html : api.hsc ../pages.hsc ../macros.hsc
 
 ../dest/ci-build.html : ci-build.hsc ../pages.hsc ../macros.hsc
+
+../dest/history.html : history.hsc ../pages.hsc ../macros.hsc versions.hsc
+
+../dest/statistics.html : statistics.hsc ../pages.hsc ../macros.hsc
 
 # --- DO NOT MODIFY THIS LINE -- hsc-dependencies precede ---
 

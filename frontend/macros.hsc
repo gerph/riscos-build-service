@@ -155,7 +155,6 @@ function toggle_header_menu() {
 </$macro>
 
 
-
 <***** Common formatting macros ****>
 
 <$macro filelink filename:string/REQUIRED label:string/REQUIRED>

@@ -659,6 +659,22 @@ div#log { display: none }
     background-color: red;
 }
 
+.statistics td {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.statistics th {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-align: left;
+}
+
+.statistics .statistics-section {
+    background-color: darkgrey;
+    color: white;
+}
+
 /*
 body {
     background-color: #ddd;
