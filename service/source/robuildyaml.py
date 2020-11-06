@@ -6,7 +6,7 @@ The `.robuild.yaml` file is used within sources supplied to the RISC OS Build se
 to define how the build should be performed.
 
 The file itself may be called `.robuild.yml`, `.robuild.yaml` or `.robuild` (in RISC OS,
-those files will use `/` instead of `.`.
+those files will use `/` instead of `.`).
 
 The file is structured as YAML, and contains a dictionary with the following elements:
 

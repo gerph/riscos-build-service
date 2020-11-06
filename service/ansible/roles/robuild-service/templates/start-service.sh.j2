@@ -6,7 +6,7 @@
 set -eo pipefail
 
 scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-cd "$scriptdir"
+cd "$scriptdir/robuild-service"
 
 logdir=logs
 
@@ -25,19 +25,29 @@ trap sig_term SIGTERM
 trap sig_term SIGHUP
 trap sig_term SIGINT
 
+# Set up the virtualenv, we will use
+rm -rf venv
+virtualenv venv
+source venv/bin/activate
+
+# Install the components we need
+pip install -r requirements.txt
 
 export PYTHONUNBUFFERED=1
 
 # Using > >(...) to create a redirection to a subprocess.
 # Using this rather than a pipe with | means that $! gets
 # set to the pid of the first command, not the second.
+echo "Starting servers..."
 ./server.py > >(ts >> "$logdir/server.log") 2>&1 &
 pid_server=$!
 ./wsserver.py > >(ts >> "$logdir/wsserver.log") 2>&1 &
 pid_wsserver=$!
 
 while true; do
-    sleep 60 &
+    sleep 20 &
     pid_sleep=$!
     wait
 done
+
+echo "Servers exited"

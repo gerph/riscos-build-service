@@ -1,0 +1,4 @@
+# Configuration for docker
+
+# Whether docker should be started; disable this if your docker is masked.
+docker_start: yes

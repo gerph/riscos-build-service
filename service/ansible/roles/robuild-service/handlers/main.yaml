@@ -1,0 +1,23 @@
+
+# Restart the systemd-logind service after reconfiguration
+- name: restart-logind
+  systemd:
+    state: restarted
+    name: systemd-logind
+  become: yes
+
+# Ensure that the daemon recognises the new configuration
+- name: restart-robuild-service
+  systemd:
+    scope: user
+    daemon_reload: true
+  changed_when: true
+  notify: restart-robuild-service-2
+
+# And restart the service
+- name: restart-robuild-service-2
+  systemd:
+    scope: user
+    state: restarted
+    enabled: yes
+    name: robuild-service.service

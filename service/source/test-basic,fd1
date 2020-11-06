@@ -1,0 +1,18 @@
+PRINT"BASIC: ";REPORT$
+PRINT"----"
+
+PRINT"*FX0"
+SYS "XOS_Byte", 0 TO err%
+SYS "XOS_GenerateError",err%+4 TO a$
+PRINTa$
+PRINT"----"
+PRINT"Modules:"
+*Modules
+PRINT"----"
+PRINT"System details:"
+FOR I = 0TO10
+    SYS "OS_ReadSysInfo", 9, I TO a%
+    IF a%=0 THENa$="<unset>" ELSESYS "XOS_GenerateError",a% TO a$
+    PRINT I; " : "; a$
+NEXT
+               

@@ -1,11 +1,16 @@
-
 [Unit]
 Description=JFPatch services
 Documentation=https://jfpatch.riscos.online/
 
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
 [Service]
 Type=simple
+ExecStartPre=/usr/bin/docker pull {{ robuildservice_image }}:{{ robuildservice_version }}
 ExecStart=/home/ubuntu/start-service.sh
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

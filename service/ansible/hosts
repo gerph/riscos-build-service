@@ -1,0 +1,7 @@
+# Hosts for deploying robuild-service
+
+[robuild-service]
+backend0.build.riscos.online
+
+[robuild-service-test]
+ec2-3-249-143-63.eu-west-1.compute.amazonaws.com

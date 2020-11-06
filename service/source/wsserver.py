@@ -5,6 +5,7 @@ WebSocket builder.
 
 import base64
 import json
+import os
 import threading
 
 from websocket_server import WebsocketServer
@@ -12,6 +13,8 @@ from websocket_server import WebsocketServer
 import robuild
 import build
 import json_funcs
+import simpleyaml
+
 
 VERSION = '1.04'
 NAME = 'RISC OS Build system'
@@ -24,6 +27,26 @@ MAX_RUNTIME = 30 * 60
 DEFAULT_RUNTIME = 10 * 60
 
 
+class Config(object):
+    def __init__(self):
+        self.version = VERSION
+        self.name = NAME
+        self.max_runtime = MAX_RUNTIME
+        self.default_runtime = DEFAULT_RUNTIME
+        if os.path.isfile('override_ws.yaml'):
+            # The override file allows us to reconfigure this at deployment time.
+            with open('override_ws.yaml', 'r') as fh:
+                override = simpleyaml.load(fh)
+                if 'version' in override:
+                    self.version = override['version']
+                if 'name' in override:
+                    self.name = override['name']
+                if 'max_runtime' in override:
+                    self.max_runtime = override['max_runtime']
+                if 'default_runtime' in override:
+                    self.default_runtime = override['default_runtime']
+
+
 class OptionError(Exception):
     pass
 
@@ -31,12 +54,13 @@ class OptionError(Exception):
 class HarnessStream(object):
 
     def __init__(self):
+        self.config = Config()
         self.builder = None
         self.source_data = None
         self.debug = None
         self.thread = None
         self.server_running = False
-        self.timeout = DEFAULT_RUNTIME
+        self.timeout = self.config.default_runtime
         self.ansitext = True
 
     def set_source(self, source_data):
@@ -56,9 +80,9 @@ class HarnessStream(object):
         # more about the system than necessary.
         if option == 'timeout':
             if not isinstance(value, (int, float)) or \
-               value > MAX_RUNTIME or \
+               value > self.config.max_runtime or \
                value <= 0:
-                raise OptionError("Option 'timeout' must be a positive number, less than {}".format(MAX_RUNTIME))
+                raise OptionError("Option 'timeout' must be a positive number, less than {}".format(self.config.max_runtime))
             print("Configured 'timeout' to {}".format(value))
             self.timeout = value
             return
@@ -140,7 +164,7 @@ class HarnessStreamWS(HarnessStream):
         self.server = kwargs.pop('server')
         self.client = kwargs.pop('client')
         super(HarnessStreamWS, self).__init__(*args, **kwargs)
-        self.send_message('welcome', '{} version {}'.format(NAME, VERSION))
+        self.send_message('welcome', '{} version {}'.format(self.config.name, self.config.version))
 
     def send_message(self, code, data):
         message = ''.join(json_funcs.json_iterable([code, data]))

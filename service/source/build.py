@@ -13,6 +13,7 @@ Given a source file (or data), build it.
 * Returns the results through callbacks and the results object.
 """
 
+import os
 import threading
 
 try:
@@ -30,12 +31,17 @@ import result
 
 
 class Builder(object):
-    docker_image = 'gerph/robuild-service'
+    docker_image = 'gerph/robuild-service:latest'
     docker_workdir = '/home/riscos'
     docker_mountdir = '{}/fs/work'.format(docker_workdir)
     pyro_configfile = None
 
     def __init__(self, sourcefile=None, data=None, timeout=(60 * 10)):
+        # Allow an explicit override to be set (on initialisation)
+        if os.path.isfile('override_image.txt'):
+            with open('override_image.txt', 'r') as fh:
+                self.docker_image = fh.read().strip()
+
         self.sourcefile = sourcefile
         self.data = data
         self.result = result.BuildResultLines()

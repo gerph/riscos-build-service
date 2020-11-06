@@ -1,0 +1,9 @@
+# Playbook for deploying the demo service
+
+- hosts: robuild-service
+  roles:
+    - robuild-service
+
+- hosts: robuild-service-test
+  roles:
+    - robuild-service

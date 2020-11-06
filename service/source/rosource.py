@@ -59,8 +59,11 @@ def touch(fname, times=None):
 
 class RISCOSSource(object):
     dir = None
+    primary_file = None
+    shutil = shutil
 
     def __init__(self, source, touch_buildables=True):
+        assert source is not None, "RISCOSSource must be supplied a valid source"
         self.source = source
         self.dir = tempfile.mkdtemp(prefix='robuild', dir=tempdir)
         self.source_file = os.path.join(self.dir, '_source_')
@@ -68,7 +71,6 @@ class RISCOSSource(object):
             fh.write(self.source)
         self.primary_file = roname.RISCOSName()
         self.content = None
-        self.shutil = shutil
         self.touch_buildables = touch_buildables
 
         # Discovered items
@@ -127,6 +129,9 @@ class RISCOSSource(object):
 
     @property
     def primary_filetype(self):
+        if not self.primary_file:
+            return -1
+
         return self.primary_file.filetype
 
     def guess_filetype(self, filename=None, data=None, unix_filename=None):

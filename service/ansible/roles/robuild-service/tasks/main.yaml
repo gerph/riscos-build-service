@@ -1,0 +1,95 @@
+# Install the service so that we run on startup
+
+#### Prerequisites
+- name: Ensure that ts is present
+  apt:
+    name:
+      - moreutils
+      - python-virtualenv
+    state: present
+  become: yes
+
+
+#### Docker configuration
+- name: Log in to the docker registry
+  docker_login:
+    registry_url: "{{ robuildservice_registry }}"
+    password: "{{ robuildservice_registry_pass }}"
+    username: "{{ robuildservice_registry_user }}"
+
+- name: Ensure that logout doesn't kill processes
+  lineinfile:
+    path: "/etc/systemd/logind.conf"
+    regexp: "^#?KillUserProcesses="
+    line: "KillUserProcesses=no"
+  become: yes
+  notify: restart-logind
+
+# That logout processes thing doesn't seem to really work, so we also set linger
+- name: Enable user linger
+  shell: loginctl enable-linger {{ ansible_ssh_user }}
+  become: yes
+
+
+#### SystemD configuration
+- name: Ensure systemctl configuration exists
+  file:
+    dest: ~/.config/systemd/user
+    state: directory
+  notify: restart-robuild-service
+
+- name: systemctl service install
+  template:
+    src: robuild-service.service.j2
+    dest: ~/.config/systemd/user/robuild-service.service
+  notify: restart-robuild-service
+
+- name: Service starter script
+  template:
+    src: start-service.sh.j2
+    dest: ~/start-service.sh
+    mode: 0755
+  notify: restart-robuild-service
+
+
+#### Service source
+- name: Create directory for the service source
+  file:
+    dest: robuild-service
+    state: directory
+  notify: restart-robuild-service
+
+- name: Copy the service code
+  copy:
+    src: "{{ item }}"
+    dest: "robuild-service/"
+  with_fileglob:
+    - ../source/*.py
+    - ../source/requirements.txt
+    - ../source/*,fd1
+  notify: restart-robuild-service
+
+- name: Ensure the tools are executable
+  file:
+    dest: "robuild-service/{{ item }}"
+    mode: 0755
+  with_items:
+    - cli.py
+    - wsclient.py
+    - wsserver.py
+    - server.py
+  notify: restart-robuild-service
+
+
+#### Configuration
+- name: Set the docker image we will use
+  copy:
+    content: "{{ robuildservice_image }}:{{ robuildservice_version }}"
+    dest: "robuild-service/override_image.txt"
+  # No need to notify; this it read on connection.
+
+- name: Set the websockets configuration
+  copy:
+    content: "{{ robuildservice_wsconfig | to_nice_yaml }}"
+    dest: "robuild-service/override_ws.yaml"
+  # No need to notify; this it read on connection.

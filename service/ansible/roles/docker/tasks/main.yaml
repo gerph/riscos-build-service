@@ -1,0 +1,30 @@
+# Install docker, and ensure the user has access
+
+- name: Ensure apt is up to date
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Ensure docker installed
+  apt:
+    name:
+      - docker.io
+      - python-docker
+      - python3-docker
+      - python3-requests
+    state: present
+  become: yes
+
+- name: Start the docker service
+  service:
+    name: docker
+    state: started
+  become: yes
+  when: docker_start
+
+- name: Ensure user has access to docker
+  user:
+    name: "{{ ansible_ssh_user }}"
+    groups:
+      - docker
+  become: yes

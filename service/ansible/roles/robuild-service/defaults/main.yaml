@@ -1,0 +1,19 @@
+# Configuration variables
+
+# Registry to log in to (if any)
+robuildservice_registry: "docker-registry.gerph.org"
+
+# Login parameters for the registry
+robuildservice_registry_user:
+robuildservice_registry_pass:
+
+# Docker image to use
+robuildservice_image: "docker-registry.gerph.org/gerph/robuild-service"
+
+# Version to use, if not specified
+robuildservice_version: latest
+
+# Configuration for the websockets service
+robuildservice_wsconfig:
+    version: "{{ robuildservice_version }}"
+    name: "RISC OS Build System"

@@ -14,7 +14,7 @@ import build
 
 def setup_parser():
     parser = argparse.ArgumentParser(usage="%s [<options>]" % (os.path.basename(sys.argv[0]),))
-    parser.add_argument('--source', type=str,
+    parser.add_argument('--source', type=str, required=True,
                         help="Source file to build")
     parser.add_argument('--debug', type=str, default='',
                         help="Add debug options to the execution")
