@@ -11,7 +11,9 @@ cross_install: docker
 
 docker: prepare
 	DOCKER_BUILDKIT=1 docker build --build-arg PYROMANIAC_BUILD_VERSION=${PYROMANIAC_BUILD_VERSION} -t "gerph/robuild-service:$${CI_BRANCH_VERSION:-latest}" ${ROOT_DIR}
-	bash -c 'if [[ "${CI_BRANCH}" == "master" && ! "${CI_BRANCH_VERSION}" =~ -dirty ]] ; then docker tag "gerph/robuild-service:${CI_BRANCH_VERSION}" gerph/robuild-service:latest ; fi'
+	bash -c 'if [[ "${CI_BRANCH}" == "master" && ! "${CI_BRANCH_VERSION}" =~ -dirty ]] ; then ./tag-and-push gerph/robuild-service ${CI_BRANCH_VERSION} ${CI_BRANCH} ; fi'
+
+release:
 
 prepare: dirs
 clean:

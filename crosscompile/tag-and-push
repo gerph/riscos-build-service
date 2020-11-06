@@ -1,0 +1,22 @@
+#!/bin/bash
+##
+# Tag newly created container and push it to the remote registry.
+#
+
+registry=docker-registry.gerph.org
+
+repo=$1
+version=$2
+branch=$3
+
+if [[ "$branch" == 'master' ]] ; then
+    docker tag "$repo:$version" "$repo:latest"
+fi
+docker tag "$repo:$version" "$registry/$repo:$version"
+if [[ "$branch" == 'master' ]] ; then
+    docker tag "$repo:$version" "$registry/$repo:latest"
+fi
+docker push "$registry/$repo:$version"
+if [[ "$branch" == 'master' ]] ; then
+    docker push "$registry/$repo:latest"
+fi
