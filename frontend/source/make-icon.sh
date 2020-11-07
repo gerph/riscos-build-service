@@ -223,7 +223,7 @@ makeimage_args=(
             -bordercolor none \
             -background none \
             -alpha on \
-            -density 1200 \
+            -density 600 \
             "${trim_args[@]}" \
             "${resize_args[@]}" \
             -border "${inset}x${inset}" \
