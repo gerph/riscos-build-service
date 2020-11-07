@@ -45,7 +45,11 @@
     <ul>
         <li><code>env</code>: Declares a dictionary of system variables which should be set before the build.</li>
 
-        <li><code>script</code>: Declares a list of the RISC OS commands to run. Failure of any command will fail the build.</li>
+        <li><code>script</code>: Declares a list of the RISC OS commands to run. Failure of any command will fail the build.
+<$if COND=(service = 'bro')>
+More information about the environment can be found in information <a href=":about.html">about the service</a>.
+</$if>
+        </li>
 
         <li><code>artifacts</code>: Declares a list of artifacts that should be returned. Only one item can exist at present</li>
     </ul>
@@ -65,99 +69,6 @@
 </p>
 
 </section>
-
-
-
-<section>
-    <h2>Build environment</h2>
-
-<p>
-    The build environment that the service executes files under is a variant of RISC OS
-    and can function as you might expect RISC OS to function. There are limitations, however,
-    which are based on the implementation, the nature of the service and security. These
-    limitations are subject to change at any time, but the following are the most significant:
-
-    <ul>
-        <li>There's no WindowManager. Wimp Tasks don't exist.</li>
-        <li>The build service has no interactive components. You cannot type commands.</li>
-        <li>There is no graphics system. That means no sprites and no frame buffer.</li>
-        <li>There is no sound system.</li>
-        <li>There is no printer or serial system.</li>
-        <li>There is no FileCore. There's also no Fileswitch registerable filesystems.</li>
-        <li>The filesystem is ephemeral. Every build job is independant from every other job.</li>
-        <li>There is no boot sequence. That means that none of the variables you might see on a native system will exist.</li>
-    </ul>
-</p>
-
-<p>
-    The build environment has the following tools installed:
-
-    <ul>
-        <li><code>amu</code> -
-            A Make Utility (RISC OS make tool).
-             </li>
-
-        <li><code>cc</code> -
-            RISC OS ARM C compiler.
-             </li>
-
-        <li><code>libfile</code> -
-            RISC OS ARM library management tool.
-             </li>
-
-        <li><code>link</code> -
-            RISC OS ARM linker.
-             </li>
-
-        <li><code>objasm</code> -
-            RISC OS ARM assembler.
-             </li>
-
-        <li><code>squeeze</code> -
-            RISC OS absolute executable file compressor.
-             </li>
-
-        <li><code>CMunge</code> -
-            Module header generator tool (CMHG replacement).
-             </li>
-
-        <li><code>perl</code> -
-            Perl 5.0.0 interpreter.
-             </li>
-
-        <li><code>ResGen</code> -
-            ResourceFS file creation tool.
-             </li>
-
-        <li><code>bison</code> -
-            GNU Parser generator
-             </li>
-
-        <li><code>flex</code> -
-            GNU Lexical parser generator
-             </li>
-
-        <li><code>sed</code> -
-            GNU sed, a text stream editor.
-             </li>
-
-        <li><code>jfpatch</code> -
-            JFPatch, preprocessing ARM assembler.
-            </li>
-
-        <li><code>p2c</code> -
-            Pascal to C conversion tool.
-            </li>
-    </ul>
-
-    In addition to these tools, some of the standard RISC OS commands are available.
-</p>
-
-<p>
-    There are libraries and headers for the C and Pascal libraries present.
-</p>
-</section>
-
 
 
 <section>

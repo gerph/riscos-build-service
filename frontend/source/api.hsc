@@ -311,8 +311,9 @@ The following examples show the interaction between the client and the WebSocket
 <!-- Build with errors -->
 <message-table title='WebSocket exchange for a build with errors'>
 <message sender='server' action='welcome'
-         content="'Linking over Internet with RISCOS Pyromaniac Agent version 1.04'">
-     Server announcement and version number.
+         content="'RISC OS Build System version 2.0.109'">
+     Server announcement and version number. The original version reported itself as <code>'Linking over Internet with RISCOS Pyromaniac Agent version 1.04'</code>, a reference to its release on April 1st.
+     The current versions report the version of the build system which is used.
 </message>
 
 <message sender='client' action='source'

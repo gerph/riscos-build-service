@@ -341,9 +341,14 @@ main {
     margin-right: 0.5em;
 }
 
+/*
+h1, h2, h3, div.section, footer {
+    font-family: Optima, "URW Classico", Rachana, Sawasdee, sans-serif;
+}
+*/
+
 footer {
     background-color: palegreen;
-    font-family: sans-serif;
     padding: 4px 2em 4px 8em;
     margin-top: auto;
     margin-bottom: 0em;
@@ -429,7 +434,7 @@ section {
     clear: right;
 }
 h2 {
-    background-color: dimgrey;
+    background-color: #404040;
     color: white;
     padding: 0.25em;
     margin-left: -1.25em;
@@ -437,10 +442,10 @@ h2 {
 }
 
 h3 {
-    background-color: darkgrey;
+    background-color: #696969;
     color: white;
     margin-left: -0.75em;
-    margin-right: -1.5em;
+    margin-right: -0.5em;
     padding: 0.25em;
 }
 
@@ -672,7 +677,7 @@ div#log { display: none }
 
 .statistics .statistics-section {
     background-color: darkgrey;
-    color: white;
+    color: black;
 }
 
 /*

@@ -223,7 +223,7 @@ class Variable(object):
 
 class Makefile(object):
     rule_split_re = re.compile(r'([^\s:]+\s*:);\s*(.*)')
-    default_suffixes = SpecialTarget('.SUFFIXES', '.c .o .h .s')
+    default_suffixes = SpecialTarget('.SUFFIXES', '.c .cmhg .o .h .s')
 
     def __init__(self, content):
         self.content = content
@@ -498,9 +498,10 @@ class Makefile(object):
 
                 #print("Matches target %s\n" % (target_name,))
 
-                for dependency in target.dependencies:
-                    if self.match_suffix(dependency, ext_from):
-                        candidates.append((dependency, rule))
+                if target:
+                    for dependency in target.dependencies:
+                        if self.match_suffix(dependency, ext_from):
+                            candidates.append((dependency, rule))
 
         if len(candidates) > 1:
             raise ValueError("Multiple suffix rule matches for {}: {}"
@@ -576,7 +577,7 @@ def read_makefile(mf_filename):
     return makefile
 
 
-def show_tree(makefile, goal=None, built={}, indent=0):
+def show_tree(makefile, goal=None, built={}, indent=0, debug=False):
     if not goal:
         if not makefile.first_target:
             raise ValueError("No default target known in makefile")
@@ -586,8 +587,10 @@ def show_tree(makefile, goal=None, built={}, indent=0):
     rule = makefile.find_rule(goal)
     if not rule:
         return
-    #print("{}- {}   ({})".format(" " * indent, goal, rule))
-    print("{}- {}".format(" " * indent, goal))
+    if debug:
+        print("{}- {}   ({})".format(" " * indent, goal, rule))
+    else:
+        print("{}- {}".format(" " * indent, goal))
     if goal in built:
         # Already built, so we can skip its dependencies and commands
         return
@@ -612,7 +615,20 @@ if __name__ == '__main__':
     parser.add_argument('--makefile', type=str, required=True,
                         help="Makefile to process")
 
+    parser.add_argument('--debug', action='store_true',
+                        help="Debugging this makefile parsing")
+
     options = parser.parse_args()
 
     mf = read_makefile(options.makefile)
-    show_tree(mf)
+    if options.debug:
+        print("Makefile: %r" % (mf,))
+        print("Targets:")
+        for target in mf.targets:
+            print("  %s" % (target,))
+    show_tree(mf, debug=options.debug)
+
+    print("")
+    print("Linkables:")
+    for linkable in mf.linkables():
+        print("  %s" % (linkable,))

@@ -114,7 +114,7 @@ class ROBuilderYAML(ROBuilderBase):
         ofh = io.BytesIO()
         artifact_dir = os.path.join(self.source.dir, roname.unix_filename)
 
-        with zipfile.ZipFile(ofh, 'w') as zh:
+        with zipfile.ZipFile(ofh, 'w', compression=zipfile.ZIP_DEFLATED) as zh:
             for path, dirname, filenames in os.walk(artifact_dir):
                 p = os.path.relpath(path, artifact_dir) + '/'
                 if p.startswith('./'):
@@ -134,7 +134,7 @@ class ROBuilderYAML(ROBuilderBase):
                     zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
                     zi.nfs_encoding = False
                     with open(dfn) as fh:
-                        zh.writestr(zi, fh.read())
+                        zh.writestr(zi, fh.read(), compress_type=zipfile.ZIP_DEFLATED)
                     #print("Add file: %s%s" % (p, f))
 
         return (ofh.getvalue(), FILETYPE_ZIP)
@@ -261,6 +261,7 @@ class ROBuilderPascal(ROBuilderSingleFile):
 class ROBuilderMakefile(ROBuilderBase):
     tool_name = 'AMU'
     tool_command = 'AMU'
+    mf = None
 
     def commands(self):
         args = ['{}'.format(self.tool_command)]
@@ -282,8 +283,10 @@ class ROBuilderMakefile(ROBuilderBase):
                     target_dir, _name = target.rsplit('.', 1)
                     needed_directories |= set([target_dir])
 
+            self.mf = mf
+
         except Exception as exc:
-            #traceback.print_exc()
+            traceback.print_exc()
             print("Failed to read Makefile: {}".format(exc))
 
             # Simple processing, looking at what buildables we have
@@ -302,6 +305,74 @@ class ROBuilderMakefile(ROBuilderBase):
 
     def recognise(self):
         return bool(self.source.makefile)
+
+    def collect_artifact(self):
+        if not self.mf:
+            return (None, None)
+
+        linkables = self.mf.linkables()
+        if not linkables:
+            return (None, None)
+
+        if self.ro_dirname != '@':
+            linkables = ["{}.{}".format(self.ro_dirname, linkable) for linkable in linkables]
+
+        #print("Linkables: %r" % (linkables,))
+
+        # We just archive the files that exist in as linkables in the target - ie anything
+        # we guessed is a target. But only if it exists.
+        ofh = io.BytesIO()
+        artifact_dir = self.source.dir
+
+        dirscreated = set([])
+        nfiles = 0
+
+        with zipfile.ZipFile(ofh, 'w', compression=zipfile.ZIP_DEFLATED) as zh:
+            for ro_filename in linkables:
+                roname = RISCOSName(ro_filename)
+                local_filename = os.path.join(self.source.dir, roname.unix_filename)
+
+            for path, dirname, filenames in os.walk(artifact_dir):
+                p = os.path.relpath(path, artifact_dir) + '/'
+                if p.startswith('./'):
+                    p = p[2:]
+
+                for f in filenames:
+                    fn = '{}{}'.format(p, f)
+                    roname = RISCOSName(unix_filename=fn)
+                    #print("File: %s / %s / %s" % (fn, roname, roname.ro_filename))
+
+                    if roname.ro_filename in linkables:
+                        # We wanted this file archiving.
+                        #print("Want to archive %s / %s" % (fn, roname))
+
+                        # We want to archive this file, BUT to do so we need to ensure that all
+                        # the directories above it exist.
+                        dir_parts = roname.ro_filename.split('.')
+                        for nparts in range(1, len(dir_parts)):
+                            rodirname = '.'.join(dir_parts[:nparts])
+                            if rodirname not in dirscreated:
+                                rodir = RISCOSName(ro_filename=rodirname)
+                                # FIXME: Bit of a hack here to remove the ,ffd that gets appended
+                                unixdirname = rodir.unix_filename[:-4]
+                                unixdir = os.path.join(self.source.dir, unixdirname)
+                                zi = rozipinfo.ZipInfoRISCOS.from_file(filename=unixdir, arcname=unixdirname)
+                                zi.nfs_encoding = False
+                                zh.writestr(zi, b'')
+                                #print("Add dir: %s" % (unixdirname,))
+                                dirscreated.add(rodirname)
+
+                        dfn = os.path.join(path, f)
+                        zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
+                        zi.nfs_encoding = False
+                        with open(dfn) as fh:
+                            zh.writestr(zi, fh.read(), compress_type=zipfile.ZIP_DEFLATED)
+                        #print("Add file: %s%s" % (p, f))
+                        nfiles += 1
+
+        if not nfiles:
+            return (None, None)
+        return (ofh.getvalue(), FILETYPE_ZIP)
 
 
 class ROBuilderError(Exception):

@@ -138,7 +138,7 @@ if [[ "${1:-}" =~ ^[0-9]+$ ]] ; then
 fi
 
 if [[ "${1:-}" != '' ]] ; then
-    echo "Unreocgnised parameter '$1'" >&2
+    echo "Unrecognised parameter '$1'" >&2
     exit 1
 fi
 

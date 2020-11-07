@@ -449,6 +449,7 @@ Notes:
 <h2 id='jfpatch'>JFPatch back end</h2>
 
 <version-table>
+<version number='2.57' date='31 Aug 2020'>Added -apcs command line option</version>
 <version number='2.56' date='02 Mar 2020'>Added ClipboardHolder operation</version>
 <version number='2.55' date='09 Apr 1999'>JB's modifications added</version>
 <version number='2.54' date='07 Apr 1998'>Service entry fixed, Code-in fixed now. Other things.</version>
@@ -512,6 +513,8 @@ Notes:
 <section>
 <h2 id='mkmodule'>Module generation</h2>
 <version-table>
+<version number='2.34' date='30 Aug 2020'>Added 32bit support</version>
+<version number='2.33' date='12 Aug 2020'>Added (restored?) Date support</version>
 <version number='2.32' date='24 May 2001'>Added support for 'duplicate service handlers' which may help when using auto-added handlers</version>
 <version number='2.31' date='24 May 2001'>Service handler code completely re-written to cope correctly with high-service numbers. Totally removed code for encoding using dictionary</version>
 <version number='2.30' date='16 Mar 2001'>WimpSWIve registration now uses multiple instructions (BASIC problem ?)</version>

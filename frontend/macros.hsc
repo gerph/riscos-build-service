@@ -1,4 +1,12 @@
+<$define service:string>
+<*** Use 'jfpaas' or 'bro' ***>
+<$let service="jfpaas">
+
+<$if COND=(service = 'jfpaas')>
 <$macro service-name>JFPatch-as-a-Service</$macro>
+<$else>
+<$macro service-name>RISC OS Build</$macro>
+</$if>
 
 <$include file="../pages.hsc">
 
@@ -8,7 +16,11 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title><service-name>: <(title)></title>
-  <link rel="shortcut icon" href=":favicon.ico" />
+  <$if COND=(service = 'jfpaas')>
+   <link rel="shortcut icon" href=":favicon.ico" />
+  <$else>
+   <link rel="shortcut icon" href=":favicon-buildsite.ico" />
+  </$if>
   <$if COND=(codecolouring)>
     <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
     <script src="codemirror/addon/mode/simple.js" type='text/javascript'></script>
@@ -57,8 +69,13 @@ function toggle_header_menu() {
     menu.style.display = menu.style.display == 'block' ? 'none' : 'block';
 }
 --></script>
+  <$if COND=(service = 'jfpaas')>
 <a href=':index.html'><img class='site-logo' src=':icons/patched.png' alt='[Patched Cog]' /></a>
 <h1 class='title'>JFPatch <small><i>as a Service</i></small></h1>
+  <$else>
+<a href=':index.html'><img class='site-logo' src=':icons/buildsite.png' alt='[Build Logo]' /></a>
+<h1 class='title' title="aka JFPatch-as-a-Service"><service-name></h1>
+  </$if>
 <nav class='header-menu'>
     <a href="#" onclick="toggle_header_menu()"><img src=':icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>

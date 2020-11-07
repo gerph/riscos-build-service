@@ -82,9 +82,12 @@ CODEMIRROR += ${DESTDIR}/codemirror/mode/shell.js
 endif
 
 
-EXAMPLE_SOURCES=$(wildcard jfpatch-as-a-service-examples/jfpatch-files/*)
+EXAMPLE_SOURCES = $(wildcard jfpatch-as-a-service-examples/jfpatch-files/*) \
+				  $(wildcard jfpatch-as-a-service-examples/misc-examples/*) \
+				  $(wildcard jfpatch-as-a-service-examples/c-examples/*) \
+				  jfpatch-as-a-service-examples/examples.json \
 
-EXAMPLES = $(subst jfpatch-as-a-service-examples/jfpatch-files/,${DESTDIR}/examples/,${EXAMPLE_SOURCES})
+EXAMPLES = $(subst jfpatch-as-a-service-examples/,${DESTDIR}/examples/,${EXAMPLE_SOURCES})
 
 
 #.PHONY: all static all_hsc
@@ -94,7 +97,9 @@ dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
 	mkdir -p ${DESTDIR}/images
-	mkdir -p ${DESTDIR}/examples
+	mkdir -p ${DESTDIR}/examples/jfpatch-files
+	mkdir -p ${DESTDIR}/examples/misc-examples
+	mkdir -p ${DESTDIR}/examples/c-examples
 	mkdir -p ${DESTDIR}/codemirror/lib
 	mkdir -p ${DESTDIR}/codemirror/theme
 	mkdir -p ${DESTDIR}/codemirror/mode
@@ -103,6 +108,7 @@ dirs:
 static: \
 		${DESTDIR}/.htaccess \
  	 	${DESTDIR}/ansi_up.js \
+ 	 	${DESTDIR}/builder.js \
  	 	${DESTDIR}/site.css \
  	 	${DESTDIR}/favicon.ico \
  	 	${DESTDIR}/favicon-patched.ico \
@@ -161,6 +167,7 @@ ${DESTDIR}/icons/build.png: icons/2746034.svg
 # Site icon
 # 1646265 - spanner and screwdriver crossed.
 # 2081656 - screwdriver and spanner.
+# 2078671 - crane.
 ${DESTDIR}/icons/overlay-build-large.png: icons/2078671-edited.svg
 	./make-icon.sh --trim $? $@ ${LARGE_SIZE}
 ${DESTDIR}/icons/overlay-build.png: icons/2078671-edited.svg
@@ -216,7 +223,7 @@ ${DESTDIR}/colouring.js: colouring.js.in
 versions.hsc: make-version-info.pl versions.munge
 	./make-version-info.pl > versions.hsc
 
-${DESTDIR}/examples/%: jfpatch-as-a-service-examples/jfpatch-files/%
+${DESTDIR}/examples/%: jfpatch-as-a-service-examples/%
 	cp -R $? $@
 
 ${DESTDIR}/images/howitworks.png ${DESTDIR}/images/howitworks.svg: diagrams/howitworks.png diagrams/howitworks.svg
