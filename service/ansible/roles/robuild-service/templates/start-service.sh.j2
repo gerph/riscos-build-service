@@ -44,10 +44,9 @@ pid_server=$!
 ./wsserver.py > >(ts >> "$logdir/wsserver.log") 2>&1 &
 pid_wsserver=$!
 
-while true; do
-    sleep 20 &
-    pid_sleep=$!
-    wait
-done
+# We will always wait for at least 20 seconds
+sleep 20 &
+pid_sleep=$!
+wait
 
 echo "Servers exited"

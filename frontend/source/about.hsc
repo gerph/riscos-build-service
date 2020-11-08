@@ -4,6 +4,19 @@
 <body>
     <page section='About'>
 
+<$macro binary-release url:string="" filename:string="" name:string>
+<div class='binary'>
+    <span class='binary-release-heading'>Release</span>:
+    <span class='binary-release-name'>
+        <$if COND=(filename = "")>
+            <a href=(url)><(name)></a>
+        <$else>
+            <filelink filename=("binary/" + filename) label=(name)>
+        </$if>
+    </span>
+</div>
+</$macro>
+
 <$macro block-what-is-jfpatch>
 <section>
 <h2>What is JFPatch?</h2>
@@ -59,6 +72,17 @@
     special variables to indicate the status of the build, which the front end would use to display
     a pop-up message.
 </p>
+
+<h3>Where can I obtain it?</h3>
+
+<p>
+    JFPatch is accessible through the build service by submitting sources using the API,
+    or through your browser. It is also available for download here, should you wish to use
+    it on RISC OS. JFShared is also required.
+</p>
+
+<binary-release filename="jfpatch-app-2.57.41.zip" name="JFPatch application">
+<binary-release filename="jfshared.zip" name="JFShared resource">
 
 </section>
 </$macro>

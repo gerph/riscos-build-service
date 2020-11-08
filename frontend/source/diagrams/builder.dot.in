@@ -60,6 +60,7 @@ digraph STRINGIFY(TITLE) {
     ROZipInfo [ NODE_STAGE2, label=<<B>rozipinfo</B><BR/><i>Extracts RISC OS filetype information from zip archives</i>> ];
 
     ROBuild [ NODE_STAGE3, label=<<B>robuild</B><BR/><i>Decides what type of build it is<br/>Constructs command lines for JFPatch, cc, etc</i>> ];
+    Makefile [ NODE_STAGE3, label=<<B>makefile</B><BR/><i>Parses makefiles</i>> ];
     ROBuildYAML [ NODE_STAGE3, label=<<B>robuildyaml</B><BR/><i>Parses robuild.yaml files</i>> ];
     SimpleYAML [ NODE_STAGE3, label=<<B>simpleyaml</B><BR/><i>Parses YAML without dependencies</i>> ];
 
@@ -84,6 +85,7 @@ digraph STRINGIFY(TITLE) {
         rank = same;
         ROBuild -> ROBuildYAML [ SUBPROCESS, EDGE_STAGE3 ];
         ROBuildYAML -> SimpleYAML [ SUBPROCESS, EDGE_STAGE3 ];
+        Makefile -> ROBuild [ SUBPROCESS, EDGE_STAGE3 ];
     }
 
     ROBuild -> PyroServer [ EDGE_STAGE4 ];

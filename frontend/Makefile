@@ -43,6 +43,10 @@ FLAGS = SUPPORT_JFPATCH=${SUPPORT_JFPATCH} \
         SUPPORT_PYTHON=${SUPPORT_PYTHON} \
         SUPPORT_SHELL=${SUPPORT_SHELL} \
 
+BINARIES = $(wildcard binary/*)
+BINARIES_DEST = $(patsubst binary/%,${DESTDIR}/binary/%,${BINARIES}) \
+				$(patsubst binary/%.tar.bz2,${DESTDIR}/binary/%.zip,${BINARIES})
+
 HSCFLAGS += $(subst =,:BOOL=,$(subst false,, ${FLAGS:SUPPORT_%=define "SUPPORT_%"}))
 CPPFLAGS = ${FLAGS:SUPPORT_%=-DSUPPORT_%}
 
@@ -97,6 +101,7 @@ dirs:
 	mkdir -p ${DESTDIR}
 	mkdir -p ${DESTDIR}/icons
 	mkdir -p ${DESTDIR}/images
+	mkdir -p ${DESTDIR}/binary
 	mkdir -p ${DESTDIR}/examples/jfpatch-files
 	mkdir -p ${DESTDIR}/examples/misc-examples
 	mkdir -p ${DESTDIR}/examples/c-examples
@@ -135,6 +140,7 @@ static: \
  	 	${DESTDIR}/images/howitworks.svg \
  	 	${CODEMIRROR} \
  	 	${EXAMPLES} \
+ 	 	${BINARIES_DEST} \
 
 ${DESTDIR}/icons/file_%.png: icons/file_%.svg
 	./make-icon.sh --inset 1 $? $@ ${FILETYPE_SIZE}
@@ -216,6 +222,13 @@ ${DESTDIR}/codemirror/%: codemirror/%
 
 ${DESTDIR}/.htaccess: htaccess
 	cp $? $@
+
+${DESTDIR}/binary/%.zip: binary/%.tar.bz2
+	-rm -rf tmpdir tmpdir.zip
+	mkdir -p tmpdir
+	cd tmpdir ; tar jxvf ../$?
+	cd tmpdir ; zip -9r ../tmpdir.zip *
+	mv tmpdir.zip $@
 
 ${DESTDIR}/colouring.js: colouring.js.in
 	./preprocess.pl $(CPPFLAGS) $? $@

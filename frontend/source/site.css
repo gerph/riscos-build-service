@@ -622,6 +622,15 @@ div.howitworks {
 img.howitworks {
 }
 
+div.open-source, div.binary, div.website {
+    padding-top: 0.5em;
+    padding-left: 1.5em;
+}
+
+span.open-source-heading, span.binary-release-heading, span.website-release-heading {
+    font-weight: bold;
+}
+
 
 /* Remove the tools used for debugging */
 form#general { display: none; }

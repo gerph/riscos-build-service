@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 07-Nov-2020 22:00:47
+# updated: 08-Nov-2020 17:41:09
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -12,12 +12,6 @@ INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/fileformat.html
 SOURCE fileformat.hsc
-TITLE 
-ID header-menu
-INCLUDE ../pages.hsc
-INCLUDE ../macros.hsc
-DOCUMENT ../dest/about.html
-SOURCE about.hsc
 TITLE 
 ID header-menu
 INCLUDE ../pages.hsc
@@ -122,3 +116,9 @@ ID mkmacros
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 INCLUDE versions.hsc
+DOCUMENT ../dest/about.html
+SOURCE about.hsc
+TITLE 
+ID header-menu
+INCLUDE ../pages.hsc
+INCLUDE ../macros.hsc
