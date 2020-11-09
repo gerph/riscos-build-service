@@ -18,6 +18,8 @@ def setup_parser():
                         help="Source file to build")
     parser.add_argument('--debug', type=str, default='',
                         help="Add debug options to the execution")
+    parser.add_argument('--config', action='append',
+                        help="Add config options to the execution")
     parser.add_argument('--stream', action='store_true',
                         help="Use the streaming interface")
     parser.add_argument('--output', type=str, default=None,
@@ -69,6 +71,10 @@ try:
     if options.debug:
         for debug in options.debug.split(','):
             builder.pyro.add_debug(debug)
+    if options.config:
+        for config in options.config:
+            (var, value) = config.split('=')
+            builder.pyro.set_config(var, value)
 
     builder.prepare_docker()
     rc = builder.run()
