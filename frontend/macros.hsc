@@ -1,11 +1,11 @@
 <$define service:string>
 <*** Use 'jfpaas' or 'bro' ***>
-<$let service="jfpaas">
+<$let service="bro">
 
 <$if COND=(service = 'jfpaas')>
 <$macro service-name>JFPatch-as-a-Service</$macro>
 <$else>
-<$macro service-name>RISC OS Build</$macro>
+<$macro service-name>RISC OS Build service</$macro>
 </$if>
 
 <$include file="../pages.hsc">

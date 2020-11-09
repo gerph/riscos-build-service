@@ -18,15 +18,17 @@
     General information about <service-name>.
 </link-to-page>
 
+<$if COND=(service = 'jfpaas')>
 <link-to-page href=':fileformat.html' name='JFPatch File Format'>
     File format specification for JFPatch files.
 </link-to-page>
+</$if>
 
-<link-to-page href=':api.html' name='API documentation'>
+<link-to-page href=':api.html' name='Service API documentation'>
     API documentation for communicating with <service-name>.
 </link-to-page>
 
-<link-to-page href=':robuildyaml.html' name='Build configuration'>
+<link-to-page href=':robuildyaml.html' name='RISC OS Build configuration'>
     File format specification for '.robuild.yaml' build configuration.
 </link-to-page>
 
@@ -37,6 +39,12 @@
 <link-to-page href=':statistics.html' name='Statistics'>
     Some statistics on Pyromaniac and related projects.
 </link-to-page>
+
+<$if COND=(service = 'bro')>
+<link-to-page href=':fileformat.html' name='JFPatch File Format'>
+    File format specification for JFPatch files.
+</link-to-page>
+</$if>
 
 <link-to-page href=':history.html' name='History'>
     History of <service-name> and related systems.
