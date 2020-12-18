@@ -15,7 +15,7 @@ digraph STRINGIFY(TITLE) {
     # Containers
     Ubuntu [ CONTAINER_OTHER, label=<<B>ubuntu:18.04</B><br/><i>Base OS</i>> ];
     Pyromaniac [ CONTAINER_MINE, label=<<B>gerph/pyromaniac</B><br/><i>Pyromaniac, support packages + core RISC OS modules</i>> ];
-    Build [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-build</B><br/><i>Adds build tootls and environment</i>> ];
+    Build [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-build</B><br/><i>Adds build tools and environment</i>> ];
     Demo [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-demo</B><br/><i>Adds P2C, example code, web shell</i>> ];
     VNCServer [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-vncserver</B><br/><i>Adds automatic running of VNC server</i>> ];
     ROBuild [ CONTAINER_MINE, label=<<B>gerph/pyromaniac-robuild</B><br/><i>Adds JFPatch and P2C</i>> ];
