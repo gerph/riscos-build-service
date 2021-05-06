@@ -6,15 +6,19 @@ config:
   safe: true
 
   emulation.disable_interrupt: yes
-  graphics.implementation: 'null'
+  graphics.implementation: 'cairo'
   memorymap.zeropage_enable: yes
   memorymap.appspace_size: 12M
-  input.readline_native: yes
+  input.readline_native: no
   taskwindow.in_taskwindow: true
   filesystem.native_directory: fs
-  input.eof_effect: exit
+  input.eof_effect: reset
+  pyro.reset_effect: exit
   vdu.implementation: ansitext
   VDUANSIText.support_primarybold: no
+  pyromaniacmodule.enable: true
+  pyromaniacmodule.config_enable: yes
+  pyromaniacmodule.config_allow: input
 
 variables:
   'JFPatch$ScrapDir': '$.tmp'

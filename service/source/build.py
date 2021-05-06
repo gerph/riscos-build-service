@@ -52,6 +52,9 @@ class Builder(object):
         self.timeout = timeout
         self.pyro_config = [
                 ('trace.watch_lowvectors', False),
+                ('pyromaniacmodule.enable', True),
+                ('pyromaniacmodule.config_enable', True),
+                ('pyromaniacmodule.config_allow', 'input'),
             ]
 
     def load(self, sourcefile=None, data=None):
