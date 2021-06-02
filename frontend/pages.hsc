@@ -19,32 +19,32 @@
 </link-to-page>
 
 <$if COND=(service = 'jfpaas')>
-<link-to-page href=':fileformat.html' name='JFPatch File Format'>
+<link-to-page href=':fileformat.html' name='Docs: JFPatch File Format'>
     File format specification for JFPatch files.
 </link-to-page>
 </$if>
 
-<link-to-page href=':api.html' name='Service API documentation'>
+<link-to-page href=':api.html' name='Docs: Service API'>
     API documentation for communicating with <service-name>.
 </link-to-page>
 
-<link-to-page href=':robuildyaml.html' name='RISC OS Build configuration'>
+<link-to-page href=':robuildyaml.html' name='Docs: .robuild.yaml format'>
     File format specification for '.robuild.yaml' build configuration.
 </link-to-page>
 
-<link-to-page href=':ci-build.html' name='CI configuration'>
-    How to use <service-name> with CI systems.
+<link-to-page href=':ci-build.html' name='Docs: Automation with git'>
+    How to use <service-name> with automation systems like Github, GitLab, Jenkins, etc.
 </link-to-page>
+
+<$if COND=(service = 'bro')>
+<link-to-page href=':fileformat.html' name='Docs: JFPatch format'>
+    File format specification for JFPatch files.
+</link-to-page>
+</$if>
 
 <link-to-page href=':statistics.html' name='Statistics'>
     Some statistics on Pyromaniac and related projects.
 </link-to-page>
-
-<$if COND=(service = 'bro')>
-<link-to-page href=':fileformat.html' name='JFPatch File Format'>
-    File format specification for JFPatch files.
-</link-to-page>
-</$if>
 
 <link-to-page href=':history.html' name='History'>
     History of <service-name> and related systems.
