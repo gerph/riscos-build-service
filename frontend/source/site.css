@@ -295,6 +295,7 @@ div.workflow label img {
 /* Page styling */
 html, body {
     height: 100%;
+    scroll-padding-top: 4rem; /* Make anchors avoid the top bar */
 }
 body {
     margin: 0;
@@ -434,7 +435,7 @@ section {
     clear: right;
 }
 h2 {
-    background-color: #404040;
+    background-color: dimgrey;
     color: white;
     padding: 0.25em;
     margin-left: -1.25em;
@@ -442,10 +443,11 @@ h2 {
 }
 
 h3 {
-    background-color: #696969;
+    background-color: dimgrey;
+    font-weight: normal;
     color: white;
     margin-left: -0.75em;
-    margin-right: -0.5em;
+    margin-right: -1.5em;
     padding: 0.25em;
 }
 
