@@ -128,12 +128,12 @@ class HarnessStream(object):
 
         except robuild.ROBuilderError as exc:
             self.stream_callback('message', 'Source file format not recognised')
-            self.stream_callback('rc', -1)
+            self.stream_callback('rc', 255)
             self.stream_callback('complete', True)
 
         except Exception as exc:
             self.stream_callback('message', 'Build failure: ' + str(exc))
-            self.stream_callback('rc', -1)
+            self.stream_callback('rc', 255)
             self.stream_callback('complete', True)
 
         finally:
