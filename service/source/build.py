@@ -51,7 +51,6 @@ class Builder(object):
         self.docker = None
         self.timeout = timeout
         self.pyro_config = [
-                ('trace.watch_lowvectors', True),
                 ('pyromaniacmodule.enable', True),
                 ('pyromaniacmodule.config_enable', True),
                 ('pyromaniacmodule.config_allow', 'input'),
