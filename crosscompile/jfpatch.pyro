@@ -19,6 +19,7 @@ config:
   pyromaniacmodule.enable: true
   pyromaniacmodule.config_enable: yes
   pyromaniacmodule.config_allow: input
+  watchregions.lowmemory: yes=abort
 
 variables:
   'JFPatch$ScrapDir': '$.tmp'
