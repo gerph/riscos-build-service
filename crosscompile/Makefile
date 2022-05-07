@@ -4,7 +4,7 @@
 ROOT_DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Version of the pyromaniac-build container we are based on.
-PYROMANIAC_BUILD_VERSION ?= 0.33.3005
+PYROMANIAC_BUILD_VERSION ?= 0.35.3127
 
 ifeq (${CI_BRANCH_VERSION},)
 DOCKER_TAG = latest
