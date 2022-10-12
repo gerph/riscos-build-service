@@ -142,7 +142,7 @@ def url_build(format):
             content = {
                     'messages': "Badness: Server error: {}".format(exc),
                     'throwback': [],
-                    'output': "Server exception: {}".format(exc),
+                    'output': "Server exception: {}\nPlease report this to <gerph@gerph.org>.".format(exc),
                     'data': None,
                     'filetype': 0xfff,
                     'rc': 1,
