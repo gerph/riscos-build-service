@@ -52,6 +52,7 @@ class Builder(object):
         self.timeout = timeout
         self.pyro_config = [
                 ('pyromaniacmodule.enable', True),
+                ('pyromaniacmodule.debug_enable', True),
                 ('pyromaniacmodule.config_enable', True),
                 ('pyromaniacmodule.config_allow', 'input'),
             ]
