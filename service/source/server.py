@@ -137,6 +137,19 @@ def url_build(format):
         except Exception as exc2:
             print("Another exception in close: {}".format(exc2))
         #raise
+        if format == 'json':
+            # If they requested JSON, let's report this as a proper encoded message.
+            content = {
+                    'messages': "Badness: Server error: {}".format(exc),
+                    'throwback': [],
+                    'output': "Server exception: {}".format(exc),
+                    'data': None,
+                    'filetype': 0xfff,
+                    'rc': 1,
+                }
+            encoded = json_funcs.json_iterable(content, pretty=True)
+            return Response(encoded, 500, mimetype='application/json')
+
         return "Badness: {}".format(exc), 500
 
 
