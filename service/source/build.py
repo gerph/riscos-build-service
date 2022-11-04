@@ -54,7 +54,9 @@ class Builder(object):
                 ('pyromaniacmodule.enable', True),
                 ('pyromaniacmodule.debug_enable', True),
                 ('pyromaniacmodule.config_enable', True),
-                ('pyromaniacmodule.config_allow', 'input'),
+                # Meh, let's allow everything - if this service is to be useful, we should
+                # allow the user to configure the system as they need to.
+                ('pyromaniacmodule.config_allow', ''),
             ]
 
     def load(self, sourcefile=None, data=None):
