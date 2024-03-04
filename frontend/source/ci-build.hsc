@@ -86,7 +86,7 @@ STATUS_CODE=$(curl --silent -F source=@my-source-file -o /tmp/output --write-out
 <h3>Extracting more information</h3>
 
 <p>
-    The above example suffice for simple submissions to the service, but you may wish to do more than this.
+    The above examples suffice for simple submissions to the service, but you may wish to do more than this.
     The JSON interface allows you to extract more information about the response from the service.
 </p>
 
@@ -102,7 +102,7 @@ curl --silent -F source=@my-source-file -o /tmp/result.json http://json.build.ri
 <shell>
 jq -r '.messages[]' /tmp/result.json &gt; /tmp/messages.txt
 jq -r 'reduce .output[] as $i ("";. + $i)' /tmp/result.json &gt; /tmp/output.txt
-RC=$(jq -r .rc /tmp/robuild/result.json)
+RC=$(jq -r .rc /tmp/result.json)
 # /tmp/messages.txt now contains the messages from the service.
 # /tmp/output now contains the output from the build.
 # $RC contains the return code (0 if all was well)
@@ -115,7 +115,7 @@ RC=$(jq -r .rc /tmp/robuild/result.json)
 
 <shell>
 FILETYPE=$(jq -r .filetype /tmp/result.json)
-FILETYPE_HEX=$(printf '%3x' "$FILETYPE")
+FILETYPE_HEX=$(printf '%03x' "$FILETYPE")
 if [ "$RC" = 0 ] ; then
     jq -r .data /tmp/result.json | base64 --decode - &gt; "/tmp/built,$FILETYPE_HEX"
 fi
@@ -188,7 +188,7 @@ RC=$(jq -r .rc "${TMPBUILD}"/result.json | tee "${TMPBUILD}/rc")
 FILETYPE=$(jq -r .filetype "${TMPBUILD}/result.json")
 FILETYPE_HEX=xxx
 if [ "$FILETYPE" != 'null' ] ; then
-    FILETYPE_HEX=$(printf '%3x' "$FILETYPE")
+    FILETYPE_HEX=$(printf '%03x' "$FILETYPE")
 fi
 
 # Marker files for the state

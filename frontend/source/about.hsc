@@ -229,8 +229,11 @@
 
 <p>
     There are a number of examples that have been created which can be used as templates for building
-    components. Look for '<a href="https://github.com/topics/riscos-ci">riscos-ci</a>' on GitHub. A guide
-    to how you use the system can be found in the <a href=":ci-build.html">CI build documentation</a>.
+    components. Look for '<a href="https://github.com/topics/riscos-ci">riscos-ci</a>' on GitHub. The repository <a href="https://github.com/gerph/riscos-ci-templates">riscos-ci-templates</a> contains just the templates for use with GitLab and GitHub.
+</p>
+<p>
+    A guide to how you use the system can be found in the <a href=":ci-build.html">CI build documentation</a>. Some simple command line examples of building
+    BASIC with the shell can be found in the <a href="https://github.com/gerph/riscos-build-basic-example">riscos-build-basic-example</a> repository.
 </p>
 
 <p>
