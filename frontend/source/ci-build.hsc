@@ -109,7 +109,7 @@ RC=$(jq -r .rc /tmp/result.json)
 </shell>
 
 <p>
-    The resulting data, if any, is returned in the '<code>data</code>' key, and the RISC OS filetype in the 'filetype' as an integer.
+    The resulting data, if any, is returned in the '<code>data</code>' key, and the RISC OS filetype in the '<code>filetype</code>' as an integer.
     The returned data is Base64 encoded, so will need to be decoded before it can be used.
 </p>
 
