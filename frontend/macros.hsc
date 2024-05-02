@@ -64,10 +64,23 @@
 <$macro page /CLOSE section:string/REQUIRED>
 <header class='page-head'>
 <script type='text/javascript'><!--
-function toggle_header_menu() {
+/* 0 => off, 1 => on, 2 => toggle */
+function change_header_menu(enable) {
     var menu = document.getElementById("header-menu");
-    menu.style.display = menu.style.display == 'block' ? 'none' : 'block';
+    if (enable == 2)
+        enable = (menu.style.display != 'block')
+    menu.style.display = enable ? 'block' : 'none';
 }
+function toggle_header_menu() {
+    change_header_menu(2)
+}
+
+window.addEventListener('click', function(e){
+    if (!document.getElementById('header-menu').contains(e.target) &&
+        !document.getElementById('header-menu-button').contains(e.target)) {
+        change_header_menu(0);
+    }
+})
 --></script>
   <$if COND=(service = 'jfpaas')>
 <a href=':index.html'><img class='site-logo' src=':icons/patched.png' alt='[Patched Cog]' /></a>
@@ -77,7 +90,7 @@ function toggle_header_menu() {
 <h1 class='title' title="aka JFPatch-as-a-Service"><service-name></h1>
   </$if>
 <nav class='header-menu'>
-    <a href="#" onclick="toggle_header_menu()"><img src=':icons/menu.png' alt='[menu]'/></a>
+    <a href="#/" onclick="toggle_header_menu()" id='header-menu-button'><img src=':icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>
         <links-to-pages>
     </ul>

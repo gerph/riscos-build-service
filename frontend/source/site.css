@@ -396,6 +396,22 @@ ul.header-menu-block {
 }
 
 
+@media (max-width: 640px) {
+    html, body {
+        scroll-padding-top: 5.25rem; /* Make anchors avoid the top bar */
+    }
+    main {
+        padding-top: 5em;
+    }
+    header .section {
+        float: none;
+        padding-left: 60px;
+        font-size: 0.75em;
+        display: block;
+    }
+}
+
+
 /* Document load menu */
 nav.load-menu {
 }
