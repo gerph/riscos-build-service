@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 02-May-2024 18:14:29
+# updated: 02-May-2024 18:21:30
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -113,6 +113,13 @@ ID github
 ID gitlab
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
+DOCUMENT ../dest/statistics.html
+SOURCE statistics.hsc
+TITLE
+ID header-menu-button
+ID header-menu
+INCLUDE ../pages.hsc
+INCLUDE ../macros.hsc
 DOCUMENT ../dest/history.html
 SOURCE history.hsc
 TITLE 
@@ -128,10 +135,3 @@ ID mkmacros
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 INCLUDE versions.hsc
-DOCUMENT ../dest/statistics.html
-SOURCE statistics.hsc
-TITLE
-ID header-menu-button
-ID header-menu
-INCLUDE ../pages.hsc
-INCLUDE ../macros.hsc
