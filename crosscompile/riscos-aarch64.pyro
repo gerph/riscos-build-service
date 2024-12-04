@@ -1,0 +1,31 @@
+%YAML 1.1
+---
+# Configuration for use as a tool
+
+config:
+  safe: true
+
+  emulation.disable_interrupt: yes
+  graphics.implementation: 'null'
+  memorymap.zeropage_enable: yes
+  memorymap.appspace_size: 1M
+  input.readline_native: yes
+  taskwindow.in_taskwindow: true
+  filesystem.native_directory: fs
+  input.eof_effect: exit
+  vdu.implementation: ansitext
+  VDUANSIText.support_primarybold: no
+  systembell.implementation: console
+
+# We cannnot load these modules on RISC OS 64.
+#modules:
+#  internal: true
+#  rom:
+#    - modules/BASIC,ffa
+#    - modules/SCL,ffa
+#    - modules/FPEmulator,ffa
+#    - modules/Obey,ffa
+
+variables:
+  'Alias$WimpSlot': '||'
+  'Alias$Alias': 'Set Alias$%0 %*1'
