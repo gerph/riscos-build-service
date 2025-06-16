@@ -77,8 +77,16 @@ class PyroServer(pyro.Pyro):
             self.post_url = url
         else:
             self.post_scheme = scheme
-            self.post_hostname = hostname or socket.gethostbyname(socket.getfqdn())
-            #print("Hostname is {}".format(self.post_hostname))
+            if hostname:
+                self.post_hostname = hostname
+            else:
+                fqdn = socket.getfqdn()
+                try:
+                    fqdn = socket.gethostbyname(fqdn)
+                except Exception:
+                    # IF we couldn't convert to a hostname, don't bother.
+                    pass
+                self.post_hostname = fqdn
             self.post_port = port
             self.post_path = path
 
