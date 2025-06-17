@@ -85,6 +85,8 @@ class Builder(object):
     def prepare_builder(self):
         self.robuilder = robuild.ROBuilder(self.rosource)
         self.result.message("Build tool selected: {}".format(self.robuilder.tool_name))
+        for msg in self.robuilder.messages():
+            self.result.message("Build tool message: {}".format(msg))
 
     def prepare_pyro(self):
         self.pyro = pyroserver.PyroNativeServer(throwback_function=self.result.throwback_received,
@@ -92,6 +94,8 @@ class Builder(object):
         self.setup_pyro()
         for command in self.robuilder.commands():
             self.pyro.add_command(command)
+        for config, value in self.robuilder.configs():
+            self.pyro.set_config(config, value)
 
     def prepare_docker(self):
         self.pyro.start_server()

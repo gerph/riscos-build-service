@@ -150,6 +150,18 @@ class RISCOSSource(object):
         if data.startswith(b'\xc5\xc6\xcb\xc3'):
             return FILETYPE_AOF
 
+        if data[4:12].startswith(b'\x48\x67\x76\x79\x76\x67\x6c\x21'):
+            if data[20:24].startswith(b'\x40\x00\x00\x00'):
+                return FILETYPE_UTILITY64
+            else:
+                return FILETYPE_UTILITY32
+
+        if data[16:20].startswith(b'\x11\x00\x00\xef'):
+            if data[48:52].startswith(b'\x40\x00\x00\x00'):
+                return FILETYPE_ABSOLUTE64
+            else:
+                return FILETYPE_ABSOLUTE32
+
         if data[0:3].upper() == 'IN ':
             return FILETYPE_JFPATCH
 

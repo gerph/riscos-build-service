@@ -3,6 +3,10 @@
 Filetypes for RISC OS.
 """
 
+FILETYPE_UTILITY32 = 0xFFC
+FILETYPE_UTILITY64 = 0x1FFC
+FILETYPE_ABSOLUTE32 = 0xFF8
+FILETYPE_ABSOLUTE64 = 0x1FF8
 FILETYPE_BASIC = 0xFFB
 FILETYPE_BASTXT = 0xFD1
 FILETYPE_JFPATCH = 0x13C
@@ -27,6 +31,10 @@ BUILDABLE_FILETYPES = (FILETYPE_BASIC,
                        FILETYPE_OBJASM,
                        FILETYPE_PASCAL,
                        FILETYPE_PERL,
+                       FILETYPE_UTILITY32,
+                       FILETYPE_UTILITY64,
+                       FILETYPE_ABSOLUTE32,
+                       FILETYPE_ABSOLUTE64,
                       )
 
 AOF_GENERATING = (FILETYPE_OBJASM,

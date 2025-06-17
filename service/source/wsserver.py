@@ -62,7 +62,7 @@ class HarnessStream(object):
         self.server_running = False
         self.timeout = self.config.default_runtime
         self.ansitext = True
-        self.arch = 'aarch32'
+        self.arch = None
 
     def set_source(self, source_data):
         self.source_data = source_data
@@ -125,7 +125,7 @@ class HarnessStream(object):
                 self.builder.pyro_config.append(('vdu.implementation', 'ansitext'))
             else:
                 self.builder.pyro_config.append(('vdu.implementation', 'plain'))
-            if self.arch != 'aarch32':
+            if self.arch:
                 self.builder.pyro_config.append(('emulation.implementation', self.arch))
 
             self.builder.prepare_pyro()
