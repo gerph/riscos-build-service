@@ -16,3 +16,4 @@ else
     exec pyro --config-file "riscos-aarch64.pyro" \
               --config-file "build-aarch64.pyro" \
               --config-file "build-service-aarch64.pyro" "$@"
+fi
