@@ -8,6 +8,11 @@
 
 here=$(cd "$(dirname "$0")" && pwd)
 cd "$here"
-exec pyro --config-file "riscos.pyro" \
-          --config-file "build.pyro" \
-          --config-file "jfpatch.pyro" "$@"
+if [[ "$PYRO_ARCH" != 'aarch64' ]] ; then
+    exec pyro --config-file "riscos.pyro" \
+              --config-file "build.pyro" \
+              --config-file "build-service.pyro" "$@"
+else
+    exec pyro --config-file "riscos-aarch64.pyro" \
+              --config-file "build-aarch64.pyro" \
+              --config-file "build-service-aarch64.pyro" "$@"

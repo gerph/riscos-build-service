@@ -1,6 +1,6 @@
-%YAML 1.1
+-%YAML 1.1
 ---
-# Configuration for use with JFPatch
+# Configuration for use with RISC OS Build service
 
 config:
   safe: true
@@ -22,5 +22,4 @@ config:
   watchregions.lowmemory: yes=abort
 
 variables:
-  'JFPatch$ScrapDir': '$.tmp'
-  'JFPatch$Dir': '$.Library.JFPatchResources'
+  'Sys$Arch': 'AArch64'

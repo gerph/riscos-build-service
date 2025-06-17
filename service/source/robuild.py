@@ -40,9 +40,36 @@ class ROBuilderBase(object):
         return "<{}({})>".format(self.__class__.__name__, self.source)
 
     def recognise(self):
+        """
+        Recogniser for this builder type.
+
+        @return:    True if the self.source is recognised (use self.source.primary_file for single files)
+                    False if this builder cannot handle the content.
+        """
         return False
 
+    def messages(self):
+        """
+        Messages to report from the builder processes on recognition of the type.
+
+        @return:    list of strings to report
+        """
+        return []
+
+    def configs(self):
+        """
+        Additional Pyromaniac configurations to add if recognised.
+
+        @return:    list of tuples of (config, value)
+        """
+        return []
+
     def commands(self):
+        """
+        Commands to execute if recognised.
+
+        @return:    list of RISC OS commands
+        """
         raise NotImplementedError("{}.commands is not implemented".format(self.__class__.__name__))
 
     def collect_artifact(self):
@@ -142,13 +169,66 @@ class ROBuilderYAML(ROBuilderBase):
 
 class ROBuilderSingleFile(ROBuilderBase):
     tool_filetype = None
+    tool_filetypes = ()
 
     def recognise(self):
         if len(self.source.buildables) != 1:
             return False
-        if self.source.primary_file.filetype == self.tool_filetype:
+        if self.tool_filetype and \
+           self.source.primary_file.filetype == self.tool_filetype:
+            return True
+        if self.tool_filetypes and \
+           self.source.primary_file.filetype in self.tool_filetypes:
             return True
         return False
+
+
+@register_builder
+class ROBuilderUtility(ROBuilderSingleFile):
+    tool_name = 'Utility'
+    tool_command = 'Run'
+    tool_filetypes = (FILETYPE_UTILITY32, FILETYPE_UTILITY64)
+    default_options = {}
+
+    def messages(self):
+        if self.source.primary_file.filetype == FILETYPE_UTILITY64:
+            return ["Requires RISC OS AArch64"]
+        return []
+
+    def configs(self):
+        if self.source.primary_file.filetype == FILETYPE_UTILITY64:
+            return [
+                    ('emulation.implementation', 'aarch64'),
+                ]
+        return []
+
+    def commands(self):
+        args = [self.tool_command, self.ro_filename]
+        return [' '.join(args)]
+
+
+@register_builder
+class ROBuilderAbsolute(ROBuilderSingleFile):
+    tool_name = 'Absolute'
+    tool_command = 'Run'
+    tool_filetypes = (FILETYPE_ABSOLUTE32, FILETYPE_ABSOLUTE64)
+    default_options = {}
+
+    def messages(self):
+        if self.source.primary_file.filetype == FILETYPE_ABSOLUTE64:
+            return ["Requires RISC OS AArch64"]
+        return []
+
+    def configs(self):
+        if self.source.primary_file.filetype == FILETYPE_ABSOLUTE64:
+            return [
+                    ('emulation.implementation', 'aarch64'),
+                ]
+        return []
+
+    def commands(self):
+        args = [self.tool_command, self.ro_filename]
+        return [' '.join(args)]
 
 
 @register_builder

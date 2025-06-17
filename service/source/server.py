@@ -49,8 +49,7 @@ def url_ping():
     return 'OK'
 
 
-@app.route('/build/<format>', methods=['POST'])
-def url_build(format):
+def url_build_any(format, arch):
     if 'source' not in request.files:
         return "Unprocessable entity: Require 'source' to build", 422
 
@@ -151,6 +150,18 @@ def url_build(format):
             return Response(encoded, 500, mimetype='application/json')
 
         return "Badness: {}".format(exc), 500
+
+
+@app.route('/build/<arch>/<format>', methods=['POST'])
+def url_build_arch(arch, format):
+    if arch not in ('aarch32', 'aarch64'):
+        return "Unprocessable entity: Architecture '%s' not supported" % (arch,), 422
+    return url_build_any(format, arch)
+
+
+@app.route('/build/<format>', methods=['POST'])
+def url_build(format):
+    return url_build_any(format, None)
 
 
 if __name__ == "__main__":

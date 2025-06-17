@@ -16,7 +16,7 @@ import json_funcs
 import simpleyaml
 
 
-VERSION = '1.05'
+VERSION = '1.06'
 NAME = 'RISC OS Build system'
 
 
@@ -62,6 +62,7 @@ class HarnessStream(object):
         self.server_running = False
         self.timeout = self.config.default_runtime
         self.ansitext = True
+        self.arch = None
 
     def set_source(self, source_data):
         self.source_data = source_data
@@ -73,6 +74,7 @@ class HarnessStream(object):
         return {
                 'timeout': self.timeout,
                 'ansitext': self.ansitext,
+                'arch': self.arch,
             }
 
     def set_option(self, option, value):
@@ -91,6 +93,13 @@ class HarnessStream(object):
             value = bool(value)
             print("Configured 'ansitext' to {}".format(value))
             self.ansitext = value
+            return
+
+        if option == 'arch':
+            if value not in ('aarch32', 'aarch64'):
+                raise OptionError("Option 'arch' must be either 'aarch32' or 'aarch64'")
+            print("Configured 'arch' to {}".format(value))
+            self.arch = value
             return
 
         raise OptionError("Option '{}' is not known".format(option))
@@ -116,6 +125,8 @@ class HarnessStream(object):
                 self.builder.pyro_config.append(('vdu.implementation', 'ansitext'))
             else:
                 self.builder.pyro_config.append(('vdu.implementation', 'plain'))
+            if self.arch:
+                self.builder.pyro_config.append(('emulation.implementation', self.arch))
 
             self.builder.prepare_pyro()
             if self.debug:
