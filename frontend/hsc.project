@@ -2,7 +2,7 @@ HSC_PROJECT
 VERSION 3 
 # Contains all data relevant for project.
 # Maintained by hsc, DO NOT MODIFY!
-# updated: 02-May-2024 18:27:52
+# updated: 17-Jun-2025 11:15:56
 DOCUMENT ../dest/codemirror-examples.html
 SOURCE codemirror-examples.hsc
 TITLE 
@@ -94,13 +94,6 @@ ID header-menu-button
 ID header-menu
 INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
-DOCUMENT ../dest/api.html
-SOURCE api.hsc
-TITLE 
-ID header-menu-button
-ID header-menu
-INCLUDE ../pages.hsc
-INCLUDE ../macros.hsc
 DOCUMENT ../dest/ci-build.html
 SOURCE ci-build.hsc
 TITLE 
@@ -115,7 +108,14 @@ INCLUDE ../pages.hsc
 INCLUDE ../macros.hsc
 DOCUMENT ../dest/statistics.html
 SOURCE statistics.hsc
-TITLE
+TITLE 
+ID header-menu-button
+ID header-menu
+INCLUDE ../pages.hsc
+INCLUDE ../macros.hsc
+DOCUMENT ../dest/api.html
+SOURCE api.hsc
+TITLE 
 ID header-menu-button
 ID header-menu
 INCLUDE ../pages.hsc

@@ -86,15 +86,15 @@ POST requests are <media-type>application/x-www-form-urlencoded</media-type> wit
     </endpoint>
 
 
-    <endpoint url="/build/<arch>/(json|binary)" method='POST'>
+    <endpoint url="/build/&lt;arch&gt;/(json|binary)" method='POST'>
         <p>Responds in the same way as the 'binary' or 'json' endpoints, above, but
         selects the architecture to use. The architecture may be specified as one
         of:</p>
         <ul>
             <li>'aarch32': Regular RISC OS, 32-bit ARM</li>
             <li>'aarch64': RISC OS 64-bit ARM</li>
-        </li>
-    <endpoint>
+        </ul>
+    </endpoint>
 </endpoint-list>
 </section>
 
