@@ -74,7 +74,7 @@ POST requests are <media-type>application/x-www-form-urlencoded</media-type> wit
 
     <endpoint url="/build/json" method='POST'>
         Outputs JSON encoded details of the build and output. The following
-        dictionary keys are defined:
+        dictionary keys are defined on the response:
         <param-list>
             <param name='messages'>A list of build management messages, explaining what the system did to perform the build.</param>
             <param name='throwback'>A list of throwback event structures. Each structure is the same format as the 'throwback' server action in the WebSocket protocol.</param>
@@ -84,6 +84,17 @@ POST requests are <media-type>application/x-www-form-urlencoded</media-type> wit
             <param name='rc'>Return code for the build. Usually 0 for success or 1 for failure.</param>
         </param-list>
     </endpoint>
+
+
+    <endpoint url="/build/<arch>/(json|binary)" method='POST'>
+        <p>Responds in the same way as the 'binary' or 'json' endpoints, above, but
+        selects the architecture to use. The architecture may be specified as one
+        of:</p>
+        <ul>
+            <li>'aarch32': Regular RISC OS, 32-bit ARM</li>
+            <li>'aarch64': RISC OS 64-bit ARM</li>
+        </li>
+    <endpoint>
 </endpoint-list>
 </section>
 
@@ -201,6 +212,7 @@ The server may send other messages to the client at any time to explain its prog
     <param-list label="Option">
      <param name='timeout'>Specifies the timeout for the build process in seconds.</param>
      <param name='ansitext'>Controls whether the ANSI text translation is performed (converts the RISC OS VDU sequences into ANSI terminal control codes). True enables the ANSI text mode (the default), whilst False disables it.</param>
+     <param name='arch'>Selects the architecture to use for building. Values may be 'aarch32' or 'aarch64'.</param>
     </param-list>
 </param>
 </param-list>

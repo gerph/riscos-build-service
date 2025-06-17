@@ -16,7 +16,7 @@ import json_funcs
 import simpleyaml
 
 
-VERSION = '1.05'
+VERSION = '1.06'
 NAME = 'RISC OS Build system'
 
 

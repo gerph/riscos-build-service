@@ -215,7 +215,7 @@ class ROBuilderAbsolute(ROBuilderSingleFile):
     default_options = {}
 
     def messages(self):
-        if self.source.primary_file.filetype == FILETYPE_UTILITY64:
+        if self.source.primary_file.filetype == FILETYPE_ABSOLUTE64:
             return ["Requires RISC OS AArch64"]
         return []
 
