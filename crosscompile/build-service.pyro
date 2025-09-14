@@ -20,8 +20,9 @@ config:
   pyromaniacmodule.config_enable: yes
   pyromaniacmodule.config_allow: input
   watchregions.lowmemory: yes=abort
+  pyromaniaccc.enable: yes
 
 variables:
-  'Sys$Arch': 'AArch32'
+  'Sys$Arch': 'aarch32'
   'JFPatch$ScrapDir': '$.tmp'
   'JFPatch$Dir': '$.Library.JFPatchResources'

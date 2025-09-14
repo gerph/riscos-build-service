@@ -1,4 +1,4 @@
--%YAML 1.1
+%YAML 1.1
 ---
 # Configuration for use with RISC OS Build service
 
@@ -22,4 +22,4 @@ config:
   watchregions.lowmemory: yes=abort
 
 variables:
-  'Sys$Arch': 'AArch64'
+  'Sys$Arch': 'aarch64'
