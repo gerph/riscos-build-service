@@ -1,7 +1,7 @@
 ARG PYROMANIAC_BUILD_VERSION=unset
 
 ### Take from the gerph/pyromaniac-build container which has Pyromaniac preconfigured
-FROM gerph/pyromaniac-build:${PYROMANIAC_BUILD_VERSION}
+FROM docker-registry.gerph.org/gerph/pyromaniac-build:${PYROMANIAC_BUILD_VERSION}
 
 
 ### JFPatch
