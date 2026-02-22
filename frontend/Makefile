@@ -138,6 +138,10 @@ static: \
  	 	${DESTDIR}/icons/menu.png \
  	 	${DESTDIR}/images/howitworks.png \
  	 	${DESTDIR}/images/howitworks.svg \
+ 	 	${DESTDIR}/images/builder.png \
+ 	 	${DESTDIR}/images/builder.svg \
+ 	 	${DESTDIR}/images/interfaces.png \
+ 	 	${DESTDIR}/images/interfaces.svg \
  	 	${CODEMIRROR} \
  	 	${EXAMPLES} \
  	 	${BINARIES_DEST} \

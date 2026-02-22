@@ -17,9 +17,9 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title><service-name>: <(title)></title>
   <$if COND=(service = 'jfpaas')>
-   <link rel="shortcut icon" href=":favicon.ico" />
+   <link rel="shortcut icon" href="/favicon.ico" />
   <$else>
-   <link rel="shortcut icon" href=":favicon-buildsite.ico" />
+   <link rel="shortcut icon" href="/favicon-buildsite.ico" />
   </$if>
   <$if COND=(codecolouring)>
     <script src="codemirror/lib/codemirror.js" type='text/javascript'></script>
@@ -56,7 +56,7 @@
     <link rel="stylesheet" href="codemirror/theme/liquibyte.css"/>
     <script src="colouring.js" type='text/javascript'></script>
   </$if>
-  <link rel="stylesheet" type="text/css" href=":site.css" />
+  <link rel="stylesheet" type="text/css" href="/site.css" />
   <$content>
 </head>
 </$macro>
@@ -90,7 +90,7 @@ window.addEventListener('click', function(e){
 <h1 class='title' title="aka JFPatch-as-a-Service"><service-name></h1>
   </$if>
 <nav class='header-menu'>
-    <a href="#/" onclick="toggle_header_menu()" id='header-menu-button'><img src=':icons/menu.png' alt='[menu]'/></a>
+    <a href="#/" onclick="toggle_header_menu()" id='header-menu-button'><img src='/icons/menu.png' alt='[menu]'/></a>
     <ul class='header-menu-block' id='header-menu' style='display: none;'>
         <links-to-pages>
     </ul>
