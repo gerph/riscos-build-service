@@ -21,7 +21,7 @@ class Clipboard(object):
 
     def __jsonencode__(self):
         return {
-                'data': base64.b64encode(self.data),
+                'data': base64.b64encode(self.data).decode('ascii'),
                 'filetype': self.filetype
             }
 

@@ -1,11 +1,10 @@
 # Install the service so that we run on startup
 
 #### Prerequisites
-- name: Ensure that ts is present
+- name: Ensure Python virtualenv is present
   apt:
     name:
-      - moreutils
-      - python-virtualenv
+      - python3-virtualenv
     state: present
   become: yes
 

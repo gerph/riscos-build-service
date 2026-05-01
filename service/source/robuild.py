@@ -160,7 +160,7 @@ class ROBuilderYAML(ROBuilderBase):
                     dfn = os.path.join(path, f)
                     zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
                     zi.nfs_encoding = False
-                    with open(dfn) as fh:
+                    with open(dfn, 'rb') as fh:
                         zh.writestr(zi, fh.read(), compress_type=zipfile.ZIP_DEFLATED)
                     #print("Add file: %s%s" % (p, f))
 
@@ -445,7 +445,7 @@ class ROBuilderMakefile(ROBuilderBase):
                         dfn = os.path.join(path, f)
                         zi = rozipinfo.ZipInfoRISCOS.from_file(filename=dfn, arcname=fn)
                         zi.nfs_encoding = False
-                        with open(dfn) as fh:
+                        with open(dfn, 'rb') as fh:
                             zh.writestr(zi, fh.read(), compress_type=zipfile.ZIP_DEFLATED)
                         #print("Add file: %s%s" % (p, f))
                         nfiles += 1

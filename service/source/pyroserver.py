@@ -3,36 +3,48 @@
 Pyromaniac class, with the ability to start a server to handle the clipboard and throwback.
 """
 
-import BaseHTTPServer
-import cgi
+import email.message
+import http.server
 import json
 import socket
 import threading
 import time
-import urlparse
+import urllib.parse
 
 import roname
 import pyro
 from rofiletypes import *
 
 
-class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+def parse_content_type(value):
+    """
+    Parse a Content-Type header into its media type and parameters.
+    """
+    message = email.message.Message()
+    message['content-type'] = value
+    content_type = message.get_content_type()
+    params = dict(message.get_params(header='content-type')[1:])
+    return content_type, params
+
+
+class PyroHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
 
         path = self.path
         request_headers = self.headers
-        content_type = request_headers.getheaders('content-type')
+        content_type = request_headers.get_all('content-type')
         content_type = content_type[0].lower() if content_type else None
-        content_length = request_headers.getheaders('content-length')
+        content_length = request_headers.get_all('content-length')
         length = int(content_length[0]) if content_length else 0
         body = self.rfile.read(length)
 
         self.log_message("Received %s" % (path,))
         self.log_message("Content type %s" % (content_type,))
 
+        content_type_params = {}
         if content_type:
-            content_type, content_type_params = cgi.parse_header(content_type)
+            content_type, content_type_params = parse_content_type(content_type)
         filename = None
         filetype = None
         if content_type == 'application/riscos':
@@ -51,9 +63,11 @@ class PyroHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
             self.server.data_received(path, body, filename, filetype)
             self.send_response(200)
+            self.end_headers()
 
         except Exception as exc:
             self.send_response(500, 'Internal error: {}'.format(exc))
+            self.end_headers()
 
     def log_message(self, *args, **kwargs):
         return self.server.log_message(*args, **kwargs)
@@ -148,7 +162,7 @@ class PyroServer(pyro.Pyro):
     def post_url(self, value):
         self._post_url = value
 
-        parsed = urlparse.urlparse(value)
+        parsed = urllib.parse.urlparse(value)
         self._post_hostname = parsed.hostname
         self._post_port = parsed.port or 80
         self._post_scheme = parsed.scheme or 'http'
@@ -189,7 +203,7 @@ class PyroNativeServer(PyroServer):
 
     def start_server(self):
         if not self.server:
-            self.server = BaseHTTPServer.HTTPServer(('', self.post_port), PyroHTTPRequestHandler)
+            self.server = http.server.HTTPServer(('', self.post_port), PyroHTTPRequestHandler)
             self.server.data_received = self.data_received
             self.server.log_message = self.log_message
             if not self.post_port:

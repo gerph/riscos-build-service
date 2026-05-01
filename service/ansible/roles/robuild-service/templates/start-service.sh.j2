@@ -27,7 +27,7 @@ trap sig_term SIGINT
 
 # Set up the virtualenv, we will use
 rm -rf venv
-virtualenv venv
+virtualenv -p python3 venv
 source venv/bin/activate
 
 # Install the components we need
@@ -39,9 +39,9 @@ export PYTHONUNBUFFERED=1
 # Using this rather than a pipe with | means that $! gets
 # set to the pid of the first command, not the second.
 echo "Starting servers..."
-./server.py > >(ts >> "$logdir/server.log") 2>&1 &
+./server.py > >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }' >> "$logdir/server.log") 2>&1 &
 pid_server=$!
-./wsserver.py > >(ts >> "$logdir/wsserver.log") 2>&1 &
+./wsserver.py > >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }' >> "$logdir/wsserver.log") 2>&1 &
 pid_wsserver=$!
 
 # We will always wait for at least 20 seconds

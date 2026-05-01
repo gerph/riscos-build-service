@@ -291,6 +291,8 @@ class StreamedInput(object):
                 raise
             if not data:
                 break
+            if isinstance(data, bytes):
+                data = data.decode('utf-8', 'replace')
             self.data_function(data)
 
     def _simple_buffer_function(self, data):
@@ -331,7 +333,6 @@ class StreamedInput(object):
             if not item:
                 break
             yield item
-        raise StopIteration()
 
     def eof(self):
         """

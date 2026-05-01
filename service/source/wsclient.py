@@ -113,7 +113,7 @@ STATE_COMPLETE = 3
 
 
 filename = options.source
-with open(filename) as fh:
+with open(filename, 'rb') as fh:
     source_data = fh.read()
 
 def send(action, data):
@@ -132,7 +132,7 @@ while state != STATE_COMPLETE:
 
     if state == STATE_AWAITWELCOME:
         # Now we send the source we're wanting built
-        send('source', base64.b64encode(source_data))
+        send('source', base64.b64encode(source_data).decode('ascii'))
         state = STATE_SENDBUILD
 
     elif state == STATE_SENDBUILD:

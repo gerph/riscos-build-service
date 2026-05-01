@@ -1,0 +1,38 @@
+# Host kernel mitigations required by the service deployment.
+
+- name: Disable algif_aead autoload for CVE-2026-31431
+  copy:
+    dest: /etc/modprobe.d/manual-disable-algif_aead.conf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      # CVE-2026-31431 Copy Fail mitigation.
+      install algif_aead /bin/false
+      blacklist algif_aead
+  become: yes
+
+- name: Check whether algif_aead is currently loaded
+  command: grep -qE '^algif_aead ' /proc/modules
+  register: algif_aead_loaded
+  changed_when: false
+  failed_when: algif_aead_loaded.rc not in [0, 1]
+
+- name: Unload algif_aead if it is currently loaded
+  command: rmmod algif_aead
+  become: yes
+  register: algif_aead_unload
+  changed_when: algif_aead_unload.rc == 0
+  failed_when: false
+  when: algif_aead_loaded.rc == 0
+
+- name: Check whether algif_aead is still loaded
+  command: grep -qE '^algif_aead ' /proc/modules
+  register: algif_aead_still_loaded
+  changed_when: false
+  failed_when: algif_aead_still_loaded.rc not in [0, 1]
+
+- name: Fail if CVE-2026-31431 mitigation requires a reboot
+  fail:
+    msg: "algif_aead is still loaded after installing the CVE-2026-31431 modprobe rule; reboot the host to complete the mitigation."
+  when: algif_aead_still_loaded.rc == 0

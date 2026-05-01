@@ -275,7 +275,7 @@ def received(client, server, message):
         error("Failed request: {}".format(exc))
 
 
-server = WebsocketServer(13254, host='0.0.0.0')
+server = WebsocketServer(host='0.0.0.0', port=13254)
 server.set_fn_new_client(connected)
 # FIXME: set_fn_client_left(disconnected)
 server.set_fn_message_received(received)

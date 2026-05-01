@@ -119,7 +119,7 @@ def url_build_any(format, arch):
                     'messages': result.messages,
                     'throwback': result.throwback,
                     'output': result.output,
-                    'data': base64.b64encode(data) if data else None,
+                    'data': base64.b64encode(data).decode('ascii') if data else None,
                     'filetype': filetype,
                     'rc': result.rc,
                 }

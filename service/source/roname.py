@@ -4,7 +4,6 @@ RISC OS/Unix filename convention conversions.
 """
 
 import re
-import string
 
 from rofiletypes import FILETYPE_DEFAULT
 
@@ -16,7 +15,7 @@ class RISCOSName(object):
     """
     An class to hold either the Unix or the RISCOS filename.
     """
-    trans_table = string.maketrans('./', '/.')
+    trans_table = str.maketrans('./', '/.')
 
     def __init__(self, unix_filename=None, ro_filename=None, filetype=None):
         self._unix_filename = None
@@ -31,7 +30,9 @@ class RISCOSName(object):
             self.filetype = filetype
 
     def __bool__(self):
-        return self._unix_filename is None and self._ro_filename is None
+        return self._unix_filename is not None or \
+               self._ro_filename is not None or \
+               self._filetype is not None
 
     def __hash__(self):
         return hash((self._unix_filename, self._ro_filename, self._filetype))

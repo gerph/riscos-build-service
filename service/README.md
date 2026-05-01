@@ -7,10 +7,9 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 
 sudo usermod -aG docker ubuntu
 
-sudo apt-get install python-pip moreutils
-#sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 2
+sudo apt-get install python3-pip python3-virtualenv
 
-sudo pip install Flask==1.1.1 websocket-server==0.4
+python3 -m pip install -r source/requirements.txt
 
 
 

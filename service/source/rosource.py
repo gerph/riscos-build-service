@@ -144,31 +144,38 @@ class RISCOSSource(object):
         if not unix_filename:
             unix_filename = filename
 
-        if data.startswith(b'\x0d\x00') and data.endswith(b'\x0d\xff'):
+        if isinstance(data, bytes):
+            data_bytes = data
+            data_text = data.decode('latin-1', 'replace')
+        else:
+            data_text = data
+            data_bytes = data.encode('latin-1', 'replace')
+
+        if data_bytes.startswith(b'\x0d\x00') and data_bytes.endswith(b'\x0d\xff'):
             return FILETYPE_BASIC
 
-        if data.startswith(b'\xc5\xc6\xcb\xc3'):
+        if data_bytes.startswith(b'\xc5\xc6\xcb\xc3'):
             return FILETYPE_AOF
 
-        if data[4:12].startswith(b'\x48\x67\x76\x79\x76\x67\x6c\x21'):
-            if data[20:24].startswith(b'\x40\x00\x00\x00'):
+        if data_bytes[4:12].startswith(b'\x48\x67\x76\x79\x76\x67\x6c\x21'):
+            if data_bytes[20:24].startswith(b'\x40\x00\x00\x00'):
                 return FILETYPE_UTILITY64
             else:
                 return FILETYPE_UTILITY32
 
-        if data[16:20].startswith(b'\x11\x00\x00\xef'):
-            if data[48:52].startswith(b'\x40\x00\x00\x00'):
+        if data_bytes[16:20].startswith(b'\x11\x00\x00\xef'):
+            if data_bytes[48:52].startswith(b'\x40\x00\x00\x00'):
                 return FILETYPE_ABSOLUTE64
             else:
                 return FILETYPE_ABSOLUTE32
 
-        if data[0:3].upper() == 'IN ':
+        if data_text[0:3].upper() == 'IN ':
             return FILETYPE_JFPATCH
 
-        if data.startswith(('REM>', 'REM >', '0REM', '10REM')) or \
-           (data.startswith('10') and '\nPRINT' in data) or \
-           ('\nPRINT' in data and '\nSYS' in data) or \
-           ('\nDEF PROC' in data or '\nDEFPROC' in data):
+        if data_text.startswith(('REM>', 'REM >', '0REM', '10REM')) or \
+           (data_text.startswith('10') and '\nPRINT' in data_text) or \
+           ('\nPRINT' in data_text and '\nSYS' in data_text) or \
+           ('\nDEF PROC' in data_text or '\nDEFPROC' in data_text):
             return FILETYPE_BASTXT
 
         if unix_filename:
@@ -185,39 +192,39 @@ class RISCOSSource(object):
                 if filetype:
                     return filetype
 
-        if any(['void *' in data,
-                'int main' in data,
-                '#include <' in data]):
+        if any(['void *' in data_text,
+                'int main' in data_text,
+                '#include <' in data_text]):
             return FILETYPE_C
 
-        if any([' AREA ' in data,
-                ' MOV ' in data,
-                ' BL ' in data]):
+        if any([' AREA ' in data_text,
+                ' MOV ' in data_text,
+                ' BL ' in data_text]):
             return FILETYPE_OBJASM
 
-        if any(['$(CFLAGS)' in data,
-                '${CFLAGS}' in data,
-                '\n.INIT:' in data,
-                '\n.PHONY:' in data,
-                '\n.c.o: ' in data,
-                '\n# Dynamic dependencies' in data]):
+        if any(['$(CFLAGS)' in data_text,
+                '${CFLAGS}' in data_text,
+                '\n.INIT:' in data_text,
+                '\n.PHONY:' in data_text,
+                '\n.c.o: ' in data_text,
+                '\n# Dynamic dependencies' in data_text]):
             return FILETYPE_AMU
 
-        if any(['\ntitle-string:' in data]):
+        if any(['\ntitle-string:' in data_text]):
             return FILETYPE_CMHG
 
-        if any(['\nbegin' in data and '\nend.' in data,
-                'program ' in data and ' writeln(' in data,
-                data.startswith('program ')]):
+        if any(['\nbegin' in data_text and '\nend.' in data_text,
+                'program ' in data_text and ' writeln(' in data_text,
+                data_text.startswith('program ')]):
             return FILETYPE_PASCAL
 
-        if '\n' in data:
-            (firstline, rest) = data.split('\n', 1)
+        if '\n' in data_text:
+            (firstline, rest) = data_text.split('\n', 1)
         else:
-            firstline = data
+            firstline = data_text
 
-        if any([data.startswith('#!') and 'perl' in firstline,
-                '\nBEGIN {' in data,]):
+        if any([data_text.startswith('#!') and 'perl' in firstline,
+                '\nBEGIN {' in data_text,]):
             return FILETYPE_PERL
 
         # FIXME: Recognise Obey?
@@ -282,10 +289,6 @@ class RISCOSSource(object):
                     dirname = os.path.dirname(filename)
                     filename = os.path.join(dirname, ext[1:], base)
 
-                # In Python 2 the filename is a unicode if the UTF-8 flag was set, and a str if not.
-                # In Python 3 the filename is always a unicode.
-                if isinstance(filename, unicode):
-                    filename = filename.encode('utf-8')
                 absfile = self.absfile(filename)
                 if is_dir:
                     if absfile.endswith('/'):

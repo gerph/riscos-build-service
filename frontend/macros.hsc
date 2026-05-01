@@ -86,7 +86,7 @@ window.addEventListener('click', function(e){
 <a href=':index.html'><img class='site-logo' src=':icons/patched.png' alt='[Patched Cog]' /></a>
 <h1 class='title'>JFPatch <small><i>as a Service</i></small></h1>
   <$else>
-<a href=':index.html'><img class='site-logo' src=':icons/buildsite.png' alt='[Build Logo]' /></a>
+<a href=':index.html'><img class='site-logo' src='/icons/buildsite.png' alt='[Build Logo]' /></a>
 <h1 class='title' title="aka JFPatch-as-a-Service"><service-name></h1>
   </$if>
 <nav class='header-menu'>
