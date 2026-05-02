@@ -5,6 +5,7 @@ ci-logs/
 # Downloaded resources
 riscos-build/
 crosscompile/riscos/
+crosscompile/ro64/
 crosscompile/pyromaniac/
 
 # Service temporary files
