@@ -40,6 +40,9 @@ build-docker:
   <<: *common-cross
   stage: build
   script:
+    # Install things we need
+    - apt-get update && apt-get install unzip
+
     - ci/build.sh native install
   tags:
     - docker-build
