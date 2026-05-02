@@ -14,6 +14,10 @@ ADD --chown=riscos:riscos *.pyro \
                           robuild-pyro \
                           /home/riscos/
 
+### RISC OS 64 binaries
+# (only whilst this isn't in the -build image)
+ADD --chown=riscos:riscos ro64/basic,ff8 /home/riscos/fs/Library64/
+
 
 #### P2C libraries
 # FIXME: Get these from artifactory.
