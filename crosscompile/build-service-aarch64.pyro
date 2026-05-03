@@ -20,6 +20,3 @@ config:
   pyromaniacmodule.config_enable: yes
   pyromaniacmodule.config_allow: input
   watchregions.lowmemory: yes=abort
-
-variables:
-  'Sys$Arch': 'aarch64'

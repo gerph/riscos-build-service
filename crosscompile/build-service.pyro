@@ -23,6 +23,5 @@ config:
   pyromaniaccc.enable: yes
 
 variables:
-  'Sys$Arch': 'aarch32'
   'JFPatch$ScrapDir': '$.tmp'
   'JFPatch$Dir': '$.Library.JFPatchResources'
