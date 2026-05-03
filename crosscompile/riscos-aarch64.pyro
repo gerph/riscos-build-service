@@ -29,7 +29,3 @@ config:
 variables:
   'Alias$WimpSlot': '||'
   'Alias$Alias': 'Set Alias$%0 %*1'
-
-# Only needed because it wasn't set in build64.pyro for some reason
-execute:
-  - command: dir work
