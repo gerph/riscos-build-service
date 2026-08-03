@@ -143,7 +143,8 @@ class HarnessStream(object):
             self.stream_callback('complete', True)
 
         except Exception as exc:
-            self.stream_callback('message', 'Build failure: ' + str(exc))
+            self.stream_callback('message',
+                                 'Build failure: {}\nPlease report this to <gerph@gerph.org>.'.format(exc))
             self.stream_callback('rc', 255)
             self.stream_callback('complete', True)
 
@@ -275,8 +276,24 @@ def received(client, server, message):
         error("Failed request: {}".format(exc))
 
 
-server = WebsocketServer(host='0.0.0.0', port=13254)
-server.set_fn_new_client(connected)
-# FIXME: set_fn_client_left(disconnected)
-server.set_fn_message_received(received)
-server.run_forever()
+def make_server(host='0.0.0.0', port=13254):
+    """
+    Create a configured WebSocket server.
+    """
+    server = WebsocketServer(host=host, port=port)
+    server.set_fn_new_client(connected)
+    # FIXME: set_fn_client_left(disconnected)
+    server.set_fn_message_received(received)
+    return server
+
+
+def run_server(host='0.0.0.0', port=13254):
+    """
+    Run the WebSocket server until it is stopped.
+    """
+    server = make_server(host=host, port=port)
+    server.run_forever()
+
+
+if __name__ == '__main__':
+    run_server()

@@ -31,6 +31,12 @@ handled:
 import simpleyaml
 
 
+try:
+    STRING_TYPES = (basestring,)
+except NameError:
+    STRING_TYPES = (str,)
+
+
 class ROBuildYAMLError(Exception):
     pass
 
@@ -41,15 +47,15 @@ class ROBYArtifact(object):
     """
     path = None
 
-    def __init__(self, artifact_yaml):
+    def __init__(self, artifact_yaml, path):
         self.artifact_yaml = artifact_yaml
 
         if not isinstance(artifact_yaml, dict):
-            raise ROBuildYAMLError("ROBuild YAML: jobs.*.artifacts.* must be a dictionary")
+            raise ROBuildYAMLError("ROBuild YAML: {} must be a dictionary".format(path))
 
         self.path = artifact_yaml.get('path', None)
-        if not self.path:
-            raise ROBuildYAMLError("ROBuild YAML: jobs.*.artifacts.*.path must contain a string")
+        if not isinstance(self.path, STRING_TYPES) or not self.path:
+            raise ROBuildYAMLError("ROBuild YAML: {}.path must contain a string".format(path))
 
 
 class ROBYJob(object):
@@ -67,36 +73,46 @@ class ROBYJob(object):
         """
         self.name = name
         self.job_yaml = job_yaml
+        self.path = 'jobs.{}'.format(name)
+
+        if not isinstance(job_yaml, dict):
+            raise ROBuildYAMLError("ROBuild YAML: {} must be a dictionary".format(self.path))
 
         # Environment variables
         env = job_yaml.get('env', {})
         if not isinstance(env, dict):
-            raise ROBuildYAMLError("ROBuild YAML: jobs.*.env must be a dictionary")
+            raise ROBuildYAMLError("ROBuild YAML: {}.env must be a dictionary".format(self.path))
         self.env = env
 
         # Working directory
         self.working_directory = job_yaml.get('dir', None)
+        if self.working_directory is not None and not isinstance(self.working_directory, STRING_TYPES):
+            raise ROBuildYAMLError("ROBuild YAML: {}.dir must be a string".format(self.path))
 
         # Script to build
         script = job_yaml.get('script', None)
-        if not script:
-            raise ROBuildYAMLError("ROBuild YAML: jobs.*.script must be a list of commands to run")
+        if not isinstance(script, list) or not script:
+            raise ROBuildYAMLError("ROBuild YAML: {}.script must be a non-empty list of commands to run".format(self.path))
 
-        if not isinstance(script, list):
-            script = [str(script)]
+        for index, command in enumerate(script):
+            if not isinstance(command, STRING_TYPES):
+                raise ROBuildYAMLError("ROBuild YAML: {}.script.{} must be a string".format(self.path, index))
 
         self.script = script
 
         # Artifacts to collect
         artifacts = job_yaml.get('artifacts', None)
-        if artifacts:
+        if artifacts is not None:
+            if not isinstance(artifacts, list):
+                raise ROBuildYAMLError("ROBuild YAML: {}.artifacts must be a list".format(self.path))
             if len(artifacts) != 1:
-                raise ROBuildYAMLError("ROBuild YAML: jobs.*.artifacts must be a single path")
+                raise ROBuildYAMLError("ROBuild YAML: {}.artifacts must contain a single path".format(self.path))
 
         self.artifacts = []
-        if artifacts:
-            for artifact_yaml in artifacts:
-                self.artifacts.append(ROBYArtifact(artifact_yaml))
+        if artifacts is not None:
+            for index, artifact_yaml in enumerate(artifacts):
+                self.artifacts.append(ROBYArtifact(artifact_yaml,
+                                                   '{}.artifacts.{}'.format(self.path, index)))
 
 
 class ROBuildYAML(object):
@@ -112,8 +128,11 @@ class ROBuildYAML(object):
         with open(self.config_filename, 'r') as fh:
             config_yaml = simpleyaml.load(fh)
 
+        if not isinstance(config_yaml, dict):
+            raise ROBuildYAMLError("ROBuild YAML: root element must be a dictionary")
+
         jobs = config_yaml.get('jobs', None)
-        if not jobs:
+        if not isinstance(jobs, dict) or not jobs:
             raise ROBuildYAMLError("ROBuild YAML: Must have a 'jobs' dictionary")
         if len(jobs) != 1:
             raise ROBuildYAMLError("ROBuild YAML: jobs dictionary must have only one key")

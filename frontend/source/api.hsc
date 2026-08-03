@@ -96,6 +96,13 @@ POST requests are <media-type>application/x-www-form-urlencoded</media-type> wit
         </ul>
     </endpoint>
 </endpoint-list>
+
+<h3>Configuration errors</h3>
+<p>
+If a supplied <code>.robuild.yaml</code> file is malformed, the JSON endpoint returns HTTP 500 with
+<code>rc</code> set to 1. Its <code>messages</code> and <code>output</code> fields identify the invalid
+configuration element, for example <code>jobs.build.script.0 must be a string</code>.
+</p>
 </section>
 
 <section>
@@ -125,6 +132,12 @@ items.</p>
 When first connected, the server will send a 'welcome' message.
 Each message from the client will be responded to with either a 'response' or 'error' message.
 The server may send other messages to the client at any time to explain its progress.
+</p>
+
+<p>
+Malformed <code>.robuild.yaml</code> files are reported after a <code>build</code> request as a
+<code>message</code> action describing the invalid element and asking the user to report the
+failure to <code>gerph@gerph.org</code>, followed by <code>rc</code> 255 and <code>complete</code> true.
 </p>
 
 <h3>Server actions</h3>
