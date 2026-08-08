@@ -16,7 +16,7 @@ ADD --chown=riscos:riscos *.pyro \
 
 ### RISC OS 64 binaries
 # (only whilst this isn't in the -build image)
-ADD --chown=riscos:riscos ro64/basic,ff8 /home/riscos/fs/Library64/
+#ADD --chown=riscos:riscos ro64/basic,ff8 /home/riscos/fs/Library64/
 
 
 #### P2C libraries
