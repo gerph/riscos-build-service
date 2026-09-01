@@ -6,9 +6,11 @@ Integration tests for the HTTP JSON and WebSocket build interfaces.
 import base64
 import io
 import json
+import threading
 import time
 import unittest
 import zipfile
+from unittest import mock
 
 from websocket import create_connection
 
@@ -83,6 +85,74 @@ class WebSocketInterfaceTests(unittest.TestCase):
                       messages)
         self.assertIn(['rc', 255], messages)
         self.assertEqual(messages[-1], ['complete', True])
+
+
+class WebSocketDisconnectionTests(unittest.TestCase):
+    """
+    Confirm that losing the WebSocket connection whilst a build is running stops the
+    Docker container it started, rather than leaving it running unattended.
+
+    docker.DockerStreamed is replaced with a fake that blocks in 'run' (as a real build
+    would whilst the container executes) until 'stop' is called, so the test does not need
+    a real Docker daemon.
+    """
+
+    def setUp(self):
+        self.server = wsserver.make_server(host='127.0.0.1', port=0)
+        self.server.run_forever(threaded=True)
+        self.client = create_connection('ws://127.0.0.1:{}'.format(self.server.port), timeout=5)
+
+    def tearDown(self):
+        self.server.shutdown_gracefully()
+        self.server.server_close()
+
+    def test_losing_the_connection_stops_the_docker_container(self):
+        created = []
+
+        class FakeDockerStreamed(object):
+            def __init__(self, image, hostname=None, user=None, command=None, workdir=None,
+                        data_function=None, complete_function=None):
+                self.name = 'fake-container'
+                self.complete_function = complete_function
+                self.started = threading.Event()
+                self.stopped = threading.Event()
+                created.append(self)
+
+            def bind(self, host_dir=None, guest_dir=None):
+                pass
+
+            def run(self):
+                self.started.set()
+                self.stopped.wait(5)
+                if self.complete_function:
+                    self.complete_function()
+                return 137
+
+            def stop(self):
+                self.stopped.set()
+
+        self.client.recv()  # 'welcome'
+
+        source = source_archive('jobs:\n  build:\n    script:\n      - "echo hi"\n')
+        self.client.send(json.dumps(['source', base64.b64encode(source).decode('ascii')]))
+        self.client.recv()  # 'response', 'Source loaded'
+
+        with mock.patch('docker.DockerStreamed', FakeDockerStreamed):
+            self.client.send(json.dumps(['build', None]))
+            self.client.recv()  # 'response', 'Started build'
+
+            end_time = time.time() + 5
+            while time.time() < end_time and not created:
+                time.sleep(0.05)
+            self.assertEqual(len(created), 1, "Build did not reach 'docker run'")
+            fake_docker = created[0]
+            self.assertTrue(fake_docker.started.wait(5), "Docker container was not started")
+
+            # Simulate the client (eg its process being interrupted) going away mid-build.
+            self.client.close()
+
+            self.assertTrue(fake_docker.stopped.wait(5),
+                            "Docker container was not stopped when the connection was lost")
 
 
 if __name__ == '__main__':

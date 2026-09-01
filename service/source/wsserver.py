@@ -180,7 +180,13 @@ class HarnessStreamWS(HarnessStream):
 
     def send_message(self, code, data):
         message = ''.join(json_funcs.json_iterable([code, data]))
-        self.server.send_message(self.client, message)
+        try:
+            self.server.send_message(self.client, message)
+        except Exception:
+            # The client may already have disconnected - eg this message is reporting the
+            # result of a build that was only still running because the connection had not
+            # yet been noticed as lost.
+            pass
 
     def start_thread(self):
         super(HarnessStreamWS, self).start_thread()
@@ -195,6 +201,19 @@ def connected(client, server):
     New connection on web socket.
     """
     client['harness'] = HarnessStreamWS(client=client, server=server)
+
+
+def disconnected(client, server):
+    """
+    Client disconnected from the web socket - eg the browser was closed, or the network
+    connection was otherwise lost whilst a build was running.
+
+    Without this, a build already in progress for this client would carry on running (and
+    its Docker container along with it) with nothing left to receive its output.
+    """
+    harness = client.get('harness')
+    if harness:
+        harness.close()
 
 
 def received(client, server, message):
@@ -282,7 +301,7 @@ def make_server(host='0.0.0.0', port=13254):
     """
     server = WebsocketServer(host=host, port=port)
     server.set_fn_new_client(connected)
-    # FIXME: set_fn_client_left(disconnected)
+    server.set_fn_client_left(disconnected)
     server.set_fn_message_received(received)
     return server
 

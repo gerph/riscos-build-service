@@ -126,11 +126,12 @@ class Builder(object):
         return rc
 
     def close(self):
+        if self.docker:
+            self.docker.stop()
         if self.rosource:
             self.rosource.close()
         if self.pyro:
             self.pyro.stop_server()
-        # FIXME: Stop any docker that might be running by killing it?
 
 
 class BuilderStream(Builder):

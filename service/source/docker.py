@@ -6,6 +6,7 @@ Interface to a command within Docker.
 import os
 import subprocess
 import time
+import uuid
 
 import streamedinput
 
@@ -32,7 +33,10 @@ class Docker(object):
         self.volumes = []
         self.user = user
         self.image = image
-        self.name = None
+        # Always give the container a name we can address directly, so that it can be
+        # killed even if our local 'docker run' client process is no longer around to
+        # forward a signal to it.
+        self.name = 'robuild-{}'.format(uuid.uuid4().hex)
         self.hostname = hostname
         self.command = command
         self.workdir = workdir
@@ -87,6 +91,24 @@ class Docker(object):
         rc = subprocess.call(command)
         return rc
 
+    def stop(self):
+        """
+        Ask the Docker daemon to kill the running container, by name.
+
+        Terminating our local 'docker run' process is not enough to guarantee that the
+        container itself stops: if that local process is killed (or dies before it has
+        forwarded a signal to the container), the container - and the Pyromaniac build
+        running inside it - is left running with nothing left to receive its output.
+        Killing the named container directly through the daemon does not depend on the
+        local process still being alive or attached.
+
+        It is safe to call this whether or not a container is currently running; if there
+        is nothing to kill, 'docker kill' merely fails and we ignore the result.
+        """
+        if self.name:
+            with open(os.devnull, 'wb') as devnull:
+                subprocess.call([self.tool_command, 'kill', self.name], stdout=devnull, stderr=devnull)
+
 
 class StreamEOF(object):
     pass
@@ -112,6 +134,13 @@ class DockerStreamed(Docker):
             # Wait between checks for it completing
             time.sleep(0.5)
         return self.stream.returncode
+
+    def stop(self):
+        # Kill the container itself first - this is what actually matters - then ask our
+        # local reader of its output to stop waiting on it as well.
+        super(DockerStreamed, self).stop()
+        if self.stream:
+            self.stream.stop()
 
     def got_output(self, data):
         self.stream_queue.put(data)
