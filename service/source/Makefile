@@ -6,7 +6,7 @@ VENV_STAMP = $(VENV)/.requirements-installed
 .PHONY: tests
 
 tests: $(VENV_STAMP)
-	$(VENV_PYTHON) -m unittest -v test_robuildyaml test_interfaces
+	$(VENV_PYTHON) -m unittest -v test_robuildyaml test_docker test_interfaces
 
 $(VENV_STAMP): requirements.txt
 	$(PYTHON) -m venv $(VENV)

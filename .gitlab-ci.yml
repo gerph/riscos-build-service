@@ -55,6 +55,14 @@ build-frontend:
   tags:
     - linux
 
+test-service:
+  <<: *common
+  stage: build
+  script:
+    - cd service/source && make tests
+  tags:
+    - linux
+
 
 #### Stages to execute ####
 stages:
