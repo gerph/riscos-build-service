@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Process the .robuild.yaml file to work out what to build.
 
@@ -31,10 +31,7 @@ handled:
 import simpleyaml
 
 
-try:
-    STRING_TYPES = (basestring,)
-except NameError:
-    STRING_TYPES = (str,)
+STRING_TYPES = (str,)
 
 
 class ROBuildYAMLError(Exception):

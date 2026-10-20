@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Invoke a RISC OS build on a given file.
 
@@ -16,12 +16,7 @@ Given a source file (or data), build it.
 import os
 import threading
 
-try:
-    # Python 2 has Queue with a capital
-    import Queue as queue
-except ImportError:
-    # Python 3 does not have a capital
-    import queue        # pylint: disable=import-error
+import queue
 
 import docker
 from rosource import RISCOSSource

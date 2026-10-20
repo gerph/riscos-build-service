@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Run a command, non-blocking, and call a function as data arrives.
 
@@ -12,11 +12,11 @@ Example usage
      si = StreamedInput(['ping', '-c', '4', 'foo.bar'])
      si.start()
      for chunk in si:
-        print "Time: %s, Output: %s" % (chunk[0], chunk[1])
+        print("Time: %s, Output: %s" % (chunk[0], chunk[1]))
 
   2. Run command, processing chunks as they arrive (using custom handler)::
      def data_handler(data):
-        print "Got line %s" % (data,)
+        print("Got line %s" % (data,))
      si = StreamedInput(['ping', '-c', '4', 'foo.bar'], data_function=data_handler)
      si.start()
 
@@ -25,7 +25,7 @@ Example usage
      si.start()
      # ... do something long running ...
      for chunk in si:
-        print "Time: %s, Output: %s" % (chunk[0], chunk[1])
+        print("Time: %s, Output: %s" % (chunk[0], chunk[1]))
      # Note, if there is an exception, the syslog command will run to completion before the
      # program will exit.
 
@@ -35,7 +35,7 @@ Example usage
 
      # Now process the chunks that have been received, and their timestamps
      for chunk in si:
-        print "Time: %s, Output: %s" % (chunk[0], chunk[1])
+        print("Time: %s, Output: %s" % (chunk[0], chunk[1]))
 """
 
 import errno
@@ -52,18 +52,7 @@ except ImportError:
     # No fcntl module; might be running on non-POSIX system
     fcntl = None
 
-try:
-    # Python 2 has Queue with a capital
-    import Queue as queue
-except ImportError:
-    # Python 3 does not have a capital
-    import queue        # pylint: disable=import-error
-
-# Ensure that we can check basestring and unicode on Python 2 and 3.
-try:
-    basestring
-except NameError:
-    basestring = str    # pylint: disable=redefined-builtin
+import queue
 
 
 class StreamedInputError(Exception):
@@ -116,7 +105,7 @@ class StreamedInput(object):
         @param stop_timeout:        Grace timeout for the subprocess to exit when told to terminate,
                                     after which the subprocess will have a 'KILL' issued.
         """
-        if not isinstance(command, (basestring, list)):
+        if not isinstance(command, (str, list)):
             raise ValueError("StreamedInput command must be a list or string, not %s" % (command.__class__.__name__,))
 
         self.command = command
@@ -192,7 +181,7 @@ class StreamedInput(object):
             stderr = subprocess.STDOUT if self.keep_stderr else open(os.devnull, 'w')
             command = self.command
             if os.name == 'nt':
-                if isinstance(command, basestring):
+                if isinstance(command, str):
                     command = shlex.split(command)
 
             self.proc = subprocess.Popen(command, shell=self.shell,

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Extract files from a source package ready for building.
 
@@ -18,13 +18,6 @@ import zipfile
 import roname
 from rofiletypes import *
 import rozipinfo
-
-
-try:
-    unicode
-except NameError:
-    # Python 3, make unicode the str type
-    unicode = str
 
 
 # Files with these extensions will be flipped to put the files into subdirectories

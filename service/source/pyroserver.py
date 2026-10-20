@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Pyromaniac class, with the ability to start a server to handle the clipboard and throwback.
 """

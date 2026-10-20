@@ -19,8 +19,8 @@ object, with the following extensions:
       the base properties.
       * RISC OS filename will be in a form for use within RISC OS, encoded
         using `filename_encoding_name` as the encoding. `riscos_filename` is
-        a bytes (str on Python 2) object, whilst `filename` is always a
-        unicode object.
+        a bytes object, whilst `filename` is always a
+        str object.
       * Load and Exec timestamps will be taken from the `riscos_date_time`
         property.
       * Load and Exec filetype will be taken from the `riscos_filetype`.
@@ -84,22 +84,7 @@ import time
 import zipfile
 
 
-try:
-    # Python 3: maketrans is a member of str
-    maketrans = bytes.maketrans
-
-except AttributeError:
-    # Python 2: maketrans is a member of string
-    import string
-    maketrans = string.maketrans
-
-
-try:
-    unicode
-
-except NameError:
-    # Python 3, make unicode the str type
-    unicode = str
+maketrans = bytes.maketrans
 
 
 unix_epoch_to_riscos_epoch = int(int(70*365.25) * 24*60*60)
@@ -822,12 +807,6 @@ class ZipInfoRISCOS(zipfile.ZipInfo):
             # We don't care about those types here; just that the name has been extracted.
         else:
             name = self.filename
-            # WARNING:
-            # In Python 2 the filename is a unicode if the UTF-8 flag was set, and a str if not.
-            # In Python 3 the filename is always a unicode.
-            if not isinstance(name, unicode):
-                # Decode from cp437 to match zipfile's handling in Python 3.
-                name = name.decode('cp437')
 
         # The filename is in unicode format for self.filename.
         # RISC OS filename should be in the RISC OS locale, so first we need to encode the

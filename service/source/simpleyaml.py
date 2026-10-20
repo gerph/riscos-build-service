@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 The SimpleYAML class is intended to allow a subset of the YAML
 standard to be processed as a configuration file, without having
@@ -6,7 +6,7 @@ to install the large PyYAML module.
 
 The idea is that the whole module, or just the class, can be
 dropped into a project where YAML is required, without any other
-dependencies. It is expected to function on Python 2.7 to 3.7.
+dependencies. It is expected to function on Python 3.
 
 Whilst it's intended to be used only for a small management,
 test and setup scripts which need to be able to perform operations
@@ -99,10 +99,7 @@ class SimpleYAML(object):
             'false': False,
         }
     null_values = ('~', 'null', 'Null', 'NULL')
-    try:
-        unichr = unichr  # pylint: disable=undefined-variable
-    except Exception:  # pylint: disable=broad-except
-        unichr = chr
+    unichr = chr
 
     def __init__(self, debug=False):
         self.debug = debug

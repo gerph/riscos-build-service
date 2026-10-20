@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Interface to a command within Docker.
 """
@@ -11,12 +11,7 @@ import uuid
 import streamedinput
 
 
-try:
-    # Python 2 has Queue with a capital
-    import Queue as queue
-except ImportError:
-    # Python 3 does not have a capital
-    import queue        # pylint: disable=import-error
+import queue
 
 
 class DockerError(Exception):
