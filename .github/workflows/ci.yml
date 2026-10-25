@@ -1,0 +1,42 @@
+---
+# Lint the build service Python sources, and run its unit tests.
+#
+# The lint checks are limited to errors that would break the service
+# (syntax errors, undefined names, invalid comparisons and the like).
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Lint the build service
+        run: ruff check --select E9,F63,F7,F82 service/source
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      - name: Run the build service tests
+        run: make tests
+        working-directory: service/source
